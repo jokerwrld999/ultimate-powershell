@@ -237,7 +237,7 @@ function pgrep($name) {
 }
 
 ## Final Line to set prompt
-oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/blue-owl.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/craver.omp.json' | Invoke-Expression
 
 # Import the Chocolatey Profile that contains the necessary code to enable
 # tab-completions to function for `choco`.
@@ -251,10 +251,6 @@ if (Test-Path($ChocolateyProfile)) {
 
 Import-Module PSReadLine
 Set-PSReadlineOption -EditMode Emacs
-Set-PSReadLineOption -PredictionSource History
-
-Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
-Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadlineKeyHandler -Key Tab -Function Complete
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
 Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
