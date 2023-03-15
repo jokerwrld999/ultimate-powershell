@@ -1,6 +1,7 @@
 # Terminal Icons Install
 #
-Install-Module PSReadLine -Force
+Install-Module -Name PowerShellGet -Force
+Install-Module PSReadLine -AllowPrerelease -Force
 Install-Module -Name Terminal-Icons -Repository PSGallery
 
 #If the file does not exist, create it.
@@ -32,7 +33,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 
 # Font Install
-.\nerd-fonts\install.ps1
+#.\nerd-fonts\install.ps1
 
 # Choco install
 #
