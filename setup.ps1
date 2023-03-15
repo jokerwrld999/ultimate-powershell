@@ -1,3 +1,8 @@
+# Terminal Icons Install
+#
+Install-Module PSReadLine -Force
+Install-Module -Name Terminal-Icons -Repository PSGallery
+
 #If the file does not exist, create it.
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
@@ -20,12 +25,6 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         throw $_.Exception.Message
     }
 }
-# If the file already exists, show the message and do nothing.
- else {
-		 Get-Item -Path $PROFILE | Move-Item -Destination oldprofile.ps1
-		 Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
-		 Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
- }
 & $profile
 
 # OMP Install
@@ -33,16 +32,8 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 
 # Font Install
-# You will have to extract and Install this font manually, alternatively use the oh my posh font installer (Must be run as admin)
-# oh-my-posh font install
-# You will also need to set your Nerd Font of choice in your window defaults or in the Windows Terminal Settings.
-.\nerd-fonts\install.ps1
-
+#.\nerd-fonts\install.ps1
 
 # Choco install
 #
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-# Terminal Icons Install
-#
-Install-Module -Name Terminal-Icons -Repository PSGallery
