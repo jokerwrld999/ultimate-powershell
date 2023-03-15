@@ -154,7 +154,7 @@ function lazyp {
 function gpush { git push }
 
 function pubip {
-    ( Invoke-RestMethod http://ifconfig.me/ip ).Content
+    Invoke-RestMethod http://ifconfig.me/ip
 }
 
 function uptime {
