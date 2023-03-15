@@ -144,11 +144,13 @@ function gcom {
     git commit -m "$args"
 }
 
-function gp {
+function lazyp {
     git add .
     git commit -m "$args"
     git push
 }
+
+function gp { git push }
 
 function Get-PubIP {
     (Invoke-WebRequest http://ifconfig.me/ip ).Content
