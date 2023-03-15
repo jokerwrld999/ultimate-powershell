@@ -150,7 +150,7 @@ function lazyp {
     git push
 }
 
-function gp { git push }
+function gpush { git push }
 
 function Get-PubIP {
     (Invoke-WebRequest http://ifconfig.me/ip ).Content
