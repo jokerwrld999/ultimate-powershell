@@ -258,4 +258,4 @@ Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadlineKeyHandler -Key Tab -Function Complete
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
-Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectLine
+Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
