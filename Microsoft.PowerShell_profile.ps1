@@ -253,8 +253,9 @@ if (Test-Path($ChocolateyProfile)) {
 Import-Module PSReadLine
 Set-PSReadlineOption -EditMode Emacs
 Set-PSReadLineOption -PredictionSource History
-Set-PSReadLineOption -PredictionViewStyle ListView
+Set-PSReadLineOption -PredictionViewStyle Compact
 
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
-Set-PSReadLineKeyHandler -Chord 'ctrl+space' -Function Complete
+Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
+Set-PSReadLineKeyHandler -Key "Ctrl+Space" -Function Complete
