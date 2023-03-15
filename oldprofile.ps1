@@ -137,7 +137,7 @@ Set-Alias -Name vim -Value $EDITOR
 
 function ll { Get-ChildItem -Path $pwd -File }
 
-function g { Set-Location C:\github }
+function g { Set-Location $HOME\Documents\Github }
 
 function gcom {
     git add .
