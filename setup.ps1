@@ -1,5 +1,3 @@
-# Terminal Icons Install
-#
 Install-Module -Name PowerShellGet -Force
 Install-Module PSReadLine -AllowPrerelease -Force
 Install-Module -Name Terminal-Icons -Repository PSGallery
@@ -39,7 +37,7 @@ else {
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 
 # Font Install
-.\nerd-fonts\install.ps1
+#.\nerd-fonts\install.ps1
 
 # Choco install
 #
