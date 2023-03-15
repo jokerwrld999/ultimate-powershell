@@ -3,7 +3,7 @@ $nerdFont = "Meslo"
 
 If(!(Test-Path -Path $fontsDir))
 {
-    New-Item -ItemType Directory -Path $fontsDir
+    New-Item -ItemType Directory -Path $fontsDir | Out-Null
     Write-Host "New folder created successfully!" -f Green
 }
 else

@@ -32,7 +32,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 
 # Font Install
-#.\nerd-fonts\install.ps1
+.\nerd-fonts\install.ps1
 
 # Choco install
 #
