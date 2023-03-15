@@ -11,12 +11,12 @@ Else
 }
 
 Write-Host "Downloading Fonts" -f Green
-#Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontsDir\meslo.zip
-#Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontsDir\cascadia.zip
+Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontsDir\meslo.zip
+Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontsDir\cascadia.zip
 
 Write-Host "Extractiing Fonts" -f Green
-#Expand-Archive -Path $fontsDir\meslo.zip -DestinationPath $fontsDir\meslo
-#Expand-Archive -Path $fontsDir\cascadia.zip -DestinationPath $fontsDir\cascadia
+Expand-Archive -Path $fontsDir\meslo.zip -DestinationPath $fontsDir\meslo
+Expand-Archive -Path $fontsDir\cascadia.zip -DestinationPath $fontsDir\cascadia
 
 function Install-Font {
     param
