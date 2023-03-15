@@ -37,7 +37,7 @@ else {
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 
 # Font Install
-irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/nerd-fonts\install.ps1" | iex
+Invoke-RestMethod "https://github.com/jokerwrld999/ultimate-powershell/raw/main/nerd-fonts\install.ps1" | Invoke-Expression
 
 # Choco install
 #

@@ -172,7 +172,7 @@ function uptime {
         $plusMinusMinutes = $bootUpTime.lastbootuptime.SubString(22, 3)
         $hourOffset = [int]$plusMinusMinutes/60
         $minuteOffset = 00
-        if ($hourOffset -contains '.') { $minuteOffset = [int](60*[decimal]('.' + $hourOffset.ToString().Split('.')[1]))}       
+        if ($hourOffset -contains '.') { $minuteOffset = [int](60*[decimal]('.' + $hourOffset.ToString().Split('.')[1]))}
           if ([int]$hourOffset -lt 10 ) { $hourOffset = "0" + $hourOffset + $minuteOffset.ToString().PadLeft(2,'0') } else { $hourOffset = $hourOffset + $minuteOffset.ToString().PadLeft(2,'0') }
         $leftSplit = $bootUpTime.lastbootuptime.Split($plusMinus)[0]
         $upSince = [datetime]::ParseExact(($leftSplit + $plusMinus + $hourOffset), 'yyyyMMddHHmmss.ffffffzzz', $null)
