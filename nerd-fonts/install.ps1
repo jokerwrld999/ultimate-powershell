@@ -27,11 +27,20 @@ param (
 
 $fontDir = "tmp-fonts"
 
-New-Item -Path $pwd -Name $fontDir -ItemType Directory
+If(!(Test-Path -Path $fontDir))
+{
+    New-Item -ItemType Directory -Path $fontDir
+    Write-Host "New folder created successfully!" -f Green
+}
+Else
+{
+  Write-Host "Folder already exists!" -f Yellow
+}
+
 Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontDir\meslo.zip
 Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontDir\cascadia.zip
-Expand-Archive -Path meslo.zip -DestinationPath $fontDir\meslo
-Expand-Archive -Path cascadia.zip -DestinationPath $fontDir\cascadia
+Expand-Archive -Path $fontDir\meslo.zip -DestinationPath $fontDir\meslo
+Expand-Archive -Path $fontDir\cascadia.zip -DestinationPath $fontDir\cascadia
 
 dynamicparam {
     $Attributes = [Collections.ObjectModel.Collection[Attribute]]::new()
