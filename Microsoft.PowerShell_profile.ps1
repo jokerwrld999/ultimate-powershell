@@ -24,6 +24,7 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 # If so and the current host is a command line, then change to red color
 # as warning to user that they are operating in an elevated context
 # Useful shortcuts for traversing directories
+function cd { Set-Location ~/ }
 function cd... { Set-Location ..\.. }
 function cd.... { Set-Location ..\..\.. }
 
