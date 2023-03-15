@@ -2,7 +2,7 @@
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
         # Detect Version of Powershell & Create Profile directories if they do not exist.
-        if ($PSVersionTable.PSEdition -eq "Core" ) { 
+        if ($PSVersionTable.PSEdition -eq "Core" ) {
             if (!(Test-Path -Path ($env:userprofile + "\Documents\Powershell"))) {
                 New-Item -Path ($env:userprofile + "\Documents\Powershell") -ItemType "directory"
             }
@@ -13,7 +13,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
             }
         }
 
-        Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/blob/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
+        Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
         Write-Host "The profile @ [$PROFILE] has been created."
     }
     catch {
@@ -23,7 +23,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 # If the file already exists, show the message and do nothing.
  else {
 		 Get-Item -Path $PROFILE | Move-Item -Destination oldprofile.ps1
-		 Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/blob/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
+		 Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
 		 Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
  }
 & $profile
@@ -40,7 +40,7 @@ Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1
 
 # Choco install
 #
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # Terminal Icons Install
 #
