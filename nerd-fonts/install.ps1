@@ -1,4 +1,4 @@
-$fontsDir = "tmp-fonts"
+$fontsDir = "$PSScriptRoot\tmp-fonts"
 
 If(!(Test-Path -Path $fontDir))
 {
