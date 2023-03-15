@@ -36,7 +36,7 @@ winget install -e --accept-source-agreements --accept-package-agreements JanDeDo
 # You will have to extract and Install this font manually, alternatively use the oh my posh font installer (Must be run as admin)
 # oh-my-posh font install
 # You will also need to set your Nerd Font of choice in your window defaults or in the Windows Terminal Settings.
-./nerd-fonts/install.ps1
+.\nerd-fonts\install.ps1
 
 
 # Choco install

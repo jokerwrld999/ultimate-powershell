@@ -27,6 +27,7 @@ param (
 
 $fontDir = "tmp-fonts"
 
+New-Item -Path $pwd -Name $fontDir -ItemType Directory
 Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontDir\meslo.zip
 Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontDir\cascadia.zip
 Expand-Archive -Path meslo.zip -DestinationPath $fontDir\meslo
