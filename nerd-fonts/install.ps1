@@ -1,8 +1,8 @@
 $fontsDir = "$PSScriptRoot\tmp-fonts"
 
-If(!(Test-Path -Path $fontDir))
+If(!(Test-Path -Path $fontsDir))
 {
-    New-Item -ItemType Directory -Path $fontDir
+    New-Item -ItemType Directory -Path $fontsDir
     Write-Host "New folder created successfully!" -f Green
 }
 Else
@@ -11,8 +11,8 @@ Else
 }
 
 Write-Host "Downloading Fonts" -f Green
-Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontsDir\meslo.zip
-Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontsDir\cascadia.zip
+Invoke-WebRequest -Uri https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip -OutFile $fontsDir\meslo.zip
+Invoke-WebRequest -Uri https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip -OutFile $fontsDir\cascadia.zip
 
 Write-Host "Extractiing Fonts" -f Green
 Expand-Archive -Path $fontsDir\meslo.zip -DestinationPath $fontsDir\meslo
