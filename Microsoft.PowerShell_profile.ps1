@@ -87,6 +87,7 @@ function admin {
 # with elevated rights.
 Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
+Set-Alias -Name reboot -Value Restart-Computer
 
 
 # Make it easy to edit this profile once it's installed
@@ -251,6 +252,5 @@ if (Test-Path($ChocolateyProfile)) {
 
 Import-Module PSReadLine
 Set-PSReadlineOption -EditMode Emacs
-Set-PSReadlineKeyHandler -Key Tab -Function Complete
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
 Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
