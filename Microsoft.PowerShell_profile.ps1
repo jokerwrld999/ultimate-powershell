@@ -153,8 +153,8 @@ function lazyp {
 
 function gpush { git push }
 
-function Get-PubIP {
-    (Invoke-WebRequest http://ifconfig.me/ip ).Content
+function pubip {
+    ( Invoke-RestMethod http://ifconfig.me/ip ).Content
 }
 
 function uptime {
