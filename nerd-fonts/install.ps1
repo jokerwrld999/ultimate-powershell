@@ -1,31 +1,4 @@
-#Requires -Version 3.0
-<#
-.SYNOPSIS
-    Installs the provided fonts.
-.DESCRIPTION
-    Installs all the provided fonts by default.  The FontName
-    parameter can be used to pick a subset of fonts to install.
-.EXAMPLE
-    C:\PS> ./install.ps1
-    Installs all the fonts located in the Git repository.
-.EXAMPLE
-    C:\PS> ./install.ps1 FiraCode, Hack
-    Installs all the FiraCode and Hack fonts.
-.EXAMPLE
-    C:\PS> ./install.ps1 CascadiaCode -WindowsCompatibleOnly
-    Filters fonts to include only those labeled as 'Windows Compatible'
-    Can be used in combination with the -FontName and/or -WhatIf parameters
-.EXAMPLE
-    C:\PS> ./install.ps1 DejaVuSansMono -WhatIf
-    Shows which fonts would be installed without actually installing the fonts.
-    Remove the "-WhatIf" to install the fonts.
-#>
-[CmdletBinding(SupportsShouldProcess)]
-param (
-    [switch]$WindowsCompatibleOnly
-    )
-
-$fontDir = "tmp-fonts"
+$fontsDir = "tmp-fonts"
 
 If(!(Test-Path -Path $fontDir))
 {
@@ -37,58 +10,101 @@ Else
   Write-Host "Folder already exists!" -f Yellow
 }
 
-Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontDir\meslo.zip
-Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontDir\cascadia.zip
-Expand-Archive -Path $fontDir\meslo.zip -DestinationPath $fontDir\meslo
-Expand-Archive -Path $fontDir\cascadia.zip -DestinationPath $fontDir\cascadia
+Write-Host "Downloading Fonts" -f Green
+#Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Meslo.zip?WT.mc_id=-blog-scottha -o $fontsDir\meslo.zip
+#Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip?WT.mc_id=-blog-scottha -o $fontsDir\cascadia.zip
 
-dynamicparam {
-    $Attributes = [Collections.ObjectModel.Collection[Attribute]]::new()
-    $ParamAttribute = [Parameter]::new()
-    $ParamAttribute.Position = 0
-    $ParamAttribute.ParameterSetName = '__AllParameterSets'
-    $Attributes.Add($ParamAttribute)
+Write-Host "Extractiing Fonts" -f Green
+#Expand-Archive -Path $fontsDir\meslo.zip -DestinationPath $fontsDir\meslo
+#Expand-Archive -Path $fontsDir\cascadia.zip -DestinationPath $fontsDir\cascadia
 
-    [string[]]$FontNames = Join-Path $PSScriptRoot $fontDir | Get-ChildItem -Directory -Name
-    $Attributes.Add([ValidateSet]::new(($FontNames)))
+function Install-Font {
+    param
+    (
+        [System.IO.FileInfo]$fontFile
+    )
 
-    $Parameter = [Management.Automation.RuntimeDefinedParameter]::new('FontName',  [string[]], $Attributes)
-    $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
-    $RuntimeParams.Add('FontName', $Parameter)
+        try {
 
-    return $RuntimeParams
-}
+            #get font name
+            $gt = [Windows.Media.GlyphTypeface]::new($fontFile.FullName)
+            $family = $gt.Win32FamilyNames['en-us']
+            if ($null -eq $family) { $family = $gt.Win32FamilyNames.Values.Item(0) }
+            $face = $gt.Win32FaceNames['en-us']
+            if ($null -eq $face) { $face = $gt.Win32FaceNames.Values.Item(0) }
+            $fontName = ("$family $face").Trim()
 
-end {
-    $FontName = $PSBoundParameters.FontName
-    if (-not $FontName) {$FontName = '*'}
-
-    $fontFiles = [Collections.Generic.List[System.IO.FileInfo]]::new()
-
-    Join-Path $PSScriptRoot $fontDir | Push-Location
-    foreach ($aFontName in $FontName) {
-        Get-ChildItem $aFontName -Recurse | Where-Object {
-            $IsValidFileExtension = $_.Extension -match 'ttf|otf'
-
-            if ($WindowsCompatibleOnly) {
-                $IsValidFileExtension -and ($_.BaseName -match 'Windows Compatible')
-            } else {
-                $IsValidFileExtension
+            switch ($fontFile.Extension) {
+                ".ttf" {$fontName = "$fontName (TrueType)"}
+                ".otf" {$fontName = "$fontName (OpenType)"}
             }
-        } | ForEach-Object {
-            $fontFiles.Add($_)
+
+            write-host "Installing font: $fontFile with font name '$fontName'"
+
+            If (!(Test-Path ("$($env:windir)\Fonts\" + $fontFile.Name))) {
+                write-host "Copying font: $fontFile"
+                Copy-Item -Path $fontFile.FullName -Destination ("$($env:windir)\Fonts\" + $fontFile.Name) -Force
+            } else {  write-host "Font already exists: $fontFile" }
+
+            If (!(Get-ItemProperty -Name $fontName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -ErrorAction SilentlyContinue)) {  
+                write-host "Registering font: $fontFile"
+                New-ItemProperty -Name $fontName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -PropertyType string -Value $fontFile.Name -Force -ErrorAction SilentlyContinue | Out-Null  
+            } else {  write-host "Font already registered: $fontFile" }
+
+            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($oShell) | out-null
+            Remove-Variable oShell
+
+        } catch {
+            write-host "Error installing font: $fontFile. " $_.exception.message
+        }
+
+     }
+
+    function Uninstall-Font {
+    param
+    (
+        [System.IO.FileInfo]$fontFile
+    )
+
+        try {
+
+        #get font name
+            $gt = [Windows.Media.GlyphTypeface]::new($fontFile.FullName)
+            $family = $gt.Win32FamilyNames['en-us']
+            if ($null -eq $family) { $family = $gt.Win32FamilyNames.Values.Item(0) }
+            $face = $gt.Win32FaceNames['en-us']
+            if ($null -eq $face) { $face = $gt.Win32FaceNames.Values.Item(0) }
+            $fontName = ("$family $face").Trim()
+
+            switch ($fontFile.Extension) {
+                ".ttf" {$fontName = "$fontName (TrueType)"}
+                ".otf" {$fontName = "$fontName (OpenType)"}
+            }
+
+            write-host "Uninstalling font: $fontFile with font name '$fontName'"
+
+            If (Test-Path ("$($env:windir)\Fonts\" + $fontFile.Name)) {
+                write-host "Removing font: $fontFile"
+                Remove-Item -Path "$($env:windir)\Fonts\$($fontFile.Name)" -Force
+            } else {  write-host "Font does not exist: $fontFile" }
+
+            If (Get-ItemProperty -Name $fontName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -ErrorAction SilentlyContinue) {
+                write-host "Unregistering font: $fontFile"
+                Remove-ItemProperty -Name $fontName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -Force
+            } else {  write-host "Font not registered: $fontFile" }
+
+            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($oShell) | out-null
+            Remove-Variable oShell
+
+        } catch {
+            write-host "Error uninstalling font: $fontFile. " $_.exception.message
         }
     }
-    Pop-Location
 
-    $fonts = $null
-    foreach ($fontFile in $fontFiles) {
-        if ($PSCmdlet.ShouldProcess($fontFile.Name, "Install Font")) {
-            if (!$fonts) {
-                $shellApp = New-Object -ComObject shell.application
-                $fonts = $shellApp.NameSpace(0x14)
-            }
-            $fonts.CopyHere($fontFile.FullName)
+    foreach ($fontDir in (Get-ChildItem -Path $fontsDir)){
+        #Loop through fonts in the same directory as the script and install/uninstall them
+        foreach ($fontItem in (Get-ChildItem -Path $fontDir |
+        Where-Object {($_.Name -like '*.ttf') -or ($_.Name -like '*.otf') })) {
+            Install-Font -fontFile $FontItem.FullName
         }
     }
-}
