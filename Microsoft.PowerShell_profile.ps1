@@ -257,4 +257,4 @@ Set-PSReadLineOption -PredictionSource History
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
-#Set-PSReadLineKeyHandler -Key "Ctrl+Space" -Function Complete
+Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function Complete
