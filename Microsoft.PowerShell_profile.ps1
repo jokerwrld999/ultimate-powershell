@@ -24,7 +24,6 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 # If so and the current host is a command line, then change to red color
 # as warning to user that they are operating in an elevated context
 # Useful shortcuts for traversing directories
-function cd { Set-Location ~/ }
 function cd... { Set-Location ..\.. }
 function cd.... { Set-Location ..\..\.. }
 
@@ -146,7 +145,7 @@ function gcom {
     git commit -m "$args"
 }
 
-function lazyp {
+function lazyg {
     git add .
     git commit -m "$args"
     git push
@@ -155,7 +154,7 @@ function lazyp {
 function gpush { git push }
 
 function pubip {
-    Invoke-RestMethod http://ifconfig.me/ip
+    ( Invoke-RestMethod http://ifconfig.me/ip ).Content
 }
 
 function uptime {
