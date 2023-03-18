@@ -1,37 +1,16 @@
 $fontsDir = "$PSScriptRoot\tmp-fonts"
 $nerdFont = "Meslo"
 
-If(!(Test-Path -Path $fontsDir))
-{
-    New-Item -ItemType Directory -Path $fontsDir | Out-Null
-    Write-Host "New folder created successfully!" -f Green
-}
-else
-{
-  Write-Host "Folder already exists!" -f Yellow
-}
+Write-Host "####### Creating Temp Folder....... #######" -f Green
+New-Item -ItemType Directory -Path $fontsDir | Out-Null
 
 Write-Host "####### Downloading Fonts....... #######" -f Green
-If(!(Test-Path -Path $fontsDir\$nerdFont.zip))
-{
-    Invoke-WebRequest -Uri https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/$nerdFont.zip -OutFile $fontsDir\$nerdFont.zip
-    Write-Host "####### Fonts downloaded successfully! #######" -f Green
-}
-else
-{
-  Write-Host "####### Fonts already downloaded! #######" -f Yellow
-}
+Invoke-WebRequest -Uri https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/$nerdFont.zip -OutFile $fontsDir\$nerdFont.zip
+Write-Host "####### Fonts downloaded successfully! #######" -f Green
 
 Write-Host "####### Extractiing Fonts....... #######" -f Green
-If(!(Test-Path -Path  $fontsDir\$nerdFont))
-{
-    Expand-Archive -Path $fontsDir\$nerdFont.zip -DestinationPath $fontsDir\$nerdFont
-    Write-Host "####### Fonts extracted successfully! #######" -f Green
-}
-else
-{
-  Write-Host "####### Fonts already extracted! #######" -f Yellow
-}
+Expand-Archive -Path $fontsDir\$nerdFont.zip -DestinationPath $fontsDir\$nerdFont
+Write-Host "####### Fonts extracted successfully! #######" -f Green
 
 function Install-Font {
     param
@@ -108,23 +87,9 @@ foreach ($fontDir in (Get-ChildItem -Path $fontsDir)){
 
     foreach ($fontItem in (Get-ChildItem -Path  $fontItems |
     Where-Object {($_.Name -like '*.ttf') -or ($_.Name -like '*.otf') })) {
-
-        Write-Host "####### Installing font $fontItem....... #######" -f Green
-        if (!(Test-Path -Path "C:\Windows\fonts\$fontItem" )) {
-            Install-Font -FontFile $fontItem
-        }
-        else {
-            Write-Host "Font already installed" -f Yellow
-        }
+     Install-Font -FontFile $fontItem
     }
 }
 
-If((Test-Path -Path  $fontsDir))
-{
-    Write-Host "####### Cleaning Temp Folder....... #######" -f Green
-    Remove-Item -Recurse -Force $fontsDir
-}
-else
-{
-  Write-Host "####### Folder already removed! #######" -f Yellow
-}
+Write-Host "####### Cleaning Temp Folder....... #######" -f Green
+Remove-Item -Recurse -Force $fontsDir

@@ -37,8 +37,12 @@ else {
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 
 # Font Install
-Invoke-RestMethod "https://github.com/jokerwrld999/ultimate-powershell/raw/main/nerd-fonts\install.ps1" | Invoke-Expression
-
+if (!(Test-Path -Path 'C:\Windows\Fonts\' -Filter Meslo*)) {
+    Invoke-RestMethod "https://github.com/jokerwrld999/ultimate-powershell/raw/main/nerd-fonts\install.ps1" | Invoke-Expression
+}
+else {
+    Write-Host "Fonts already installed" -f Yellow
+}
 # Choco install
 #
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
