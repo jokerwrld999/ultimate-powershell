@@ -1,31 +1,32 @@
 ### PowerShell template profile
-### Version 1.03 - Tim Sneath <tim@sneath.org>
-### From https://gist.github.com/timsneath/19867b12eee7fd5af2ba
-###
-### This file should be stored in $PROFILE.CurrentUserAllHosts
-### If $PROFILE.CurrentUserAllHosts doesn't exist, you can make one with the following:
-###    PS> New-Item $PROFILE.CurrentUserAllHosts -ItemType File -Force
-### This will create the file and the containing subdirectory if it doesn't already
-###
-### As a reminder, to enable unsigned script execution of local scripts on client Windows,
-### you need to run this line (or similar) from an elevated PowerShell prompt:
-###   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-### This is the default policy on Windows Server 2012 R2 and above for server Windows. For
-### more information about execution policies, run Get-Help about_Execution_Policies.
-
-# Import Terminal Icons
-Import-Module -Name Terminal-Icons
 
 # Find out if the current user identity is elevated (has admin rights)
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = New-Object Security.Principal.WindowsPrincipal $identity
 $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-# If so and the current host is a command line, then change to red color
-# as warning to user that they are operating in an elevated context
+#######################################################
+# GENERAL ALIAS'S
+#######################################################
+Set-Alias -Name su -Value admin
+Set-Alias -Name sudo -Value admin
+Set-Alias -Name reboot -Value Restart-Computer
+Set-Alias -Name ll -Value dir
+
+#######################################################
+# GENERAL FUNCTIONS
+#######################################################
 # Useful shortcuts for traversing directories
-function cd... { Set-Location ..\.. }
-function cd.... { Set-Location ..\..\.. }
+function cd.. { Set-Location .. }
+function .. { Set-Location .. }
+function ... { Set-Location ..\.. }
+function .... { Set-Location ..\..\.. }
+function ..... { Set-Location ..\..\..\.. }
+function cdls {
+	cd "$1"
+	ls .
+}
+
 
 # Compute file hashes - useful for checking successful downloads
 function md5 { Get-FileHash -Algorithm MD5 $args }
@@ -83,13 +84,6 @@ function admin {
     }
 }
 
-# Set UNIX-like aliases for the admin command, so sudo <command> will run the command
-# with elevated rights.
-Set-Alias -Name su -Value admin
-Set-Alias -Name sudo -Value admin
-Set-Alias -Name reboot -Value Restart-Computer
-
-
 # Make it easy to edit this profile once it's installed
 function Edit-Profile {
     if ($host.Name -match "ise") {
@@ -103,7 +97,7 @@ function Edit-Profile {
 Remove-Variable identity
 Remove-Variable principal
 
-Function Test-CommandExists {
+Function checkcommand {
     Param ($command)
     $oldPreference = $ErrorActionPreference
     $ErrorActionPreference = 'SilentlyContinue'
@@ -111,32 +105,8 @@ Function Test-CommandExists {
     Catch { Write-Host "$command does not exist"; RETURN $false }
     Finally { $ErrorActionPreference = $oldPreference }
 }
-#
-# Aliases
-#
-# If your favorite editor is not here, add an elseif and ensure that the directory it is installed in exists in your $env:Path
-#
-if (Test-CommandExists nvim) {
-    $EDITOR='nvim'
-} elseif (Test-CommandExists pvim) {
-    $EDITOR='pvim'
-} elseif (Test-CommandExists vim) {
-    $EDITOR='vim'
-} elseif (Test-CommandExists vi) {
-    $EDITOR='vi'
-} elseif (Test-CommandExists code) {
-    $EDITOR='code'
-} elseif (Test-CommandExists notepad) {
-    $EDITOR='notepad'
-} elseif (Test-CommandExists notepad++) {
-    $EDITOR='notepad++'
-} elseif (Test-CommandExists sublime_text) {
-    $EDITOR='sublime_text'
-}
-Set-Alias -Name vim -Value $EDITOR
 
-
-function ll { Get-ChildItem -Path $pwd -File }
+function lf { Get-ChildItem -Path $pwd -File }
 
 function g { Set-Location C:\github }
 
@@ -144,14 +114,18 @@ function gcom {
     git add .
     git commit -m "$args"
 }
-
 function lazyg {
     git add .
     git commit -m "$args"
     git push
 }
-
+function gclone() {
+	$repo=[io.path]::GetFileNameWithoutExtension("$args")
+	git clone "$1"
+	cd $repo
+}
 function gpush { git push }
+function gs { git status }
 
 function pubip {
     ( Invoke-RestMethod http://ifconfig.me/ip ).Content
@@ -242,15 +216,13 @@ oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/
 
 # Import the Chocolatey Profile that contains the necessary code to enable
 # tab-completions to function for `choco`.
-# Be aware that if you are missing these lines from your profile, tab completion
-# for `choco` will not function.
-# See https://ch0.co/tab-completion for details.
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
     Import-Module "$ChocolateyProfile"
 }
 
-Import-Module PSReadLine
+Import-Module -Name Terminal-Icons
+Import-Module -Name PSReadLine
 Set-PSReadlineOption -EditMode Emacs
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
 Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
