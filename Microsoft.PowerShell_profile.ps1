@@ -23,7 +23,7 @@ function ... { Set-Location ..\.. }
 function .... { Set-Location ..\..\.. }
 function ..... { Set-Location ..\..\..\.. }
 function cdls {
-	cd "$1"
+	cd $args
 	ls .
 }
 
