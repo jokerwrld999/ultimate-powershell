@@ -23,9 +23,11 @@ function ... { Set-Location ..\.. }
 function .... { Set-Location ..\..\.. }
 function ..... { Set-Location ..\..\..\.. }
 function cdls {
-	cd $args
+	cd "$args"
 	ls .
 }
+
+function rmf { rm -r -fo $args }
 
 
 # Compute file hashes - useful for checking successful downloads
@@ -34,7 +36,7 @@ function sha1 { Get-FileHash -Algorithm SHA1 $args }
 function sha256 { Get-FileHash -Algorithm SHA256 $args }
 
 # Quick shortcut to start code
-function c { code $args }
+function c { code "$args" }
 
 # Drive shortcuts
 function HKLM: { Set-Location HKLM: }
@@ -119,10 +121,10 @@ function lazyg {
     git commit -m "$args"
     git push
 }
-function gclone() {
-	$repo=[io.path]::GetFileNameWithoutExtension("$args")
-	git clone "$1"
-	cd $repo
+function gclone {
+	$basename =  [io.path]::GetFileNameWithoutExtension($args)
+	git clone $args
+	cd $basename
 }
 function gpush { git push }
 function gs { git status }
