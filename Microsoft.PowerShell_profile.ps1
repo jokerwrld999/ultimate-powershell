@@ -1,4 +1,23 @@
-### PowerShell template profile
+#######################################################
+# IMPORT MODULES
+#######################################################
+Import-Module -Name Terminal-Icons
+Import-Module -Name PSReadLine
+Set-PSReadlineOption -EditMode Emacs
+Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
+Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
+
+# Import the Chocolatey Profile that contains the necessary code to enable
+# tab-completions to function for `choco`.
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+    Import-Module "$ChocolateyProfile"
+}
+
+#######################################################
+# SET PWSH PROMPT
+#######################################################
+oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/quick-term.omp.json' | Invoke-Expression
 
 # Find out if the current user identity is elevated (has admin rights)
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -108,63 +127,50 @@ Function checkcommand {
     Finally { $ErrorActionPreference = $oldPreference }
 }
 
+# List files
 function lf { Get-ChildItem -Path $pwd -File }
 
+# Go to the github folder
 function g { Set-Location C:\github }
 
+# Git commit
 function gcom {
     git add .
     git commit -m "$args"
 }
+
+# Lazy git push
 function lazyg {
     git add .
     git commit -m "$args"
     git push
 }
+
+# Git clone repo and go to the directory
 function gclone {
 	$basename = [io.path]::GetFileNameWithoutExtension($args)
 	git clone $args
 	cd $basename
 }
+
+# Gh clone repo and go to the directory
 function ghclone {
 	$basename = "$args" -replace '^.*?/'
 	gh repo clone $args
 	cd $basename
 }
+# Git push
 function gpush { git push }
+
+# Git status
 function gs { git status }
 
+# Get My Public IP
 function pubip {
     ( Invoke-RestMethod http://ifconfig.me/ip ).Content
 }
 
-function uptime {
-    #Windows Powershell
-    Get-WmiObject win32_operatingsystem | Select-Object csname, @{
-        LABEL      = 'LastBootUpTime';
-        EXPRESSION = { $_.ConverttoDateTime($_.lastbootuptime) }
-    }
-
-    #Powershell Core / Powershell 7+ (Uncomment the below section and comment out the above portion)
-
-    <#
-        $bootUpTime = Get-WmiObject win32_operatingsystem | Select-Object lastbootuptime
-        $plusMinus = $bootUpTime.lastbootuptime.SubString(21,1)
-        $plusMinusMinutes = $bootUpTime.lastbootuptime.SubString(22, 3)
-        $hourOffset = [int]$plusMinusMinutes/60
-        $minuteOffset = 00
-        if ($hourOffset -contains '.') { $minuteOffset = [int](60*[decimal]('.' + $hourOffset.ToString().Split('.')[1]))}
-          if ([int]$hourOffset -lt 10 ) { $hourOffset = "0" + $hourOffset + $minuteOffset.ToString().PadLeft(2,'0') } else { $hourOffset = $hourOffset + $minuteOffset.ToString().PadLeft(2,'0') }
-        $leftSplit = $bootUpTime.lastbootuptime.Split($plusMinus)[0]
-        $upSince = [datetime]::ParseExact(($leftSplit + $plusMinus + $hourOffset), 'yyyyMMddHHmmss.ffffffzzz', $null)
-        Get-WmiObject win32_operatingsystem | Select-Object @{LABEL='Machine Name'; EXPRESSION={$_.csname}}, @{LABEL='Last Boot Up Time'; EXPRESSION={$upsince}}
-        #>
-
-
-    #Works for Both (Just outputs the DateTime instead of that and the machine name)
-    # net statistics workstation | Select-String "since" | foreach-object {$_.ToString().Replace('Statistics since ', '')}
-}
-
+# Reload $PROFILE
 function reload-profile {
     & $profile
 }
@@ -223,19 +229,3 @@ function speedtest()
     $test = & speedtest.exe --accept-license
     $test
 }
-
-## Final Line to set prompt
-oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/quick-term.omp.json' | Invoke-Expression
-
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
-}
-
-Import-Module -Name Terminal-Icons
-Import-Module -Name PSReadLine
-Set-PSReadlineOption -EditMode Emacs
-Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
-Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
