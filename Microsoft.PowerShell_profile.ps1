@@ -27,8 +27,8 @@ function cdls {
 	ls .
 }
 
+# Force remove
 function rmf { rm -r -fo $args }
-
 
 # Compute file hashes - useful for checking successful downloads
 function md5 { Get-FileHash -Algorithm MD5 $args }
@@ -122,8 +122,13 @@ function lazyg {
     git push
 }
 function gclone {
-	$basename =  [io.path]::GetFileNameWithoutExtension($args)
+	$basename = [io.path]::GetFileNameWithoutExtension($args)
 	git clone $args
+	cd $basename
+}
+function ghclone {
+	$basename = "$args" -replace '^.*?/'
+	gh repo clone $args
 	cd $basename
 }
 function gpush { git push }
@@ -211,6 +216,12 @@ function pkill($name) {
 
 function pgrep($name) {
     Get-Process $name
+}
+
+function speedtest()
+{
+    $test = & speedtest.exe --accept-license
+    $test
 }
 
 ## Final Line to set prompt
