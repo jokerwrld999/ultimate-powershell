@@ -6,11 +6,9 @@ New-Item -ItemType Directory -Path $fontsDir | Out-Null
 
 Write-Host "####### Downloading Fonts....... #######" -f Green
 Invoke-WebRequest -Uri https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/$nerdFont.zip -OutFile $fontsDir\$nerdFont.zip
-Write-Host "####### Fonts downloaded successfully! #######" -f Green
 
 Write-Host "####### Extractiing Fonts....... #######" -f Green
 Expand-Archive -Path $fontsDir\$nerdFont.zip -DestinationPath $fontsDir\$nerdFont
-Write-Host "####### Fonts extracted successfully! #######" -f Green
 
 function Install-Font {
     param

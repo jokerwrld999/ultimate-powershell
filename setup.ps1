@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 Install-Module -Name PowerShellGet -Force
 Install-Module PSReadLine -AllowPrerelease -Force
 Install-Module -Name Terminal-Icons -Repository PSGallery
