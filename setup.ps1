@@ -37,7 +37,7 @@ else {
 # Install Oh-My-Posh
 winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
 # Install Speedtest
-winget install -e --accept-source-agreements --accept-package-agreements Ookla.Speedtest.Desktop
+choco install speedtest
 
 # Font Install
 if (!(Test-Path -Path 'C:\Windows\Fonts\' -Filter Meslo*)) {

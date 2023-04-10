@@ -1,24 +1,3 @@
-#######################################################
-# IMPORT MODULES
-#######################################################
-Import-Module -Name Terminal-Icons
-Import-Module -Name PSReadLine
-Set-PSReadlineOption -EditMode Emacs
-Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
-Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
-
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
-}
-
-#######################################################
-# SET PWSH PROMPT
-#######################################################
-oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/quick-term.omp.json' | Invoke-Expression
-
 # Find out if the current user identity is elevated (has admin rights)
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = New-Object Security.Principal.WindowsPrincipal $identity
@@ -226,6 +205,27 @@ function pgrep($name) {
 
 function speedtest()
 {
-    $test = & speedtest.exe --accept-license
+    $test = & speedtest --accept-license
     $test
 }
+
+#######################################################
+# IMPORT MODULES
+#######################################################
+Import-Module -Name Terminal-Icons
+Import-Module -Name PSReadLine
+Set-PSReadlineOption -EditMode Emacs
+Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
+Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
+
+# Import the Chocolatey Profile that contains the necessary code to enable
+# tab-completions to function for `choco`.
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+    Import-Module "$ChocolateyProfile"
+}
+
+#######################################################
+# SET PWSH PROMPT
+#######################################################
+oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/quick-term.omp.json' | Invoke-Expression
