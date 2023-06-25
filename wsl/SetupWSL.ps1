@@ -49,9 +49,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
-            Write-Host "####### Updating Distro....... #######" -f Green
-            wsl -d Arch -u root /bin/bash -c "; pacman -S ansible git --needed --noconfirm"
-
+            #wsl -d Arch -u root /bin/bash -c "; pacman -S ansible git --needed --noconfirm"
             Write-Host "####### Setting Up Default User....... #######" -f Green
             setupUser 'wheel'
 

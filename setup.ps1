@@ -8,7 +8,7 @@ if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
     iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
     Write-Host "Check Scoop Module...."
     ~\scoop\shims\scoop.cmd update
-} 
+}
 else {
     Write-Host "Updating Scoop Module"
     scoop update
