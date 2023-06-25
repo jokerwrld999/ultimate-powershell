@@ -54,8 +54,8 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
     }
 
     Write-Host "####### Starting Arch Distro....... #######" -f Green
-    Start-Process -WindowStyle hidden ~\scoop\apps\archwsl\current\Arch.exe
-    Start-Sleep -s 10
+    Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
+    Start-Sleep -s 20
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
