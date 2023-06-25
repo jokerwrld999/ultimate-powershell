@@ -3,10 +3,18 @@
 Set-ExecutionPolicy ByPass -Scope Process -Force
 
 # >>> Installing Scoop
-$env:SCOOP='C:\Applications\Scoop'
-$env:SCOOP_GLOBAL='C:\GlobalScoopApps'
-[Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
-iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+if (Get-Module -ListAvailable -Name scoop) {
+    Write-Host "Updating Scoop Module"
+    scoop udate
+} 
+else {
+    Write-Host "Installing Scoop Module"
+    $env:SCOOP='C:\Applications\Scoop'
+    $env:SCOOP_GLOBAL='C:\GlobalScoopApps'
+    [Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
+    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+}
+
 
 # >>> Installing choco
 iwr -useb chocolatey.org/install.ps1 | iex
