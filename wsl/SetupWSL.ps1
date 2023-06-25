@@ -45,7 +45,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
     scoop install archwsl
 
     Write-Host "####### Starting Arch Distro....... #######" -f Green
-    Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
+    Start-Process -WindowStyle hidden Arch.exe
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
