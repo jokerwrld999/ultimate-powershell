@@ -3,16 +3,13 @@
 Set-ExecutionPolicy ByPass -Scope Process -Force
 
 # >>> Installing Scoop
-if (Get-Module -ListAvailable -Name scoop) {
-    Write-Host "Updating Scoop Module"
-    scoop udate
+if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
+    Write-Host "Installing Scoop Module"
+    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
 } 
 else {
-    Write-Host "Installing Scoop Module"
-    $env:SCOOP='C:\Applications\Scoop'
-    $env:SCOOP_GLOBAL='C:\GlobalScoopApps'
-    [Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
-    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+    Write-Host "Updating Scoop Module"
+    scoop update
 }
 
 
