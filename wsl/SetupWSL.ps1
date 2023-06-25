@@ -46,6 +46,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
 
     Write-Host "####### Starting Arch Distro....... #######" -f Green
     Start-Process -WindowStyle hidden Arch.exe
+    Start-Sleep -s 10
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
@@ -54,7 +55,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
             setupUser 'wheel'
 
             Write-Host "####### Initializing keyring....... #######" -f Green
-            wsl -d Arch -u root /bin/bash -c "pacman-key --init; pacman-key --populate; pacman -Syu; pacman -S archlinux-keyring --noconfirm"
+            wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Syu --noconfirm; pacman -S archlinux-keyring --noconfirm"
             wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman -S --needed base-devel git ansible --noconfirm"
 
             break
