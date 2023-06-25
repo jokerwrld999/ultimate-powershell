@@ -1,10 +1,22 @@
 #Requires -RunAsAdministrator
 
+Set-ExecutionPolicy ByPass -Scope Process -Force
+
+# >>> Installing Scoop
+$env:SCOOP='C:\Applications\Scoop'
+$env:SCOOP_GLOBAL='C:\GlobalScoopApps'
+[Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
+iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+
+# >>> Installing choco
+iwr -useb chocolatey.org/install.ps1 | iex
+
+# >>> Install Terminal Moudules
 Install-Module -Name PowerShellGet -Force
 Install-Module PSReadLine -AllowPrerelease -Force
 Install-Module -Name Terminal-Icons -Repository PSGallery
 
-#If the file does not exist, create it.
+# >>> If the file does not exist, create it.
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
         # Detect Version of Powershell & Create Profile directories if they do not exist.
@@ -26,7 +38,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         throw $_.Exception.Message
     }
 }
-# If the file already exists, show the message and do nothing.
+# >>> If the file already exists, show the message and do nothing.
 else {
     Remove-Item -Path $PROFILE
     Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
@@ -34,18 +46,15 @@ else {
 }
 & $profile
 
-# Install Oh-My-Posh
-winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
-# Install Speedtest
+# >>> Install Oh-My-Posh
+scoop update
+scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json
+# >>> Install Speedtest
 choco install speedtest
 
-# Font Install
-if (!(Test-Path -Path 'C:\Windows\Fonts\' -Filter Meslo*)) {
-    Invoke-RestMethod "https://github.com/jokerwrld999/ultimate-powershell/raw/main/nerd-fonts\install.ps1" | Invoke-Expression
-}
-else {
-    Write-Host "Fonts already installed" -f Yellow
-}
-# Choco install
-#
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+# >>> Get the NerdFonts
+scoop bucket add nerd-fonts
+scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono
+
+# >>> Setting Up WSL2
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/wsl/SetupWSL.ps1" | iex
