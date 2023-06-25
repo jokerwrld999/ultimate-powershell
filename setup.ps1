@@ -6,7 +6,9 @@ Set-ExecutionPolicy ByPass -Scope Process -Force
 if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
     Write-Host "Installing Scoop Module"
     iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
-    $env:Path += ';$env:userprofile\scoop\shims'
+    $env:Path += ';$env:userprofile\scoop\shims\scoop.cmd'
+    Write-Host "Check Scoop Module"
+    scoop update
 } 
 else {
     Write-Host "Updating Scoop Module"
