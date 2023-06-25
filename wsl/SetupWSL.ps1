@@ -11,6 +11,7 @@ wsl --set-default-version 2
 
 $distro = $args[0]
 $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
+echo $wsl_dir
 if ($custom_user -eq $null) {
     if ($args[1] -ne $null) {
         $custom_user = $args[1]
