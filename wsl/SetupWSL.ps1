@@ -54,7 +54,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
             setupUser 'wheel'
 
             Write-Host "####### Initializing keyring....... #######" -f Green
-            wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Syu; sudo pacman -S archlinux-keyring; sudo pacman -S --needed base-devel git ansible"
+            wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Syu; sudo pacman -S archlinux-keyring"
             wsl --terminate $distro
             wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman -S --needed base-devel git ansible"
 
