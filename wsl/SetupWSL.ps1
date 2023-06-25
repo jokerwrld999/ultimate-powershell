@@ -40,9 +40,18 @@ function setupUser($sudo_group) {
 
 if ($distro -eq "Arch" -or $distro -eq $null ) {
     $distro = "arch"
-    Write-Host "####### Installing Arch Distro....... #######" -f Green
-    scoop bucket add extras
-    scoop install archwsl
+    if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
+        Write-Host "####### Downloading Arch Distro....... #######" -f Green
+        Invoke-WebRequest -Uri https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip -OutFile $wsl_dir\Arch.zip
+
+        Write-Host "####### Extractiing Arch Distro....... #######" -f Green
+        Expand-Archive -Path $wsl_dir\Arch.zip -DestinationPath $wsl_dir\Arch
+
+        if (!(Test-Path -Path "$wsl_dir\Arch.zip") ){
+            Write-Host "####### Removing Temp Files....... #######" -f Green
+            Remove-Item -Recurse -Force $wsl_dir\Arch.zip
+        }
+    }
 
     Write-Host "####### Starting Arch Distro....... #######" -f Green
     Start-Process -WindowStyle hidden ~\scoop\apps\archwsl\current\Arch.exe
