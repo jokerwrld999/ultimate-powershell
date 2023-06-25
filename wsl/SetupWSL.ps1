@@ -66,7 +66,8 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
 
             Write-Host "####### Initializing keyring....... #######" -f Green
             wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Syu --noconfirm; pacman -S archlinux-keyring --noconfirm"
-            wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman -S --needed base-devel git ansible --noconfirm"
+            Write-Host "####### Installing needed pkgs....... #######" -f Green
+            wsl -d Arch -u $custom_user /bin/bash -c "sudo rm -rf /var/lib/pacman/db.lck 2>/dev/null; sudo pacman -S --needed base-devel git ansible --noconfirm"
 
             break
         }
