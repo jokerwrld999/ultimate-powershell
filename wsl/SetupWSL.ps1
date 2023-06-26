@@ -77,7 +77,7 @@ if ($distro -eq "Arch") {
     }
 }
 elseif ($distro -eq "Ubuntu" -or $distro -eq $null) {
-
+    $distro = "Ubuntu"
     Write-Host "####### Installing Ubuntu Distro....... #######" -f Green
     wsl --install -d $distro
 
