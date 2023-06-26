@@ -57,12 +57,14 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
+            Write-Host "####### Updating Distro....... #######" -f Green
+            wsl -d Arch -u root /bin/bash -c "rm -rf /var/lib/pacman/db.lck 2>/dev/null;pacman -Syu --noconfirm; pacman -Sy archlinux-keyring --needed --noconfirm; pacman -S ansible git --needed --noconfirm"
+
             Write-Host "####### Setting Up Default User....... #######" -f Green
             setupUser 'wheel'
 
-            Write-Host "####### First Launch Setting Up....... #######" -f Green
-            wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Syu --noconfirm; sudo pacman -S archlinux-keyring --noconfirm; sudo pacman -S git ansible --noconfirm"
-            #taskkill /IM Arch.exe /F
+            Write-Host "####### Initializing keyring....... #######" -f Green
+            wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Sy archlinux-keyring --needed --noconfirm; sudo pacman -Su --needed --noconfirm"
 
             break
         }
