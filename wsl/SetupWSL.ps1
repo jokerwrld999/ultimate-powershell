@@ -54,8 +54,6 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
         }
     }
 
-
-    Start-Sleep -s 20
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
