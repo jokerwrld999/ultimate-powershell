@@ -39,7 +39,7 @@ function setupUser($sudo_group) {
     wsl --shutdown $distro
 }
 
-if ($distro -eq "Arch" -or $distro -eq $null ) {
+if ($distro -eq "Arch") {
     $distro = "arch"
     if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
         Write-Host "####### Downloading Arch Distro....... #######" -f Green
@@ -76,7 +76,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
         }
     }
 }
-elseif ($distro -eq "Ubuntu") {
+elseif ($distro -eq "Ubuntu" -or $distro -eq $null) {
 
     Write-Host "####### Installing Ubuntu Distro....... #######" -f Green
     wsl --install -d $distro
