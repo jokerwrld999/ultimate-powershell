@@ -11,7 +11,7 @@ wsl --set-default-version 2
 
 $distro = $args[0]
 $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
-echo $wsl_dir
+
 if ($custom_user -eq $null) {
     if ($args[1] -ne $null) {
         $custom_user = $args[1]
@@ -36,7 +36,7 @@ if ($vault_pass -eq $null) {
 
 function setupUser($sudo_group) {
     wsl -d $distro -u root /bin/bash -c "echo '%$sudo_group ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/$sudo_group; echo -e '[boot]\nsystemd=true\n\n[user]\ndefault=$custom_user' > /etc/wsl.conf; useradd -m -p $passwd -G $sudo_group -s /bin/bash $custom_user; usermod -a -G $sudo_group $custom_user"
-    wsl --terminate $distro
+    wsl --shutdown $distro
 }
 
 if ($distro -eq "Arch" -or $distro -eq $null ) {
@@ -60,7 +60,7 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
             Write-Host "####### Setting Up Default User....... #######" -f Green
             setupUser 'wheel'
 
-            Write-Host "####### Initializing keyring....... #######" -f Green
+            Write-Host "####### First Launch Setting Up....... #######" -f Green
             wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Syu --noconfirm; sudo pacman -S archlinux-keyring --noconfirm; sudo pacman -S git ansible --noconfirm"
             #taskkill /IM Arch.exe /F
 
