@@ -54,13 +54,11 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
         }
     }
 
-    Write-Host "####### Starting Arch Distro....... #######" -f Green
-    Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
+
     Start-Sleep -s 20
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
-            taskkill /IM Arch.exe /F
             Write-Host "####### Setting Up Default User....... #######" -f Green
             setupUser 'wheel'
 
@@ -68,12 +66,15 @@ if ($distro -eq "Arch" -or $distro -eq $null ) {
             wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo rm -rf /var/lib/pacman/db.lck 2>/dev/null; sudo pacman -Syu --noconfirm; sudo pacman -S archlinux-keyring --noconfirm"
             Write-Host "####### Installing needed pkgs....... #######" -f Green
             wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman -Syu --noconfirm; sudo pacman -S git ansible --noconfirm"
+            taskkill /IM Arch.exe /F
 
             break
         }
         else {
+            Write-Host "####### Starting Arch Distro....... #######" -f Green
+            Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
             Write-Host "####### Registring Arch Distro....... #######" -f Blue
-            Start-Sleep -s 10
+            Start-Sleep -s 20
         }
     }
 }
