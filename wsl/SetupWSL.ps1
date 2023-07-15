@@ -39,8 +39,8 @@ function setupUser($sudo_group) {
     wsl --shutdown $distro
 }
 
-if ($distro -eq "Arch") {
-    $distro = "arch"
+if ($distro -eq "Arch" -or $distro -eq $null) {
+    $distro = "Arch"
     if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
         Write-Host "####### Downloading Arch Distro....... #######" -f Green
         Invoke-WebRequest -Uri https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip -OutFile $wsl_dir\Arch.zip
@@ -57,15 +57,11 @@ if ($distro -eq "Arch") {
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
-            Write-Host "####### Updating Distro....... #######" -f Green
-            wsl -d Arch -u root /bin/bash -c "pacman -Syu --noconfirm; pacman -S archlinux-keyring --needed --noconfirm; pacman -S ansible git --noconfirm"
+            Write-Host "####### Configuring Arch Distro....... #######" -f Green
+            wsl -d Arch -u root /bin/bash -c "rm -rf /var/lib/pacman/db.lck; pacman -Syu --noconfirm; pacman -S archlinux-keyring --needed --noconfirm; pacman -S ansible git --noconfirm; sudo localectl set-locale LANG=en_US.UTF-8"
 
             Write-Host "####### Setting Up Default User....... #######" -f Green
             setupUser 'wheel'
-
-            Write-Host "####### Initializing keyring....... #######" -f Green
-            #wsl -d Arch -u $custom_user /bin/bash -c "sudo pacman-key --init; sudo pacman-key --populate; sudo pacman -Su --needed --noconfirm"
-
             break
         }
         else {
@@ -76,7 +72,7 @@ if ($distro -eq "Arch") {
         }
     }
 }
-elseif ($distro -eq "Ubuntu" -or $distro -eq $null) {
+elseif ($distro -eq "Ubuntu") {
     $distro = "Ubuntu"
     Write-Host "####### Installing Ubuntu Distro....... #######" -f Green
     wsl --install -d $distro
