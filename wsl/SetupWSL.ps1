@@ -75,7 +75,7 @@ if ($distro -eq "Arch" -or $distro -eq $null) {
 elseif ($distro -eq "Ubuntu") {
     $distro = "Ubuntu"
     Write-Host "####### Installing Ubuntu Distro....... #######" -f Green
-    wsl --install -d $distro
+    wsl --install -d $distro --no-launch
 
     Write-Host "####### Updating Distro....... #######" -f Green
     wsl -d $distro -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y"
