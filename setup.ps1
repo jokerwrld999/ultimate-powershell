@@ -205,3 +205,5 @@ scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-N
 
 # >>> Setting Up WSL2
 #irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/wsl/SetupWSL.ps1" | iex
+
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/AutoHotkey/autohotkey.ps1" | iex
