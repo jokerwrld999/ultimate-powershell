@@ -7,7 +7,7 @@ if ($ExecutionPolicy -eq "RemoteSigned") {
 }
 else {
     Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned | Out-Null
+    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned *>$null
 }
 
 if ([bool](DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | select-string BingNews)){
@@ -19,55 +19,45 @@ else {
     Write-Host("All unwanted packages are already uninstalled.") -f Green
 }
 
-# Check if winget is already installed
-if (Get-Command winget -ErrorAction SilentlyContinue) {
-    Write-Host "Windows Package Manager (winget) is already installed." -f Green
-}
-else {
-    # Download the latest version of winget
-    $url = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller.msixbundle"
-    $outputPath = "winget_install.msixbundle"
+# >>> Installing Scoop
+Write-Host "Installing Scoop Module..." -f Blue
+Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin" | True *>$null
 
-    Write-Host "Downloading Windows Package Manager (winget)..." -f Blue
-    (New-Object System.Net.WebClient).DownloadFile($url, $outputPath) | Out-Null
-
-    # Install winget
-    Write-Host "Installing Windows Package Manager (winget)..."  -f Blue
-    Add-AppxPackage -Path $outputPath | Out-Null
-
-    # Remove the downloaded file
-    Remove-Item $outputPath
-
-    Write-Host "Windows Package Manager (winget) has been successfully installed." -f Green
-}
+Write-Host "Updating Scoop Module..." -f Blue
+scoop install 7zip git sudo dark innounp lessmsi aria2 --global --no-cache *>$null
+scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core' *>$null
+scoop bucket add Scoop-Apps 'https://github.com/ACooper81/scoop-apps' *>$null
+scoop bucket add main *>$null
+scoop bucket add extras *>$null
+scoop bucket add nonportable *>$null
+scoop bucket add versions *>$null
+scoop bucket add games *>$null
+scoop update *>$null
 
 # Define an array of applications to install
 $applications = @(
-    @{ Name = "7-Zip"; Id = "7zip.7zip" },
-    @{ Name = "Adobe Reader"; Id = "Adobe.Acrobat.Reader.64-bit" },
-    @{ Name = "AutoHotkey"; Id = "AutoHotkey.AutoHotkey" },
-    @{ Name = "CoreTemp"; Id = "ALCPU.CoreTemp" },
-    @{ Name = "Discord"; Id = "Discord.Discord" },
-    @{ Name = "Firefox"; Id = "Mozilla.Firefox" },
-    @{ Name = "Git"; Id = "Git.Git" },
-    @{ Name = "Github CLI"; Id = "GitHub.cli" },
-    @{ Name = "Google Chrome"; Id = "Google.Chrome" },
-    @{ Name = "Oh My Posh"; Id = "JanDeDobbeleer.OhMyPosh" },    
-    @{ Name = "Parsec"; Id = "Parsec.Parsec" },
-    @{ Name = "Python 3"; Id = "Python.Python.3.11" },
-    @{ Name = "ShareX"; Id = "ShareX.ShareX" },
-    @{ Name = "Speedtest CLI"; Id = "Ookla.Speedtest.CLI" },    
-    @{ Name = "Steam"; Id = "Valve.Steam" },
-    @{ Name = "Tailscale"; Id = "tailscale.tailscale" },
-    @{ Name = "TelegramDesktop"; Id = "Telegram.TelegramDesktop" },
-    @{ Name = "VS Code"; Id = "Microsoft.VisualStudioCode" },
-    @{ Name = "Windows Terminal"; Id = "Microsoft.WindowsTerminal" },
-    @{ Name = "qBittorrent"; Id = "qBittorrent.qBittorrent" }
+    @{ Name = "Adobe Reader"; Id = "AdobeAcrobatReader-Install" },
+    @{ Name = "AutoHotkey"; Id = "extras/autohotkey" },
+    @{ Name = "CoreTemp"; Id = "extras/coretemp" },
+    @{ Name = "Discord"; Id = "extras/discord" },
+    @{ Name = "Firefox"; Id = "extras/firefox" },
+    @{ Name = "Github CLI"; Id = "main/gh" },
+    @{ Name = "Google Chrome"; Id = "googlechrome" },
+    @{ Name = "Oh My Posh"; Id = "main/oh-my-posh" },    
+    @{ Name = "Parsec"; Id = "nonportable/parsec-np" },
+    @{ Name = "Python 3.11"; Id = "versions/python311" },
+    @{ Name = "ShareX"; Id = "extras/sharex" },
+    @{ Name = "Speedtest CLI"; Id = "extras/speedtest" },    
+    @{ Name = "Steam"; Id = "games/steam" },
+    @{ Name = "Tailscale"; Id = "extras/tailscale" },
+    @{ Name = "TelegramDesktop"; Id = "extras/telegram" },
+    @{ Name = "VS Code"; Id = "extras/vscode" },
+    @{ Name = "qBittorrent"; Id = "extras/qbittorrent" }
 )
 
 foreach ($app in $applications) {
     Write-Host ("Installing $($app.Name)...") -f Blue
-    winget install -e --id $($app.Id) --accept-source-agreements --silent | Out-Null
+    scoop install $($app.Id) *>$null
 }
 
 
@@ -109,12 +99,12 @@ Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentD
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SubscribedContent-88000326Enabled' -Value 0
 
 # Stop pestering to create a Microsoft Account. Local accounts: this is the way.
-New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Force | Out-Null
-New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'NoConnectedUser' -PropertyType DWord -Value 3 -Force | Out-Null
+New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Force *>$null
+New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'NoConnectedUser' -PropertyType DWord -Value 3 -Force *>$null
 
 # Get rid of the incredibly stupid "Show More Options" context menu default that NO ONE ASKED FOR
-New-Item -Path 'HKCU:\Software\Classes\CLSID' -Name '{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -f | Out-Null
-New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Value '' -f | Out-Null
+New-Item -Path 'HKCU:\Software\Classes\CLSID' -Name '{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -f *>$null
+New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Value '' -f *>$null
 
 # Set timezone automatically
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -Name "Start" -Value "00000003";
@@ -133,9 +123,10 @@ Get-Process -Name explorer | Stop-Process
 start explorer.exe
 
 Write-Host ("Installing Terminal Modules...") -f Blue
-Install-Module -Name PowerShellGet -Force | Out-Null
-Install-Module PSReadLine -AllowPrerelease -Force | Out-Null
-Install-Module -Name Terminal-Icons -Repository PSGallery -Force | Out-Null
+Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+Install-Module PowerShellGet -Force -AllowClobber *>$null
+Install-Module PSReadLine -AllowPrerelease -Force *>$null
+Install-Module -Name Terminal-Icons -Repository PSGallery -Force *>$null
 
 Write-Host ("Creating Powershell Profile...") -f Blue
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
@@ -143,12 +134,12 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         # Detect Version of Powershell & Create Profile directories if they do not exist.
         if ($PSVersionTable.PSEdition -eq "Core" ) {
             if (!(Test-Path -Path ($env:userprofile + "\Documents\Powershell"))) {
-                New-Item -Path ($env:userprofile + "\Documents\Powershell") -ItemType "directory" | Out-Null
+                New-Item -Path ($env:userprofile + "\Documents\Powershell") -ItemType "directory" *>$null
             }
         }
         elseif ($PSVersionTable.PSEdition -eq "Desktop") {
             if (!(Test-Path -Path ($env:userprofile + "\Documents\WindowsPowerShell"))) {
-                New-Item -Path ($env:userprofile + "\Documents\WindowsPowerShell") -ItemType "directory" | Out-Null
+                New-Item -Path ($env:userprofile + "\Documents\WindowsPowerShell") -ItemType "directory" *>$null
             }
         }
 
@@ -166,18 +157,6 @@ else {
 }
 & $profile
 
-# >>> Installing Scoop
-if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
-    Write-Host "Installing Scoop Module..." -f Blue
-    iex "& {$(irm get.scoop.sh)} -RunAsAdmin" | Out-Null
-
-    Write-Host "Check Scoop Module...." -f Blue
-    ~\scoop\shims\scoop.cmd update | Out-Null
-}
-else {
-    Write-Host "Updating Scoop Module..." -f Blue
-    scoop update | Out-Null
-}
 
 # >>> Installing Chocolatey
 if ([bool](Get-Command -Name 'choco' -ErrorAction SilentlyContinue)) {
@@ -189,8 +168,8 @@ else {
 }
 
 Write-Host("Installing Nerd Fonts...") -f Blue
-scoop bucket add nerd-fonts | Out-Null
-scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono | Out-Null
+scoop bucket add nerd-fonts *>$null
+scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono *>$null
 
 # >>> Setting Up AutoHotkey
 irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/AutoHotkey/autohotkey.ps1" | iex
