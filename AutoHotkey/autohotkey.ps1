@@ -21,7 +21,7 @@ Write-Host "The AutoHotkey script @ [$sourceFile] has been created and shortcut 
 
 Write-Host "Pathing AutoHotkey..." -f Blue
 $pattern = 'Installed:\s*(C:\\.*\\autohotkey\\[\d.]+)'
-$packageInfo = $(scoop info autohotkey)
+scoop info autohotkey -OutVariable packageInfo *>$null
 $destinationFolder = [regex]::match($packageInfo, $pattern).Groups[1].Value
 $sourceFile = [System.IO.Path]::Combine($destinationFolder, "UX\inc\identify.ahk")
 Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/identify_fix.ahk -OutFile $sourceFile
