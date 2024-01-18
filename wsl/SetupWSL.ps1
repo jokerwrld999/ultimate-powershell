@@ -43,7 +43,7 @@ if ($distro -eq "Arch" -or $distro -eq $null) {
     $distro = "Arch"
     if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
         Write-Host "####### Downloading Arch Distro....... #######" -f Green
-        Invoke-WebRequest -Uri https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip -OutFile $wsl_dir\Arch.zip
+        (new-Object System.Net.WebClient).DownloadFile(https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip, "$wsl_dir\Arch.zip")
 
         Write-Host "####### Extractiing Arch Distro....... #######" -f Green
         Expand-Archive -Path $wsl_dir\Arch.zip -DestinationPath $wsl_dir\Arch

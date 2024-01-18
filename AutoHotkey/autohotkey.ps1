@@ -20,5 +20,8 @@ $Shortcut.Save()
 Write-Host "The AutoHotkey script @ [$sourceFile] has been created and shortcut created in the Startup folder." -f Green
 
 Write-Host "Pathing AutoHotkey..." -f Blue
-$sourceFile = [System.IO.Path]::Combine("C:\Program Files", "AutoHotkey\UX\inc\identify.ahk")
+$pattern = 'Installed:\s*(C:\\.*\\autohotkey\\[\d.]+)'
+$packageInfo = $(scoop info autohotkey)
+$destinationFolder = [regex]::match($packageInfo, $pattern).Groups[1].Value
+$sourceFile = [System.IO.Path]::Combine($destinationFolder, "UX\inc\identify.ahk")
 Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/identify_fix.ahk -OutFile $sourceFile
