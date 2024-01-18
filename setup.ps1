@@ -7,7 +7,7 @@ if ($ExecutionPolicy -eq "RemoteSigned") {
 }
 else {
     Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned > $null
+    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned | Out-Null
 }
 
 if ([bool](DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | select-string BingNews)){
@@ -29,11 +29,11 @@ else {
     $outputPath = "winget_install.msixbundle"
 
     Write-Host "Downloading Windows Package Manager (winget)..." -f Blue
-    (New-Object System.Net.WebClient).DownloadFile($url, $outputPath) > $null
+    (New-Object System.Net.WebClient).DownloadFile($url, $outputPath) | Out-Null
 
     # Install winget
     Write-Host "Installing Windows Package Manager (winget)..."  -f Blue
-    Add-AppxPackage -Path $outputPath > $null
+    Add-AppxPackage -Path $outputPath | Out-Null
 
     # Remove the downloaded file
     Remove-Item $outputPath
@@ -52,9 +52,11 @@ $applications = @(
     @{ Name = "Git"; Id = "Git.Git" },
     @{ Name = "Github CLI"; Id = "GitHub.cli" },
     @{ Name = "Google Chrome"; Id = "Google.Chrome" },
+    @{ Name = "Oh My Posh"; Id = "JanDeDobbeleer.OhMyPosh" },    
     @{ Name = "Parsec"; Id = "Parsec.Parsec" },
     @{ Name = "Python 3"; Id = "Python.Python.3.11" },
     @{ Name = "ShareX"; Id = "ShareX.ShareX" },
+    @{ Name = "Speedtest CLI"; Id = "Ookla.Speedtest.CLI" },    
     @{ Name = "Steam"; Id = "Valve.Steam" },
     @{ Name = "Tailscale"; Id = "tailscale.tailscale" },
     @{ Name = "TelegramDesktop"; Id = "Telegram.TelegramDesktop" },
@@ -65,11 +67,11 @@ $applications = @(
 
 foreach ($app in $applications) {
     Write-Host ("Installing $($app.Name)...") -f Blue
-    winget install -e --id $($app.Id) --accept-source-agreements --silent > $null
+    winget install -e --id $($app.Id) --accept-source-agreements --silent | Out-Null
 }
 
 
-Write-Output("Changing registry settings for taskbar, lockscreen, and more...") -f Green
+Write-Host ("Changing registry settings for taskbar, lockscreen, and more...") -f Blue
 
 # Set the Windows Taskbar to always combine items
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0 
@@ -108,11 +110,11 @@ Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentD
 
 # Stop pestering to create a Microsoft Account. Local accounts: this is the way.
 New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Force | Out-Null
-New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'NoConnectedUser' -PropertyType DWord -Value 3 -Force
+New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'NoConnectedUser' -PropertyType DWord -Value 3 -Force | Out-Null
 
 # Get rid of the incredibly stupid "Show More Options" context menu default that NO ONE ASKED FOR
-New-Item -Path 'HKCU:\Software\Classes\CLSID' -Name '{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -f
-New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Value '' -f
+New-Item -Path 'HKCU:\Software\Classes\CLSID' -Name '{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -f | Out-Null
+New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Value '' -f | Out-Null
 
 # Set timezone automatically
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -Name "Start" -Value "00000003";
@@ -120,38 +122,38 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -N
 # Disable prompts to create an MSFT account
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000";
 
-Write-Output("Disabling as much data collection / mining as we can...") -f Green
+Write-Host ("Disabling as much data collection / mining as we can...") -f Blue
 Get-Service DiagTrack | Set-Service -StartupType Disabled
 Get-Service dmwappushservice | Set-Service -StartupType Disabled
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
 
 # Finally, stop and restart explorer.
+Write-Host ("Restarting Explorer...") -f Blue
 Get-Process -Name explorer | Stop-Process
 start explorer.exe
 
+Write-Host ("Installing Terminal Modules...") -f Blue
+Install-Module -Name PowerShellGet -Force | Out-Null
+Install-Module PSReadLine -AllowPrerelease -Force | Out-Null
+Install-Module -Name Terminal-Icons -Repository PSGallery -Force | Out-Null
 
-# >>> Install Terminal Moudules
-Install-Module -Name PowerShellGet -Force
-Install-Module PSReadLine -AllowPrerelease -Force
-Install-Module -Name Terminal-Icons -Repository PSGallery -Force
-
-# >>> If the file does not exist, create it.
+Write-Host ("Creating Powershell Profile...") -f Blue
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
         # Detect Version of Powershell & Create Profile directories if they do not exist.
         if ($PSVersionTable.PSEdition -eq "Core" ) {
             if (!(Test-Path -Path ($env:userprofile + "\Documents\Powershell"))) {
-                New-Item -Path ($env:userprofile + "\Documents\Powershell") -ItemType "directory"
+                New-Item -Path ($env:userprofile + "\Documents\Powershell") -ItemType "directory" | Out-Null
             }
         }
         elseif ($PSVersionTable.PSEdition -eq "Desktop") {
             if (!(Test-Path -Path ($env:userprofile + "\Documents\WindowsPowerShell"))) {
-                New-Item -Path ($env:userprofile + "\Documents\WindowsPowerShell") -ItemType "directory"
+                New-Item -Path ($env:userprofile + "\Documents\WindowsPowerShell") -ItemType "directory" | Out-Null
             }
         }
 
         Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
-        Write-Host "The profile @ [$PROFILE] has been created."
+        Write-Host "The profile @ [$PROFILE] has been created." -f Green
     }
     catch {
         throw $_.Exception.Message
@@ -160,42 +162,35 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 else {
     Remove-Item -Path $PROFILE
     Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
-    Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
+    Write-Host "The profile @ [$PROFILE] has been created and old profile removed." -f Green
 }
 & $profile
 
 # >>> Installing Scoop
 if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
     Write-Host "Installing Scoop Module..." -f Blue
-    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+    iex "& {$(irm get.scoop.sh)} -RunAsAdmin" | Out-Null
 
     Write-Host "Check Scoop Module...." -f Blue
-    ~\scoop\shims\scoop.cmd update
+    ~\scoop\shims\scoop.cmd update | Out-Null
 }
 else {
     Write-Host "Updating Scoop Module..." -f Blue
-    scoop update
+    scoop update | Out-Null
 }
 
-# >>> Installing choco
-# Install chocolatey
+# >>> Installing Chocolatey
 if ([bool](Get-Command -Name 'choco' -ErrorAction SilentlyContinue)) {
     Write-Host("Chocolatey is already installed, skip installation.") -f Green
 }
 else {
-    Write-Host("Installing Chocolatey...") -f Green
+    Write-Host("Installing Chocolatey...") -f Blue
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
-# >>> Install Oh-My-Posh
-scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json
-
-# >>> Install Speedtest
-choco install speedtest > $null
-
-# >>> Get the NerdFonts
-scoop bucket add nerd-fonts > $null
-scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono > $null
+Write-Host("Installing Nerd Fonts...") -f Blue
+scoop bucket add nerd-fonts | Out-Null
+scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono | Out-Null
 
 # >>> Setting Up WSL2
 #irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/wsl/SetupWSL.ps1" | iex
