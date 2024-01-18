@@ -9,7 +9,7 @@ if (!(Test-Path -Path $destinationFolder -PathType Container)) {
 }
 
 Write-Host "Downloading AutoHotkey script..." -f Blue
-Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/$fileName.ahk -OutFile $sourceFile
+Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/$fileName -OutFile $sourceFile
 
 Write-Host "Creating Shortcut at the Startup folder..." -f Blue
 $WshShell = New-Object -ComObject WScript.Shell
