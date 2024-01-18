@@ -1,12 +1,15 @@
 #Requires -RunAsAdministrator
 
-# >>> Enable Hyper-V
-dism.exe /online /enable-feature /featurename:Microsoft-Hyper-V /all /norestart
-# >>> Enable WSL2
-dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-# >>> Enable Virtual Machine Platform
-dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-# >>> Set WSL 2 as default
+Write-Host "####### Enabling Hyper-V....... #######" -f Blue
+dism.exe /online /enable-feature /featurename:Microsoft-Hyper-V /all /norestart *>$null
+
+Write-Host "####### Enabling WSL....... #######" -f Blue
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart *>$null
+
+Write-Host "####### Enabling Virtual Machine Platform....... #######" -f Blue
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart *>$null
+
+Write-Host "####### Setting WSL 2....... #######" -f Blue
 wsl --set-default-version 2
 
 $distro = $args[0]
