@@ -20,12 +20,12 @@ else {
 }
 
 # >>> Installing Scoop
-if ([bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
+if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
     Write-Host "Scoop is already installed, skip installation." -f Green
 }
 else {
     Write-Host "Installing Scoop Module..." -f Blue
-    Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin" | True *>$null
+    iex "& {$(irm get.scoop.sh *>$null)} -RunAsAdmin"
 }
 
 Write-Host "Updating Scoop Module..." -f Blue
@@ -79,6 +79,10 @@ Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowTaskViewButton' -Value 0
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Value 0
 
+# Set Dark Windows Theme
+Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0 -Type Dword -Force
+Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0 -Type Dword -Force
+
 # Disable Game Overlays
 Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Name 'AppCaptureEnabled' -Value 0
 
@@ -124,7 +128,7 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection
 # Finally, stop and restart explorer.
 Write-Host ("Restarting Explorer...") -f Blue
 Get-Process -Name explorer | Stop-Process
-start explorer.exe
+Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -comObject Shell.Application).Windows() | foreach-object {$_.quit()}
 
 Write-Host ("Installing Terminal Modules...") -f Blue
 Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
