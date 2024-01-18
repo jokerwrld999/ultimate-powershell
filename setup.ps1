@@ -20,8 +20,13 @@ else {
 }
 
 # >>> Installing Scoop
-Write-Host "Installing Scoop Module..." -f Blue
-Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin" | True *>$null
+if ([bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
+    Write-Host "Scoop is already installed, skip installation." -f Green
+}
+else {
+    Write-Host "Installing Scoop Module..." -f Blue
+    Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin" | True *>$null
+}
 
 Write-Host "Updating Scoop Module..." -f Blue
 scoop install 7zip git sudo dark innounp lessmsi aria2 --global --no-cache *>$null
@@ -43,11 +48,11 @@ $applications = @(
     @{ Name = "Firefox"; Id = "extras/firefox" },
     @{ Name = "Github CLI"; Id = "main/gh" },
     @{ Name = "Google Chrome"; Id = "googlechrome" },
-    @{ Name = "Oh My Posh"; Id = "main/oh-my-posh" },    
+    @{ Name = "Oh My Posh"; Id = "main/oh-my-posh" },
     @{ Name = "Parsec"; Id = "nonportable/parsec-np" },
     @{ Name = "Python 3.11"; Id = "versions/python311" },
     @{ Name = "ShareX"; Id = "extras/sharex" },
-    @{ Name = "Speedtest CLI"; Id = "extras/speedtest" },    
+    @{ Name = "Speedtest CLI"; Id = "extras/speedtest" },
     @{ Name = "Steam"; Id = "games/steam" },
     @{ Name = "Tailscale"; Id = "extras/tailscale" },
     @{ Name = "TelegramDesktop"; Id = "extras/telegram" },
@@ -60,11 +65,10 @@ foreach ($app in $applications) {
     scoop install $($app.Id) *>$null
 }
 
-
 Write-Host ("Changing registry settings for taskbar, lockscreen, and more...") -f Blue
 
 # Set the Windows Taskbar to always combine items
-Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0 
+Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0
 
 # Set the Windows Taskbar to use small icons
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarSmallIcons' -Value 1

@@ -44,6 +44,7 @@ function setupUser($sudo_group) {
 
 if ($distro -eq "Arch" -or $distro -eq $null) {
     $distro = "Arch"
+    Write-Host "####### Installing Arch Distro....... #######" -f Blue
     if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
         Write-Host "####### Downloading Arch Distro....... #######" -f Green
         (new-Object System.Net.WebClient).DownloadFile("https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip", "$wsl_dir\Arch.zip")
@@ -77,7 +78,7 @@ if ($distro -eq "Arch" -or $distro -eq $null) {
 }
 elseif ($distro -eq "Ubuntu") {
     $distro = "Ubuntu"
-    Write-Host "####### Installing Ubuntu Distro....... #######" -f Green
+    Write-Host "####### Installing Ubuntu Distro....... #######" -f Blue
     wsl --install -d $distro
 
     Write-Host "####### Updating Distro....... #######" -f Green
