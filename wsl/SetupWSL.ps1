@@ -38,7 +38,7 @@ if ($vault_pass -eq $null) {
 }
 
 function setupUser($sudo_group) {
-    wsl -d $distro -u root /bin/bash -c "echo '%$sudo_group ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/$sudo_group; echo -e '[boot]\nsystemd=true\n\n[user]\ndefault=$custom_user' > /etc/wsl.conf; useradd -m -p $passwd -G $sudo_group -s /bin/bash $custom_user; usermod -a -G $sudo_group $custom_user &> /dev/null"
+    wsl -d $distro -u root /bin/bash -c "echo '%$sudo_group ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/$sudo_group; echo -e '[boot]\nsystemd=true\n\n[user]\ndefault=$custom_user' > /etc/wsl.conf; useradd -m -p $passwd -G $sudo_group -s /bin/bash $custom_user &> /dev/null; usermod -a -G $sudo_group $custom_user &> /dev/null" *>$null
     wsl --shutdown $distro *>$null
 }
 
@@ -62,7 +62,7 @@ if ($distro -eq "Arch" -or $distro -eq $null) {
         wsl -d Arch -u root /bin/bash -c "cd; ls -la"
         if($? -eq "true") {
             Write-Host "####### Configuring Arch Distro....... #######" -f Blue
-            wsl -d Arch -u root /bin/bash -c "rm -rf /var/lib/pacman/db.lck; pacman -Syu --noconfirm > /dev/null 2>&1; pacman -S archlinux-keyring --needed --noconfirm > /dev/null 2>&1; pacman -S ansible git --noconfirm > /dev/null 2>&1; sudo localectl set-locale LANG=en_US.UTF-8 &> /dev/null"
+            wsl -d Arch -u root /bin/bash -c "rm -rf /var/lib/pacman/db.lck; pacman -Syu --noconfirm &> /dev/null; pacman -S archlinux-keyring --needed --noconfirm &> /dev/null; pacman -S ansible git --noconfirm &> /dev/null; sudo localectl set-locale LANG=en_US.UTF-8 &> /dev/null"
 
             Write-Host "####### Setting Up Default User....... #######" -f Blue
             setupUser 'wheel'
@@ -85,7 +85,7 @@ elseif ($distro -eq "Ubuntu") {
     wsl -d $distro -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y &> /dev/null"
 
     Write-Host "####### Setting Up Distro....... #######" -f Blue
-    setupUser 'sudo'
+    setupUser 'sudo' *>$null
 }
 else {
     Write-Host "No shuch distro in the list" -f Yellow
@@ -94,4 +94,4 @@ else {
 Write-Host "####### Runing Ansible Playbook on $distro....... #######" -f Blue
 wsl -d $distro -u $custom_user /bin/bash -c "mkdir ~/github &> /dev/null; cd ~/github; git clone https://github.com/jokerwrld999/ansible-linux.git &> /dev/null; echo $vault_pass > ~/github/ansible-linux/.vault_pass"
 
-wsl -d $distro -u $custom_user /bin/bash -c "cd ~/github/ansible-linux; ansible-galaxy collection install -r requirements.yml &> /dev/null; ansible-playbook local.yml &> /dev/null"
+wsl -d $distro -u $custom_user /bin/bash -c "cd ~/github/ansible-linux; ansible-galaxy collection install -r requirements.yml &> /dev/null; ansible-playbook local.yml"
