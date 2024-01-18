@@ -3,42 +3,42 @@
 # Set PowerShell execution policy to RemoteSigned for the current user
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($ExecutionPolicy -eq "RemoteSigned") {
-    Write-Host("Execution policy is already set to RemoteSigned for the current user, skipping...") -ForegroundColor Green
+    Write-Host("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green
 }
 else {
-    Write-Host("Setting execution policy to RemoteSigned for the current user...") -ForegroundColor Green
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+    Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
+    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned > $null
 }
 
 if ([bool](DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | select-string BingNews)){
-    Write-Host("Uninstalling some unwanted packages...") -ForegroundColor Blue
+    Write-Host("Uninstalling some unwanted packages...") -f Blue
 
     DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | % {$_ -replace("PackageName : ", "")} | select-string "^((?!WindowsStore).)*$" | select-string "^((?!DesktopAppInstaller).)*$" | select-string "^((?!Photos).)*$" | select-string "^((?!Notepad).)*$" | select-string "^((?!Terminal).)*$" | ForEach-Object {Remove-AppxPackage -allusers -package $_}
 }
 else {
-    Write-Host("All unwanted packages are already uninstalled.") -ForegroundColor Green
+    Write-Host("All unwanted packages are already uninstalled.") -f Green
 }
 
 # Check if winget is already installed
 if (Get-Command winget -ErrorAction SilentlyContinue) {
-    Write-Host "Windows Package Manager (winget) is already installed." -ForegroundColor Green
+    Write-Host "Windows Package Manager (winget) is already installed." -f Green
 }
 else {
     # Download the latest version of winget
     $url = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller.msixbundle"
     $outputPath = "winget_install.msixbundle"
 
-    Write-Host "Downloading Windows Package Manager (winget)..." -ForegroundColor Blue
-    Invoke-WebRequest -Uri $url -OutFile $outputPath -UseBasicParsing
+    Write-Host "Downloading Windows Package Manager (winget)..." -f Blue
+    (New-Object System.Net.WebClient).DownloadFile($url, $outputPath) > $null
 
     # Install winget
-    Write-Host "Installing Windows Package Manager (winget)..."  -ForegroundColor Blue
-    Add-AppxPackage -Path $outputPath
+    Write-Host "Installing Windows Package Manager (winget)..."  -f Blue
+    Add-AppxPackage -Path $outputPath > $null
 
     # Remove the downloaded file
     Remove-Item $outputPath
 
-    Write-Host "Windows Package Manager (winget) has been successfully installed." -ForegroundColor Green
+    Write-Host "Windows Package Manager (winget) has been successfully installed." -f Green
 }
 
 # Define an array of applications to install
@@ -64,15 +64,15 @@ $applications = @(
 )
 
 foreach ($app in $applications) {
-    Write-Host ("Installing $($app.Name)...") -ForegroundColor Blue
+    Write-Host ("Installing $($app.Name)...") -f Blue
     winget install -e --id $($app.Id) --accept-source-agreements --silent > $null
 }
 
 
-Write-Output("Changing registry settings for taskbar, lockscreen, and more...") -ForegroundColor Green
+Write-Output("Changing registry settings for taskbar, lockscreen, and more...") -f Green
 
 # Set the Windows Taskbar to always combine items
-Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0
+Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0 
 
 # Set the Windows Taskbar to use small icons
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarSmallIcons' -Value 1
@@ -120,7 +120,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -N
 # Disable prompts to create an MSFT account
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000";
 
-Write-Output("Disabling as much data collection / mining as we can...") -ForegroundColor Green
+Write-Output("Disabling as much data collection / mining as we can...") -f Green
 Get-Service DiagTrack | Set-Service -StartupType Disabled
 Get-Service dmwappushservice | Set-Service -StartupType Disabled
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
@@ -129,26 +129,6 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection
 Get-Process -Name explorer | Stop-Process
 start explorer.exe
 
-# >>> Installing Scoop
-if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
-    Write-Host "Installing Scoop Module"
-    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
-    Write-Host "Check Scoop Module...."
-    ~\scoop\shims\scoop.cmd update
-}
-else {
-    Write-Host "Updating Scoop Module"
-    scoop update
-}
-# >>> Installing choco
-# Install chocolatey
-if ([bool](Get-Command -Name 'choco' -ErrorAction SilentlyContinue)) {
-    Write-Host("Chocolatey is already installed, skip installation.") -ForegroundColor Green
-}
-else {
-    Write-Host("Installing Chocolatey...") -ForegroundColor Green
-    Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
 
 # >>> Install Terminal Moudules
 Install-Module -Name PowerShellGet -Force
@@ -177,7 +157,6 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         throw $_.Exception.Message
     }
 }
-# >>> If the file already exists, show the message and do nothing.
 else {
     Remove-Item -Path $PROFILE
     Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
@@ -185,15 +164,38 @@ else {
 }
 & $profile
 
+# >>> Installing Scoop
+if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
+    Write-Host "Installing Scoop Module..." -f Blue
+    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+
+    Write-Host "Check Scoop Module...." -f Blue
+    ~\scoop\shims\scoop.cmd update
+}
+else {
+    Write-Host "Updating Scoop Module..." -f Blue
+    scoop update
+}
+
+# >>> Installing choco
+# Install chocolatey
+if ([bool](Get-Command -Name 'choco' -ErrorAction SilentlyContinue)) {
+    Write-Host("Chocolatey is already installed, skip installation.") -f Green
+}
+else {
+    Write-Host("Installing Chocolatey...") -f Green
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
 # >>> Install Oh-My-Posh
-scoop update
 scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json
+
 # >>> Install Speedtest
-choco install speedtest
+choco install speedtest > $null
 
 # >>> Get the NerdFonts
-scoop bucket add nerd-fonts
-scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono
+scoop bucket add nerd-fonts > $null
+scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono > $null
 
 # >>> Setting Up WSL2
 #irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/wsl/SetupWSL.ps1" | iex
