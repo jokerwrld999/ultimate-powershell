@@ -46,7 +46,7 @@ if ($distro -eq "Arch" -or $distro -eq $null) {
     $distro = "Arch"
     Write-Host "####### Installing Arch Distro....... #######" -f Blue
     if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
-        Write-Host "####### Downloading Arch Distro....... #######" -f Green
+        Write-Host "####### Downloading Arch Distro....... #######" -f Blue
         (new-Object System.Net.WebClient).DownloadFile("https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip", "$wsl_dir\Arch.zip")
 
         Write-Host "####### Extractiing Arch Distro....... #######" -f Green
@@ -61,15 +61,15 @@ if ($distro -eq "Arch" -or $distro -eq $null) {
     while($true) {
         wsl -d Arch -u root /bin/sh -c "cd; ls -la"
         if($? -eq "true") {
-            Write-Host "####### Configuring Arch Distro....... #######" -f Green
+            Write-Host "####### Configuring Arch Distro....... #######" -f Blue
             wsl -d Arch -u root /bin/bash -c "rm -rf /var/lib/pacman/db.lck; pacman -Syu --noconfirm; pacman -S archlinux-keyring --needed --noconfirm; pacman -S ansible git --noconfirm; sudo localectl set-locale LANG=en_US.UTF-8"
 
-            Write-Host "####### Setting Up Default User....... #######" -f Green
+            Write-Host "####### Setting Up Default User....... #######" -f Blue
             setupUser 'wheel'
             break
         }
         else {
-            Write-Host "####### Starting Arch Distro....... #######" -f Green
+            Write-Host "####### Starting Arch Distro....... #######" -f Blue
             Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
             Write-Host "####### Registring Arch Distro....... #######" -f Blue
             Start-Sleep -s 20
@@ -81,16 +81,16 @@ elseif ($distro -eq "Ubuntu") {
     Write-Host "####### Installing Ubuntu Distro....... #######" -f Blue
     wsl --install -d $distro
 
-    Write-Host "####### Updating Distro....... #######" -f Green
+    Write-Host "####### Updating Distro....... #######" -f Blue
     wsl -d $distro -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y"
 
-    Write-Host "####### Setting Up Distro....... #######" -f Green
+    Write-Host "####### Setting Up Distro....... #######" -f Blue
     setupUser 'sudo'
 }
 else {
     Write-Host "No shuch distro in the list" -f Yellow
 }
 
-Write-Host "####### Runing Ansible Playbook on $distro....... #######" -f Green
+Write-Host "####### Runing Ansible Playbook on $distro....... #######" -f Blue
 wsl -d $distro -u $custom_user /bin/bash -c "mkdir ~/github; cd ~/github; git clone https://github.com/jokerwrld999/ansible-linux.git; echo $vault_pass > ~/github/ansible-linux/.vault_pass"
 wsl -d $distro -u $custom_user /bin/bash -c "cd ~/github/ansible-linux; ansible-galaxy collection install -r requirements.yml; ansible-playbook local.yml"
