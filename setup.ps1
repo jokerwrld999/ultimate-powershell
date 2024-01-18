@@ -192,7 +192,8 @@ Write-Host("Installing Nerd Fonts...") -f Blue
 scoop bucket add nerd-fonts | Out-Null
 scoop install Meslo-NF Meslo-NF-Mono Hack-NF Hack-NF-Mono FiraCode-NF FiraCode-NF-Mono FiraMono-NF FiraMono-NF-Mono | Out-Null
 
-# >>> Setting Up WSL2
-#irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/wsl/SetupWSL.ps1" | iex
-
+# >>> Setting Up AutoHotkey
 irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/AutoHotkey/autohotkey.ps1" | iex
+
+# >>> Setting Up WSL2
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/wsl/SetupWSL.ps1" | iex
