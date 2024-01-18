@@ -11,7 +11,7 @@ if (!(Test-Path -Path $destinationFolder -PathType Leaf)) {
             New-Item -Path $destinationFolder -ItemType Directory -Force
         }
 
-        Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/ultimate_keys.ahk -OutFile $sourceFile
+        Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/ultimate_keys_v2.ahk -OutFile $sourceFile
 
         # Create a shortcut to the script in the Startup folder
         $WshShell = New-Object -ComObject WScript.Shell

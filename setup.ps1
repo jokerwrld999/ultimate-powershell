@@ -3,92 +3,73 @@
 # Set PowerShell execution policy to RemoteSigned for the current user
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($ExecutionPolicy -eq "RemoteSigned") {
-    Write-Verbose "Execution policy is already set to RemoteSigned for the current user, skipping..." -Verbose
+    Write-Host("Execution policy is already set to RemoteSigned for the current user, skipping...") -ForegroundColor Green
 }
 else {
-    Write-Verbose "Setting execution policy to RemoteSigned for the current user..." -Verbose
+    Write-Host("Setting execution policy to RemoteSigned for the current user...") -ForegroundColor Green
     Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 }
 
-# >>> Installing Scoop
-if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
-    Write-Host "Installing Scoop Module"
-    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
-    Write-Host "Check Scoop Module...."
-    ~\scoop\shims\scoop.cmd update
-}
-else {
-    Write-Host "Updating Scoop Module"
-    scoop update
-}
-
 if ([bool](DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | select-string BingNews)){
-    Write-Verbose "Uninstalling some unwanted packages..." -Verbose
+    Write-Host("Uninstalling some unwanted packages...") -ForegroundColor Blue
 
-    DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | % {$_ -replace("PackageName : ", "")} |`
-    select-string "^((?!WindowsStore).)*$" |`
-    select-string "^((?!DesktopAppInstaller).)*$" |`
-    select-string "^((?!Photos).)*$" |`
-    select-string "^((?!Notepad).)*$" |`
-    select-string "^((?!Terminal).)*$" |`
-    ForEach-Object {Remove-AppxPackage -allusers -package $_}
+    DISM /Online /Get-ProvisionedAppxPackages | select-string Packagename | % {$_ -replace("PackageName : ", "")} | select-string "^((?!WindowsStore).)*$" | select-string "^((?!DesktopAppInstaller).)*$" | select-string "^((?!Photos).)*$" | select-string "^((?!Notepad).)*$" | select-string "^((?!Terminal).)*$" | ForEach-Object {Remove-AppxPackage -allusers -package $_}
 }
 else {
-    write-Verbose "All unwanted packages are already uninstalled."
+    Write-Host("All unwanted packages are already uninstalled.") -ForegroundColor Green
 }
 
-Write-Verbose "Installing Autohotkey..."
-winget install -e --id Lexikos.AutoHotkey
+# Check if winget is already installed
+if (Get-Command winget -ErrorAction SilentlyContinue) {
+    Write-Host "Windows Package Manager (winget) is already installed." -ForegroundColor Green
+}
+else {
+    # Download the latest version of winget
+    $url = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller.msixbundle"
+    $outputPath = "winget_install.msixbundle"
 
-Write-Verbose "Installing CoreTemp..."
-winget install -e --id ALCPU.CoreTemp --accept-source-agreements
+    Write-Host "Downloading Windows Package Manager (winget)..." -ForegroundColor Blue
+    Invoke-WebRequest -Uri $url -OutFile $outputPath -UseBasicParsing
 
-Write-Verbose "Installing TelegramDesktop..."
-winget install -e --id Telegram.TelegramDesktop --accept-source-agreements
+    # Install winget
+    Write-Host "Installing Windows Package Manager (winget)..."  -ForegroundColor Blue
+    Add-AppxPackage -Path $outputPath
 
-Write-Verbose "Installing Discord..."
-winget install -e --id Discord.Discord --accept-source-agreements
+    # Remove the downloaded file
+    Remove-Item $outputPath
 
-Write-Verbose "Installing Google Chrome..."
-winget install -e --id Google.Chrome --accept-source-agreements
+    Write-Host "Windows Package Manager (winget) has been successfully installed." -ForegroundColor Green
+}
 
-Write-Verbose "Installing Firefox..."
-winget install -e --id Mozilla.Firefox --accept-source-agreements
+# Define an array of applications to install
+$applications = @(
+    @{ Name = "7-Zip"; Id = "7zip.7zip" },
+    @{ Name = "Adobe Reader"; Id = "Adobe.Acrobat.Reader.64-bit" },
+    @{ Name = "AutoHotkey"; Id = "AutoHotkey.AutoHotkey" },
+    @{ Name = "CoreTemp"; Id = "ALCPU.CoreTemp" },
+    @{ Name = "Discord"; Id = "Discord.Discord" },
+    @{ Name = "Firefox"; Id = "Mozilla.Firefox" },
+    @{ Name = "Git"; Id = "Git.Git" },
+    @{ Name = "Github CLI"; Id = "GitHub.cli" },
+    @{ Name = "Google Chrome"; Id = "Google.Chrome" },
+    @{ Name = "Parsec"; Id = "Parsec.Parsec" },
+    @{ Name = "Python 3"; Id = "Python.Python.3.11" },
+    @{ Name = "ShareX"; Id = "ShareX.ShareX" },
+    @{ Name = "Steam"; Id = "Valve.Steam" },
+    @{ Name = "Tailscale"; Id = "tailscale.tailscale" },
+    @{ Name = "TelegramDesktop"; Id = "Telegram.TelegramDesktop" },
+    @{ Name = "VS Code"; Id = "Microsoft.VisualStudioCode" },
+    @{ Name = "Windows Terminal"; Id = "Microsoft.WindowsTerminal" },
+    @{ Name = "qBittorrent"; Id = "qBittorrent.qBittorrent" }
+)
 
-Write-Verbose "Installing Git..."
-winget install -e --id Git.Git --accept-source-agreements
+foreach ($app in $applications) {
+    Write-Host ("Installing $($app.Name)...") -ForegroundColor Blue
+    winget install -e --id $($app.Id) --accept-source-agreements --silent > $null
+}
 
-Write-Verbose "Installing Github Cli..."
-winget install -e --id GitHub.cli --accept-source-agreements
 
-Write-Verbose "Installing Python3..."
-winget install -e --id Python.Python.3.11 --accept-source-agreements
-
-Write-Verbose "Installing VS Code..."
-winget install -e --id Microsoft.VisualStudioCode --accept-source-agreements
-
-Write-Verbose "Installing Adobe Reader..."
-winget install -e --id Adobe.Acrobat.Reader.64-bit --accept-source-agreements
-
-Write-Verbose "Installing Steam..."
-winget install -e --id Valve.Steam --accept-source-agreements
-
-Write-Verbose "Installing Parsec..."
-winget install -e --id Parsec.Parsec --accept-source-agreements
-
-Write-Verbose "Installing 7Zip..."
-winget install -e --id 7zip.7zip --accept-source-agreements
-
-Write-Verbose "Installing ShareX..."
-winget install -e --id ShareX.ShareX --accept-source-agreements
-
-Write-Verbose "Installing Tailscale..."
-winget install -e --id tailscale.tailscale --accept-source-agreements
-
-Write-Verbose "Installing QBitTorrent..."
-winget install -e --id qBittorrent.qBittorrent --accept-source-agreements
-
-Write-Output("Changing registry settings for taskbar, lockscreen, and more...")
+Write-Output("Changing registry settings for taskbar, lockscreen, and more...") -ForegroundColor Green
 
 # Set the Windows Taskbar to always combine items
 Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0
@@ -139,7 +120,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -N
 # Disable prompts to create an MSFT account
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000";
 
-Write-Output("Disabling as much data collection / mining as we can...")
+Write-Output("Disabling as much data collection / mining as we can...") -ForegroundColor Green
 Get-Service DiagTrack | Set-Service -StartupType Disabled
 Get-Service dmwappushservice | Set-Service -StartupType Disabled
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
@@ -148,13 +129,24 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection
 Get-Process -Name explorer | Stop-Process
 start explorer.exe
 
+# >>> Installing Scoop
+if (!(Test-Path -Path ($env:userprofile + "\scoop"))) {
+    Write-Host "Installing Scoop Module"
+    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+    Write-Host "Check Scoop Module...."
+    ~\scoop\shims\scoop.cmd update
+}
+else {
+    Write-Host "Updating Scoop Module"
+    scoop update
+}
 # >>> Installing choco
 # Install chocolatey
 if ([bool](Get-Command -Name 'choco' -ErrorAction SilentlyContinue)) {
-    Write-Verbose "Chocolatey is already installed, skip installation." -Verbose
+    Write-Host("Chocolatey is already installed, skip installation.") -ForegroundColor Green
 }
 else {
-    Write-Verbose "Installing Chocolatey..." -Verbose
+    Write-Host("Installing Chocolatey...") -ForegroundColor Green
     Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
