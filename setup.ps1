@@ -10,6 +10,7 @@ else {
     Set-ExecutionPolicy -Scope CurrentUser RemoteSigned *>$null
 }
 
+Start-Process 
 
 # >>> Running Tweaks
 Write-Host "####### Running Tweaks....... #######" -f Blue
