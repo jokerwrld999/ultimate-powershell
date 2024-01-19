@@ -10,8 +10,6 @@ else {
     Set-ExecutionPolicy -Scope CurrentUser RemoteSigned *>$null
 }
 
-Start-Process 
-
 # >>> Running Tweaks
 Write-Host "####### Running Tweaks....... #######" -f Blue
 irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks.ps1" | iex
