@@ -11,7 +11,7 @@ $Shortcut.TargetPath = $sharexAppPath
 $Shortcut.Save()
 
 Write-Host "Starting ShareX..." -f Blue
-Start-Process -FilePath $sharexAppPath -NoNewWindow -PassThru *>$null
+Start-Process -FilePath $sharexAppPath -PassThru -WindowStyle Minimized *>$null
 Write-Host "The ShareX app has been started and shortcut was created at the Startup folder." -f Green
 
 Write-Host "Restoring ShareX backup..." -f Blue

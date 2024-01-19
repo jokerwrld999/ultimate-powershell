@@ -1,4 +1,5 @@
 ﻿; --------------------------- INITIAL OPTIONS ---------------------------
+#Requires AutoHotkey 2.0-
 #SingleInstance Force
 ListLines(false)
 SendMode("Input") ; Recommended for new scripts due to its superior speed and reliability.
