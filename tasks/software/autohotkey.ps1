@@ -23,7 +23,7 @@ Write-Host "Pathing AutoHotkey..." -f Blue
 $pattern = '^\s*(C:\\.*\\autohotkey\\\d.*$)'
 $autoHotkeyInstallPath = (powershell -c "scoop info autohotkey") -match $pattern
 $autoHotkeySourcePath = [System.IO.Path]::Combine($autoHotkeyInstallPath.Trim(), "UX\inc\identify.ahk")
-Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/identify_fix.ahk -OutFile $autoHotkeySourcePath
+Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/main/AutoHotkey/identify_fix.ahk" -OutFile $autoHotkeySourcePath
 Write-Host "AutoHotkey was successfully patched @ [$autoHotkeySourcePath]." -f Green
 
 Write-Host "Starting AutoHotkey script..." -f Blue
