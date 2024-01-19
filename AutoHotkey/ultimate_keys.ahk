@@ -11,11 +11,9 @@ ProcessSetPriority("H")
 SetWinDelay(-1)
 SetControlDelay(-1)
 
-If (!A_IsAdmin)  ; IF NOT Admin
-{
-    Run, *RunAs "%A_ScriptFullPath%"  ; Run script as admin
-    ExitApp  ; Exit the current instance running without admin privileges
-}
+; ************************** GLOBAL VARIABLES **************************
+Global USERPROFILE := EnvGet("USERPROFILE")
+Global APPS := USERPROFILE "\scoop\apps\"
 
 ; ************************** HOTSTRINGS **************************
 ; Insert Gmail Address
@@ -24,7 +22,6 @@ If (!A_IsAdmin)  ; IF NOT Admin
 ; Insert Username
 :o:jkw::jokerwrld
 
-; ************************** HOTKEYS **************************
 ; --------------------------- POWER OPTIONS ---------------------------
 ; Win+LShift+F1 - Hibernate
 #<+F1::
@@ -35,7 +32,7 @@ return
 
 ; Win+LShift+F2 - Sleep
 #<+F2::
-{ ; V1toV2: Added bracket
+{
 	DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
 return
 }
@@ -58,14 +55,14 @@ return
 ; Win+C - Open Chrome
 #C::
 {
-	Run("chrome.exe")
+	Run(APPS "googlechrome\current\chrome.exe")
 return
 }
 
 ; Win+V - Open VSCode
 #V::
-{ ; V1toV2: Added bracket
-	Run("$env:USERPROFILE\AppData\Local\Programs\Microsoft VS Code\Code.exe")
+{
+	Run(APPS "vscode\current\Code.exe")
 return
 }
 
@@ -79,7 +76,7 @@ return
 ; Win+T - Open Telegram
 #T::
 {
-	Run("$env:USERPROFILE\AppData\Roaming\Telegram Desktop\Telegram.exe")
+	Run(APPS "telegram\current\Telegram.exe")
 return
 }
 
@@ -303,9 +300,7 @@ SetDefaultKeyboard(LocaleID){
 	SPI_SETDEFAULTINPUTLANG := 0x005A
 	SPIF_SENDWININICHANGE := 2
 	Lan := DllCall("LoadKeyboardLayout", "Str", Format("{:08x}", LocaleID), "Int", 0)
-	Lan%LocaleID% := Buffer(4, 0)
-	NumPut("UPtr", LocaleID, Lan%LocaleID%)
-	DllCall("SystemParametersInfo", "UInt", SPI_SETDEFAULTINPUTLANG, "UInt", 0, "UPtr", Lan%LocaleID%, "UInt", SPIF_SENDWININICHANGE)
+	DllCall("SystemParametersInfo", "UInt", SPI_SETDEFAULTINPUTLANG, "UInt", 0, "UPtr", LocaleID, "UInt", SPIF_SENDWININICHANGE)
 	owindows := WinGetList(,,,)
 	awindows := Array()
 	windows := owindows.Length
