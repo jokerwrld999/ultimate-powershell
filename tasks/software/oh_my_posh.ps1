@@ -35,25 +35,32 @@ else {
 & $profile
 
 
-Write-Host ("Downloading Wallpapers...") -f Blue
-$wallsFolder = [System.IO.Path]::Combine($env:USERPROFILE, "Pictures/Walls")
-$url = 'https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/walls'
+# Write-Host ("Downloading Wallpapers...") -f Blue
+# $wallsFolder = [System.IO.Path]::Combine($env:USERPROFILE, "Pictures")
+# $folderPath = "Walls"
+# $githubUrl = "https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/jokerwrld999/ultimate-powershell/tree/main/files/terminal/walls"
 
-if (!(Test-Path -Path $wallsFolder)) {
-    Write-Host ("Creating $wallsFolder folder...") -f Blue
-    New-Item -Path $wallsFolder -ItemType "directory" *>$null
-}
+# if (!(Test-Path -Path "$wallsFolder\$folderPath")) {
+#     Write-Host ("Creating $wallsFolder\$folderPath folder...") -f Blue
+#     # GitHub API URL for downloading a zip archive of the folder
+#     $repositoryName = "ultimate-powershell"
+#     $branchName = "main"
 
-# enable TLS 1.2 and TLS 1.1 protocols
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12, [Net.SecurityProtocolType]::Tls11
 
-Write-Host ("Downloading walls...") -f Blue
-$WebResponse = Invoke-WebRequest -Uri $url
-# get the list of links, skip the first one ("../") and download the files
-$WebResponse.Links | Select-Object -ExpandProperty href -Skip 1 | ForEach-Object {
-    Write-Host "Downloading file '$_'"
-    $filePath = Join-Path -Path $wallsFolder -ChildPath $_
-    $fileUrl  = '{0}/{1}' -f $url.TrimEnd('/'), $_
-    Invoke-WebRequest -Uri $fileUrl -OutFile $filePath
-}
-Write-Host ("Walls successfully downloaded @ [$wallsFolder]...") -f Green
+#     # Download the HTML content from the provided URL
+#     $htmlContent = Invoke-WebRequest -Uri $githubUrl
+
+#     # Extract the download link from the HTML content
+#     $downloadLink = $htmlContent.ParsedHtml.getElementById("do").href
+
+#     # Download the zip archive
+#     Invoke-WebRequest -Uri $downloadLink -OutFile "$wallsFolder\repo.zip"
+
+#     # Expand the downloaded zip archive
+#     Expand-Archive -Path "$wallsFolder\repo.zip" -DestinationPath $wallsFolder
+
+#     # Remove the downloaded zip archive
+#     Remove-Item -Path "$wallsFolder\repo.zip"
+# }
+
+# Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -f Green
