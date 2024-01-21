@@ -9,10 +9,14 @@ param (
 
 function CheckAndInstallFeatures() {
     Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
-    if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform" | Where-Object { $_.State -eq "Disabled" }).Count -gt 0) {
+    if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform").State -eq "Disabled") {
         try {
             Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
-            $restartRequired = (Install-WindowsFeature -Name "VirtualMachinePlatform" -IncludeAllSubFeature -Feature<OoB>e $true -Restart).RestartNeeded
+            Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online", "/enable-feature", "/featurename:Microsoft-Windows-Subsystem-Linux", "/all", "/norestart"
+            Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online", "/enable-feature", "/featurename:VirtualMachinePlatform", "/all", "/norestart"
+
+            $pendingRenameOperations = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name PendingFileRenameOperations -EA SilentlyContinue
+            $restartRequired = $pendingRenameOperations -ne $null
 
             Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
             if ($restartRequired) {
@@ -25,13 +29,14 @@ function CheckAndInstallFeatures() {
                 }
             } else {
                 Write-Host "Features enabled successfully." -ForegroundColor Green
+                SetupWSLDistro
             }
         } catch {
             Write-Host "An error occurred while configuring features." -ForegroundColor Red
         }
     } else {
         Write-Host "Features are already enabled." -ForegroundColor Green
-        $SetupWSLDistro
+        SetupWSLDistro
     }
 }
 
@@ -57,8 +62,8 @@ function SetupCustomUser {
         [string] $SudoGroup
     )
 
-    wsl -d $Distro -u root bash -c "ls -la /home/$CustomUser >/dev/null 2>&1"
-    if ($LASTEXITCODE -ne 0){
+    $UserHomeDirectoryExists = Test-Path "\\wsl$\$Distro\home\$CustomUser"
+    if (!$UserHomeDirectoryExists){
         Write-Host "####### Setting Up Custom User $CustomUser... #######" -ForegroundColor Blue
         wsl -d $Distro -u root /bin/bash -c @"
             if ! grep -q '%$SudoGroup ALL=(ALL) NOPASSWD: ALL' /etc/sudoers.d/$SudoGroup; then

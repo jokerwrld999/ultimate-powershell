@@ -1,11 +1,6 @@
-$wslInfo = $(powershell -c "wsl --version")
-Write-Output "WSL Info: $wslInfo"
-$pattern = '^Kernel version: (\d+\.\d+\.\d+\.\d+)'
-$matches = [regex]::Match($wslInfo, $pattern)
-
-if ($matches.Success) {
-    $kernelVersion = $matches.Groups[1].Value
-    Write-Output "Kernel Version: $kernelVersion"
-} else {
-    Write-Output "Kernel Version not found in the text."
-}
+$output = wsl --version
+$output = $output | Select-Object -Skip 1
+$output = $output.ToString().Trim()
+$versionMatch = $output -match '(?i)^Kernel.*(\d+\.\d+\.\d+\.\d+)'
+$version = $matches[1]
+Write-Host "WSL kernel version: $version"
