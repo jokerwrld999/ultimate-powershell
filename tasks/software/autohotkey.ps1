@@ -27,4 +27,4 @@ Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/
 Write-Host "AutoHotkey was successfully patched @ [$autoHotkeySourcePath]." -f Green
 
 Write-Host "Starting AutoHotkey script..." -f Blue
-Start-Process -FilePath "$env:USERPROFILE\scoop\shims\autohotkey.exe" -ArgumentList "$autoHotkeyScriptPath" -NoNewWindow -PassThru *>$null
+Start-Process -FilePath "$env:USERPROFILE\scoop\shims\autohotkey.exe" -ArgumentList "$autoHotkeyScriptPath" -NoNewWindow *>$null
