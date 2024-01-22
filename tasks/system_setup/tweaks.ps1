@@ -90,11 +90,8 @@ else {
     Write-Host "####### Registry tweaks has been already configured... #######" -ForegroundColor Green
 }
 
-Write-Host ("Running OOSU10...") -f Blue
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/ooshutup10_winutil_settings.cfg" -OutFile $ENV:userprofile\ooshutup10.cfg
-Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $ENV:userprofile\OOSU10.exe
-Start-Process -FilePath "$ENV:userprofile\OOSU10.exe" -ArgumentList "$ENV:userprofile\ooshutup10.cfg /quiet" -NoNewWindow
-Write-Host ("OOSU10 completed successfully.") -f Green
+# Run OOSU10
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | iex *> $null
 
 $edgePackage = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name msedge
 if ($edgePackage) {
@@ -107,7 +104,7 @@ if ($edgePackage) {
 $oneDriveInstalled = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer -Name OneDrive -ErrorAction SilentlyContinue)
 if ($oneDriveInstalled) {
     Write-Host ("Removing OneDrive...") -f Blue
-    irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/remove_onedrive.ps1" | iex *> $null
+    irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/remove_onedrive.ps1" | iex *> $null
 } else {
     Write-Host "OneDrive has been already uninstalled." -f Green
 }
