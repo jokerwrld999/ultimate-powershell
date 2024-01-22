@@ -91,7 +91,7 @@ else {
 }
 
 # Run OOSU10
-irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | iex *> $null
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | iex
 
 $edgePackage = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name msedge
 if ($edgePackage) {
