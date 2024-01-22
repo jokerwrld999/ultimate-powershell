@@ -29,20 +29,19 @@ function CheckAndInstallFeatures() {
                 }
             } else {
                 Write-Host "Features enabled successfully." -ForegroundColor Green
-                SetupWSLDistro
             }
         } catch {
             Write-Host "An error occurred while configuring features." -ForegroundColor Red
         }
     } else {
         Write-Host "Features are already enabled." -ForegroundColor Green
-        SetupWSLDistro
+        $SetupWSLDistro
     }
 }
 
 function ScheduleTaskForNextBoot() {
     Write-Host "Scheduling task for next boot..." -ForegroundColor Blue
-    $action = New-ScheduledTaskAction -Execute "powershell.Exe" -Argument "-File $PSCommandPath -Boot"
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File $PSCommandPath -Boot"
     $Trigger = New-ScheduledTaskTrigger -AtStartup
     $Settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -RunIdeIfIdle -RunIfAvailable
     $Principal = New-ScheduledTaskPrincipal -UserId "LOCALSERVICE" -LogonType 'Service'
@@ -83,63 +82,15 @@ function SetupCustomUser {
         Write-Host "####### Custom User $CustomUser set up is finished successfully. #######" -f Green
     }
     else {
-        Write-Host "####### CustomUser $CustomUser has been already configured... #######" -ForegroundColor Green
+        Write-Host "####### Custom User $CustomUser has been already configured... #######" -ForegroundColor Green
     }
 
 }
 
-function WSLKernelUpdate {
-    $releases = Invoke-WebRequest -Uri https://api.github.com/repos/microsoft/WSL2-Linux-Kernel/releases | ConvertFrom-Json
-    $latestKernelVersion = $releases[0].tag_name
-    $currentKernelVersion = (powershell -c "wsl --version") -match '(?i)^Kernel.*(\d+\.\d+\.\d+\.\d+)'
-    $defaultWSLVersion = wsl --status | Select-Object -ExpandProperty DefaultDistribution
-
-    if ($currentKernelVersion -ne $latestKernelVersion -or $defaultWSLVersion -ne "2") {
-        wsl --update
-        wsl --set-default-version 2 | Out-null
-        wsl --shutdown
-
-        Write-Host "WSL kernel updated and set to version 2."
-    } else {
-        Write-Host "WSL kernel is already up-to-date and set to version 2."
-    }
-}
-
-function SetupWSLDistro {
-    param (
-        [Parameter(Mandatory = $false)]
-        [string] $Distro = "Arch",
-        [Parameter(Mandatory = $false)]
-        [string] $CustomUser = "jokerwrld",
-        [Parameter(Mandatory = $false)]
-        [string] $UserPass = $CustomUser,
-        [Parameter(Mandatory = $true)]
-        [string] $VaultPass = {Read-Host "Vault pass: "}
-    )
-
-#    WSLKernelUpdate
-
-    switch ($Distro) {
-        "Arch" {
-            InstallArchDistro
-            SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'wheel'
-        }
-        "Ubuntu" {
-            InstallUbuntuDistro
-            SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'sudo'
-        }
-        default {
-            Write-Host "No such distro in the list" -ForegroundColor Yellow
-            return
-        }
-    }
-    RunAnsiblePlaybook -Distro $Distro -CustomUser $CustomUser -VaultPass $VaultPass
-}
 
 function InstallArchDistro {
     $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
 
-    Write-Host "####### Installing Arch Distro... #######" -f Blue
     if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
         Write-Host "####### Downloading Arch Distro... #######" -f Blue
         (new-Object System.Net.WebClient).DownloadFile("https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip", "$wsl_dir\Arch.zip")
@@ -156,7 +107,7 @@ function InstallArchDistro {
     while($true) {
         wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1"
         if($LASTEXITCODE -eq 0) {
-            Write-Host "####### Arch Registered Successfully#######" -f Green
+            Write-Host "####### Arch Installed Successfully#######" -f Green
 
             wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
             if ($LASTEXITCODE -ne 0){
@@ -177,7 +128,7 @@ function InstallArchDistro {
             break
         }
         else {
-            Write-Host "####### Registering Arch... #######" -f Blue
+            Write-Host "####### Installing Arch... #######" -f Blue
             Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
             Start-Sleep -s 20
         }
@@ -185,10 +136,15 @@ function InstallArchDistro {
 }
 
 function InstallUbuntuDistro {
+    $jobName = "InstallUbuntu"  # Replace with the actual job name
     while($true) {
         wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1"
         if($LASTEXITCODE -eq 0 ) {
             Write-Host "####### Ubuntu installed successfully#######" -f Green
+            if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+                Stop-Job -Name $jobName
+                Remove-Job -Name $jobName
+            }
 
             wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
             if ($LASTEXITCODE -ne 0) {
@@ -204,14 +160,13 @@ function InstallUbuntuDistro {
         }
         else {
             Write-Host "####### Installing Ubuntu... #######" -f Blue
-            Start-Process powershell.exe -c "wsl --install -d Ubuntu"
+            Start-Job -Name $jobName -ScriptBlock {wsl --install -d Ubuntu}
             Start-Sleep -s 20
         }
     }
 }
 
 function RunAnsiblePlaybook {
-    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
         [string] $Distro,
@@ -227,7 +182,7 @@ function RunAnsiblePlaybook {
         mkdir -p ~/github
         cd ~/github
         if [ ! -d ansible-linux ]; then
-            git clone https://github.com/jokerwrld999/ansible-linux.git
+            git clone https://github.com/jokerwrld999/ansible-linux.git >/dev/null 2>&1
         fi
         echo "$VaultPass" > ansible-linux/.vault_pass
         cd ansible-linux
@@ -237,7 +192,41 @@ function RunAnsiblePlaybook {
     Write-Host "####### Finished Ansible Playbook on $Distro... #######" -f Green
 }
 
-$SetupWSLDistro = SetupWSLDistro -Distro Arch #-CustomUser 'username' -UserPass 'password' -VaultPass '<your_vault_pass>'
+function SetupWSLDistro {
+    param (
+        [Parameter(Mandatory = $false)]
+        [string] $Distro = "Arch",
+        [Parameter(Mandatory = $false)]
+        [string] $CustomUser = "jokerwrld",
+        [Parameter(Mandatory = $false)]
+        [string] $UserPass = $CustomUser,
+        [Parameter(Mandatory = $true)]
+        [string] $VaultPass = {Read-Host "Vault pass: " -AsSecureString}
+    )
+
+#    WSLKernelUpdate
+    wsl --update
+    wsl --set-default-version 2 | Out-null
+    wsl --shutdown
+
+    switch ($Distro) {
+        "Arch" {
+            InstallArchDistro
+            SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'wheel'
+        }
+        "Ubuntu" {
+            InstallUbuntuDistro
+            SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'sudo'
+        }
+        default {
+            Write-Host "No such distro in the list" -ForegroundColor Yellow
+            return
+        }
+    }
+    RunAnsiblePlaybook -Distro $Distro -CustomUser $CustomUser -VaultPass $VaultPass
+}
+
+$SetupWSLDistro = SetupWSLDistro -Distro Ubuntu #-CustomUser 'username' -UserPass 'password' -VaultPass '<your_vault_pass>'
 if (!$Boot) {
     CheckAndInstallFeatures
 }
