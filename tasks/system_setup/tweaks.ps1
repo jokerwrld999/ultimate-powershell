@@ -67,7 +67,10 @@ Set-WinHomeLocation -GeoID 244
 Set-TimeZone -Name "GTB Standard Time"
 
 # Disable prompts to create an MSFT account
-Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000";
+Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000"
+
+# Disable Uac
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Type DWord -Value 0
 
 Write-Host ("Disabling as much data collection / mining as we can...") -f Blue
 Get-Service DiagTrack | Set-Service -StartupType Disabled
@@ -77,3 +80,18 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection
 Write-Host ("Restarting Explorer...") -f Blue
 Get-Process -Name explorer | Stop-Process
 Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -comObject Shell.Application).Windows() | foreach-object {$_.quit()}
+
+Write-Host ("Running OOSU10...") -f Blue
+curl.exe -s \"https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/ooshutup10_winutil_settings.cfg\" -o $ENV:temp\\ooshutup10.cfg
+curl.exe -s \"https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe\" -o $ENV:temp\\OOSU10.exe
+Start-Process $ENV:temp\\OOSU10.exe -ArgumentList \"\"\"$ENV:temp\\ooshutup10.cfg\"\" /quiet\"
+
+Write-Host ("Removing Edge...") -f Blue
+irm "https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/edgeremoval.ps1" | iex 
+
+Write-Host ("Removing Edge...") -f Blue
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/remove_onedrive.ps1" | iex
+
+Write-Host ("Deleting Temp Files...") -f Blue
+Get-ChildItem -Path \"C:\\Windows\\Temp\" *.* -Recurse | Remove-Item -Force -Recurse
+Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse
