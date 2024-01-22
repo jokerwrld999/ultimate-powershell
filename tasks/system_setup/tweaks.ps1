@@ -91,9 +91,9 @@ else {
 }
 
 Write-Host ("Running OOSU10...") -f Blue
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/ooshutup10_winutil_settings.cfg" -OutFile $ENV:temp\ooshutup10.cfg
-Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $ENV:temp\\OOSU10.exe
-Start-Process -FilePath "$ENV:temp\OOSU10.exe" -ArgumentList "$ENV:temp\ooshutup10.cfg /quiet" -NoNewWindow
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/ooshutup10_winutil_settings.cfg" -OutFile $ENV:userprofile\ooshutup10.cfg
+Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $ENV:userprofile\OOSU10.exe
+Start-Process -FilePath "$ENV:userprofile\OOSU10.exe" -ArgumentList "$ENV:userprofile\ooshutup10.cfg /quiet" -NoNewWindow
 Write-Host ("OOSU10 completed successfully.") -f Green
 
 $edgePackage = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name msedge
