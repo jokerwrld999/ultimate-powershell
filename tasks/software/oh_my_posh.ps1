@@ -1,6 +1,12 @@
 $pwshScriptsPath = "$env:USERPROFILE\Documents\Powershell"
+$profile5Path = "C:\Windows\System32\WindowsPowerShell\v1.0"
+$profile7Path = "C:\Program Files\PowerShell\7"
+$profileName = "profile.ps1"
+$profile5Source = "$profile5Path\$profileName"
+$profile7Source = "$profile7Path\$profileName"
 $sftaScript = "$pwshScriptsPath\Scripts\SFTA.ps1"
-$PROFILE = $PROFILE.AllUsersAllHosts
+
+winget install --id Microsoft.Powershell --source winget
 
 Write-Host ("Installing Terminal Modules...") -f Blue
 Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
@@ -8,36 +14,39 @@ Install-Module PowerShellGet -Force -AllowClobber *>$null
 Install-Module PSReadLine -AllowPrerelease -Force *>$null
 Install-Module -Name Terminal-Icons -Repository PSGallery -Force *>$null
 
-Write-Host ("Creating Powershell Profile...") -f Blue
-if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
-    try {
-        # Detect Version of Powershell & Create Profile directories if they do not exist.
-        if ($PSVersionTable.PSEdition -eq "Core" ) {
-            if (!(Test-Path -Path $pwshScriptsPath)) {
-                New-Item -Path $pwshScriptsPath -ItemType "directory" *>$null
-            }
-        }
-        elseif ($PSVersionTable.PSEdition -eq "Desktop") {
-            if (!(Test-Path -Path $pwshScriptsPath)) {
-                New-Item -Path $pwshScriptsPath -ItemType "directory" *>$null
-            }
-        }
 
-        Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1 -OutFile $PROFILE
-        Write-Host "The profile @ [$PROFILE] has been created." -f Green
+$profiles = @($profile5Source, $profile7Source)
+foreach ($profile in $profiles) {
+    if (!(Test-Path -Path $profile -PathType Leaf)) {
+        try {
+            # Detect Version of Powershell & Create Profile directories if they do not exist.
+                if (!(Test-Path -Path $profile5Path)) {
+                    New-Item -Path $profile5Path -ItemType "directory" *>$null
+                }
+                if (!(Test-Path -Path $profile7Path)) {
+                    New-Item -Path $profile7Path -ItemType "directory" *>$null
+                }
+            Write-Host ("Creating Powershell Profile...") -f Blue
+            Invoke-WebRequest -Uri https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1 -OutFile $profile
+            Write-Host "The profile @ [$profile] has been created." -f Green
+            }
+
+        catch {
+            throw $_.Exception.Message
+        }
     }
-    catch {
-        throw $_.Exception.Message
+    else {
+        Remove-Item -Path $profile
+        Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1 -o $profile
+        Write-Host "The profile @ [$profile] has been created and old profile removed." -f Green
     }
 }
-else {
-    Remove-Item -Path $PROFILE
-    Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1 -o $PROFILE
-    Write-Host "The profile @ [$PROFILE] has been created and old profile removed." -f Green
-}
-& $PROFILE
+
+& $profile5Source
+& $profile7Source
 
 if (!(Test-Path -Path $sftaScript -PathType Leaf)) {
+    New-Item -Path "$pwshScriptsPath\Scripts" -ItemType "directory" *>$null
     Write-Host "Downloading PowerShell SFTA..." -f Blue
     Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1" -OutFile $sftaScript
 }
