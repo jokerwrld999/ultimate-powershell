@@ -1,3 +1,7 @@
+$pwshScriptsPath = "$env:USERPROFILE\Documents\Powershell"
+$sftaScript = "$pwshScriptsPath\Scripts\SFTA.ps1"
+$PROFILE = $PROFILE.AllUsersAllHosts
+
 Write-Host ("Installing Terminal Modules...") -f Blue
 Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 Install-Module PowerShellGet -Force -AllowClobber *>$null
@@ -8,15 +12,14 @@ Write-Host ("Creating Powershell Profile...") -f Blue
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
         # Detect Version of Powershell & Create Profile directories if they do not exist.
-        $powershellScriptsFolder = [System.IO.Path]::Combine($env:USERPROFILE, "Documents\Powershell")
         if ($PSVersionTable.PSEdition -eq "Core" ) {
-            if (!(Test-Path -Path $powershellScriptsFolder)) {
-                New-Item -Path $powershellScriptsFolder -ItemType "directory" *>$null
+            if (!(Test-Path -Path $pwshScriptsPath)) {
+                New-Item -Path $pwshScriptsPath -ItemType "directory" *>$null
             }
         }
         elseif ($PSVersionTable.PSEdition -eq "Desktop") {
-            if (!(Test-Path -Path $powershellScriptsFolder)) {
-                New-Item -Path $powershellScriptsFolder -ItemType "directory" *>$null
+            if (!(Test-Path -Path $pwshScriptsPath)) {
+                New-Item -Path $pwshScriptsPath -ItemType "directory" *>$null
             }
         }
 
@@ -32,7 +35,12 @@ else {
     Invoke-RestMethod https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1 -o $PROFILE
     Write-Host "The profile @ [$PROFILE] has been created and old profile removed." -f Green
 }
-& $profile
+& $PROFILE
+
+if (!(Test-Path -Path $sftaScript -PathType Leaf)) {
+    Write-Host "Downloading PowerShell SFTA..." -f Blue
+    Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1" -OutFile $sftaScript
+}
 
 
 # Write-Host ("Downloading Wallpapers...") -f Blue

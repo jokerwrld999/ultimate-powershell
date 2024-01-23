@@ -9,7 +9,7 @@ else {
 
 $path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
 $name = "ConsentPromptBehaviorAdmin"
-$UACValue = Get-ItemPropertyValue -Path $path -Name $name
+$UACValue = Get-ItemPropertyValue -Path $path -Name $name -ErrorAction SilentlyContinue
 
 if ($UACValue -ne 0) {
     Write-Host ("Changing registry settings for taskbar, lockscreen, and more...") -f Blue

@@ -34,16 +34,33 @@
 # WSLKernelUpdate
 
 # Check if OneDrive is installed
-$onedriveInstalled = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name OneDrive
+# $onedriveInstalled = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name OneDrive
 
-if ($onedriveInstalled) {
-    Write-Output "OneDrive is installed."
-} else {
-    Write-Output "OneDrive is not installed."
-}
-$oneDriveInstalled = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer -Name OneDrive -ErrorAction SilentlyContinue)
-if ($oneDriveInstalled) {
-    Write-Host "OneDrive is installed." -f Blue
-} else {
-    Write-Host "OneDrive is not installed." -f Green
-}
+# if ($onedriveInstalled) {
+#     Write-Output "OneDrive is installed."
+# } else {
+#     Write-Output "OneDrive is not installed."
+# }
+# $oneDriveInstalled = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer -Name OneDrive -ErrorAction SilentlyContinue)
+# if ($oneDriveInstalled) {
+#     Write-Host "OneDrive is installed." -f Blue
+# } else {
+#     Write-Host "OneDrive is not installed." -f Green
+# }
+
+# Function Create-Association($ext, $exe) {
+#     $name = cmd /c "assoc $ext 2>NUL"
+#     if ($name) { # Association already exists: override it
+#         $name = $name.Split('=')[1]
+#     } else { # Name doesn't exist: create it
+#         $name = "$($ext.Replace('.',''))file" # ".log.1" becomes "log1file"
+#         cmd /c "assoc $ext=$name"
+#     }
+#     cmd /c "ftype $name=`"$exe`" `"%1`""
+# }
+
+# Create-Association(".ahk", "notepad.exe")
+
+  .\SetUserFTA .ahk `"$env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64.exe`"
+  Write-Host "Set .ahk association to $env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64"
+powershell -command "& { . .\files\terminal\pwsh_scripts\SFTA.ps1; Set-FTA 'C:\Users\jokerwrld\scoop\apps\vscode\current\Code.exe' '.ahk' }"
