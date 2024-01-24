@@ -2,14 +2,26 @@
 $ahkScriptsFolder = "$env:USERPROFILE\Documents\AutoHotkey"
 $ahkScriptName = "ultimate_keys.ahk"
 $ahkSourceScript = "$ahkScriptsFolder\$ahkScriptName"
-$startupFolder = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\$ahkScriptName.lnk"
+$ahkStartupShortcut = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\$ahkScriptName.lnk"
 $runAsAdminReg = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"
 $ahkInstallationPath = "$env:userprofile\scoop\apps\autohotkey\current"
 $ahkExe = "$ahkInstallationPath\v2\AutoHotkey64.exe"
-$ahkFixSource = "$ahkInstallationPath\UX\inc\identify.ahk"
+$ahkFixSourceScript = "$ahkInstallationPath\UX\inc\identify.ahk"
 $runAsAdminValue = "~ RUNASADMIN"
 $sftaScript = "$env:userprofile\Documents\PowerShell\Scripts\SFTA.ps1"
-$hashFile = "$ahkScriptsFolder\ultimate_keys.ahk.sha256"
+$ahkHashFile = "$ahkSourceScript.sha256"
+$ahkFixHashFile = "$ahkFixSourceScript.sha256"
+$ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk"
+$ahkFixRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/identify_fix.ahk"
+
+function Stream-FileHash {
+    param (
+        $Uri
+    )
+    $wc = [System.Net.WebClient]::new()
+    $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
+    $FileHash.Hash
+}
 
 # Check for existing folders and registry values
 if (!(Test-Path -Path $ahkScriptsFolder -PathType Container)) {
@@ -19,19 +31,20 @@ if (!(Test-Path -Path $ahkScriptsFolder -PathType Container)) {
 
 # Download or update AHK script based on content check
 if (!(Test-Path -Path $ahkSourceScript -PathType Leaf) -or
-    (Get-FileHash $ahkSourceScript).Hash -ne (Get-Content $hashFile)) {
+    (Stream-FileHash -Uri $ahkRemoteScript) -ne (Get-Content $ahkHashFile)) {
     Write-Host "Downloading or updating AutoHotkey script..." -f Blue
-    Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk" -OutFile $ahkSourceScript | Out-Null
-    Get-FileHash $ahkSourceScript | Out-File $hashFile
+    Invoke-WebRequest -Uri $ahkRemoteScript -OutFile $ahkSourceScript | Out-Null
+    $ahkSourceScriptHash = (Get-FileHash $ahkSourceScript).Hash
+    $ahkSourceScriptHash | Out-File $ahkHashFile
 } else {
     Write-Host "AutoHotkey script is already up-to-date." -f Green
 }
 
 # Create startup shortcut only if it doesn't exist
-if (!(Test-Path -Path $startupFolder -PathType Leaf)) {
+if (!(Test-Path -Path $ahkStartupShortcut -PathType Leaf)) {
     Write-Host "Creating a shortcut at the Startup folder..." -f Blue
     $WshShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut($startupFolder)
+    $Shortcut = $WshShell.CreateShortcut($ahkStartupShortcut)
     $Shortcut.TargetPath = $ahkSourceScript
     $Shortcut.Save() | Out-Null
 
@@ -41,9 +54,16 @@ if (!(Test-Path -Path $startupFolder -PathType Leaf)) {
 }
 
 # Patch AutoHotkey (consider conditional logic if applicable)
-Write-Host "Patching AutoHotkey..." -f Blue
-Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/identify_fix.ahk" -OutFile $ahkFixSource | Out-Null
-Write-Host "AutoHotkey was successfully patched @ [$ahkFixSource]." -f Green
+if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
+    (Stream-FileHash -Uri $ahkFixRemoteScript) -ne (Get-Content $ahkFixHashFile)) {
+    Write-Host "Patching AutoHotkey..." -f Blue
+    Invoke-WebRequest -Uri $ahkFixRemoteScript -OutFile $ahkFixSourceScript | Out-Null
+    $ahkFixSourceScriptHash = (Get-FileHash $ahkFixSourceScript).Hash
+    $ahkFixSourceScriptHash | Out-File $ahkFixHashFile
+    Write-Host "AutoHotkey was successfully patched @ [$ahkFixSourceScript]." -f Green
+} else {
+    Write-Host "AutoHotkey has been already patched." -f Green
+}
 
 # Set .ahk association and Run as admin property if not already set
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
@@ -60,5 +80,6 @@ if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction Sile
 } else {
     Write-Host ".ahk association and Run as admin property already set." -f Green
 }
+
 Write-Host "Starting AutoHotkey script..." -f Blue
 Start-Process -FilePath "$ahkExe" -ArgumentList "$ahkSourceScript" -NoNewWindow *>$null

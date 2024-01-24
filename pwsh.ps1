@@ -61,6 +61,22 @@
 
 # Create-Association(".ahk", "notepad.exe")
 
-  .\SetUserFTA .ahk `"$env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64.exe`"
-  Write-Host "Set .ahk association to $env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64"
-powershell -command "& { . .\files\terminal\pwsh_scripts\SFTA.ps1; Set-FTA 'C:\Users\jokerwrld\scoop\apps\vscode\current\Code.exe' '.ahk' }"
+#   .\SetUserFTA .ahk `"$env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64.exe`"
+#   Write-Host "Set .ahk association to $env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64"
+# powershell -command "& { . .\files\terminal\pwsh_scripts\SFTA.ps1; Set-FTA 'C:\Users\jokerwrld\scoop\apps\vscode\current\Code.exe' '.ahk' }"
+
+$ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk"
+
+function Stream-FileHash {
+    param (
+        $Uri
+    )
+
+    $wc = [System.Net.WebClient]::new()
+    $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
+    $FileHash.Hash
+}
+
+$(Stream-FileHash -Uri $ahkRemoteScript) -eq (Get-Content "$env:USERPROFILE\Documents\AutoHotkey\ultimate_keys.ahk.sha256")
+
+
