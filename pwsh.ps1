@@ -34,7 +34,7 @@ if ($restartRequired) {
     if (Get-Confirmation "Would you like to perform a immediate reboot?") {
         Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
         ScheduleTaskForNextBoot
-       # Restart-Computer -force
+        Restart-Computer -force
     } else {
         Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
     }

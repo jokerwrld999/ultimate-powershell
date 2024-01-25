@@ -1,4 +1,5 @@
 #Requires -RunAsAdministrator
+$scheduledTaskName = "WSL"
 
 [CmdletBinding()]
 param (
@@ -59,7 +60,7 @@ function ScheduleTaskForNextBoot() {
     $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
     $Principal = New-ScheduledTaskPrincipal -UserId $currentUser
 
-    Register-ScheduledTask -TaskName "WSL" -Action $Action -Trigger $Trigger -Principal $Principal -Description "Continue Setting Up WSL After Boot"
+    Register-ScheduledTask -TaskName $scheduledTaskName -Action $Action -Trigger $Trigger -Principal $Principal -Description "Continue Setting Up WSL After Boot"
 }
 
 function SetupCustomUser {
@@ -266,5 +267,7 @@ if (!$Boot) {
 }
 else {
     $SetupWSLDistro
-    Unregister-ScheduledTask -TaskName "WSL"
+    if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
+        Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
+    }
 }
