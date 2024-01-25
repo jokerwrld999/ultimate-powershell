@@ -1,3 +1,9 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [switch]
+    $Boot
+)
 # function Invoke-Wsl {
 #     ((Invoke-Expression "wsl $($args -join ' ')")) -replace [char]0
 # }
@@ -149,14 +155,8 @@ if ($VaultPass -eq "dd"){
 # }
 
 
-[CmdletBinding()]
-param (
-    [Parameter()]
-    [switch]
-    $Boot
-)
 
-if ($boot){
+if ($Boot){
     Write-Host "Wooow, Boot is working"
 }
 
