@@ -266,4 +266,5 @@ if (!$Boot) {
 }
 else {
     $SetupWSLDistro
+    Unregister-ScheduledTask -TaskName "WSL"
 }
