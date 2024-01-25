@@ -184,6 +184,7 @@ function RunAnsiblePlaybook {
         [string] $VaultPass
     )
 
+
     Write-Host "####### Running Ansible Playbook on $Distro... #######" -f Blue
 
     wsl -d $Distro -u $CustomUser bash -c @"
@@ -253,6 +254,8 @@ $UserPass = Read-Host "User password (default: $CustomUser):"
 if (!$UserPass) { $UserPass = $CustomUser }
 
 $VaultPass = (Read-Host "Vault pass: " -AsSecureString)
+$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($VaultPass)
+$VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 
 $SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 

@@ -100,44 +100,50 @@
 # }
 
 # Menu prompt for distro
-# o {
-#   Write-Host "Choose a distro:"
-#   Write-Host "1. Arch"
-#   Write-Host "2. Ubuntu"
-#   $distroChoice = Read-Host "Enter choice (1 or 2):"
-# } until ($distroChoice -eq "1" -or $distroChoice -eq "2")
-# $Distro = switch ($distroChoice) {
-#   "1" { "Arch" }
-#   "2" { "Ubuntu" }
-# }
-# # Prompt for custom user and pass, showing defaults
-# $CustomUser = Read-Host "Custom user (default: jokerwrld):"
-# if (!$CustomUser) { $CustomUser = "jokerwrld" }
-# $UserPass = Read-Host "User password (default: $CustomUser):"
-# if (!$UserPass) { $UserPass = $CustomUser }
-# $VaultPass = (Read-Host "Vault pass: ")
-# Write-host "SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass"
-# if ($VaultPass -eq "dd"){
-#     Write-host "Trueeee"
-# }
-function Get-Confirmation ($message) {
-    $choice = Read-Host "$message (y/N)"
-    if ($choice -eq "y") {
-        return $true
-    } else {
-        return $false
-    }
+do {
+  Write-Host "Choose a distro:"
+  Write-Host "1. Arch"
+  Write-Host "2. Ubuntu"
+  $distroChoice = Read-Host "Enter choice (1 or 2):"
+} until ($distroChoice -eq "1" -or $distroChoice -eq "2")
+$Distro = switch ($distroChoice) {
+  "1" { "Arch" }
+  "2" { "Ubuntu" }
+}
+# Prompt for custom user and pass, showing defaults
+$CustomUser = Read-Host "Custom user (default: jokerwrld):"
+if (!$CustomUser) { $CustomUser = "jokerwrld" }
+$UserPass = Read-Host "User password (default: $CustomUser):"
+if (!$UserPass) { $UserPass = $CustomUser }
+$VaultPass = (Read-Host "Vault pass: " -AsSecureString)
+Write-host "SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass"
+
+$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($VaultPass)
+$VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+
+if ($VaultPass -eq "dd"){
+    Write-host "Trueeee"
 }
 
-Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
-$restartRequired = $true
-if ($restartRequired) {
-    if (Get-Confirmation "Would you like to perform an immediate reboot?") {
-        Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
-        # Restart-Computer -force
-    } else {
-        Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
-    }
-} else {
-    Write-Host "Features enabled successfully." -ForegroundColor Green
-}
+
+# function Get-Confirmation ($message) {
+#     $choice = Read-Host "$message (y/N)"
+#     if ($choice -eq "y") {
+#         return $true
+#     } else {
+#         return $false
+#     }
+# }
+
+# Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
+# $restartRequired = $true
+# if ($restartRequired) {
+#     if (Get-Confirmation "Would you like to perform an immediate reboot?") {
+#         Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
+#         # Restart-Computer -force
+#     } else {
+#         Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
+#     }
+# } else {
+#     Write-Host "Features enabled successfully." -ForegroundColor Green
+# }
