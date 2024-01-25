@@ -1,5 +1,4 @@
 #Requires -RunAsAdministrator
-$scheduledTaskName = "WSL"
 
 [CmdletBinding()]
 param (
@@ -16,6 +15,7 @@ function Get-Confirmation ($message) {
     }
 }
 
+$scheduledTaskName = "WSL"
 function CheckAndInstallFeatures() {
     Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
     if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform").State -eq "Disabled") {
