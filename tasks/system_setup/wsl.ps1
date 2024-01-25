@@ -183,8 +183,6 @@ function RunAnsiblePlaybook {
         [Parameter(Mandatory = $true)]
         [string] $VaultPass
     )
-
-
     Write-Host "####### Running Ansible Playbook on $Distro... #######" -f Blue
 
     wsl -d $Distro -u $CustomUser bash -c @"

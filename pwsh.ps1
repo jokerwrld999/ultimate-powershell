@@ -147,3 +147,20 @@ if ($VaultPass -eq "dd"){
 # } else {
 #     Write-Host "Features enabled successfully." -ForegroundColor Green
 # }
+
+
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [switch]
+    $Boot
+)
+
+if ($boot){
+    Write-Host "Wooow, Boot is working"
+}
+
+# $scriptPath = ((new-object net.webclient).DownloadString('https://gist.githubusercontent.com/AndrewSav/c4fb71ae1b379901ad90/raw/23f2d8d5fb8c9c50342ac431cc0360ce44465308/SO33205298'))
+# Invoke-Command -ScriptBlock ([scriptblock]::Create($scriptPath)) -ArgumentList "coucou"
+
+# Invoke-Command -ScriptBlock ([scriptblock]::Create([System.Text.Encoding]::UTF8.GetString((New-Object Net.WebClient).DownloadData('https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1')))) -ArgumentList "-Boot"
