@@ -136,7 +136,7 @@ function InstallArchDistro {
             break
         }
         else {
-            Write-Host "####### Installing Arch... #######" -f Blue
+            Write-Host "####### Initializing Arch... #######" -f Blue
             Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
             Start-Sleep -s 20
         }
@@ -167,7 +167,7 @@ function InstallUbuntuDistro {
             break
         }
         else {
-            Write-Host "####### Installing Ubuntu... #######" -f Blue
+            Write-Host "####### Initializing Ubuntu... #######" -f Blue
             Start-Job -Name $jobName -ScriptBlock {wsl --install -d Ubuntu}
             Start-Sleep -s 20
         }
@@ -212,6 +212,7 @@ function SetupWSLDistro {
         [string] $VaultPass = (Read-Host "Vault pass: " -AsSecureString)
     )
 
+    Write-Host "####### Installing $Distro... #######" -f Blue
 #    WSLKernelUpdate
     wsl --update
     wsl --set-default-version 2 | Out-Null
