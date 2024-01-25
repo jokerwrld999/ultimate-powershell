@@ -3,8 +3,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [switch]
-    $Boot
+    [switch] $Boot
 )
 
 function Get-Confirmation ($message) {
