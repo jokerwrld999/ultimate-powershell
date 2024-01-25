@@ -80,21 +80,64 @@
 # $(Stream-FileHash -Uri $ahkRemoteScript) -eq (Get-Content "$env:USERPROFILE\Documents\AutoHotkey\ultimate_keys.ahk.sha256")
 
 
-$packageInfo = winget list --id Microsoft.Powershell --source winget
-$versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
-if ($versionMatch){
-    $currentVersion = $versionMatch.Matches[0].Groups[1].Value
-    $availableVersion = $versionMatch.Matches.Count -gt 1
-    if ($availableVersion) {
-        Write-Host "An update is available for Google Chrome:"
-        Write-Host "  Current version: $currentVersion"
-        Write-Host "  Available version: $availableVersion"
-                Write-Host " Uninstalling... And Installing"
-    }
-    else {
-    Write-host "Up to date"
+# $packageInfo = winget list --id Microsoft.Powershell --source winget
+# $versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
+# if ($versionMatch){
+#     $currentVersion = $versionMatch.Matches[0].Groups[1].Value
+#     $availableVersion = $versionMatch.Matches.Count -gt 1
+#     if ($availableVersion) {
+#         Write-Host "An update is available for Google Chrome:"
+#         Write-Host "  Current version: $currentVersion"
+#         Write-Host "  Available version: $availableVersion"
+#                 Write-Host " Uninstalling... And Installing"
+#     }
+#     else {
+#     Write-host "Up to date"
+#     }
+# }
+# else {
+#   Write-Host "Installing...."
+# }
+
+# Menu prompt for distro
+# o {
+#   Write-Host "Choose a distro:"
+#   Write-Host "1. Arch"
+#   Write-Host "2. Ubuntu"
+#   $distroChoice = Read-Host "Enter choice (1 or 2):"
+# } until ($distroChoice -eq "1" -or $distroChoice -eq "2")
+# $Distro = switch ($distroChoice) {
+#   "1" { "Arch" }
+#   "2" { "Ubuntu" }
+# }
+# # Prompt for custom user and pass, showing defaults
+# $CustomUser = Read-Host "Custom user (default: jokerwrld):"
+# if (!$CustomUser) { $CustomUser = "jokerwrld" }
+# $UserPass = Read-Host "User password (default: $CustomUser):"
+# if (!$UserPass) { $UserPass = $CustomUser }
+# $VaultPass = (Read-Host "Vault pass: ")
+# Write-host "SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass"
+# if ($VaultPass -eq "dd"){
+#     Write-host "Trueeee"
+# }
+function Get-Confirmation ($message) {
+    $choice = Read-Host "$message (y/N)"
+    if ($choice -eq "y") {
+        return $true
+    } else {
+        return $false
     }
 }
-else {
-  Write-Host "Installing...."
+
+Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
+$restartRequired = $true
+if ($restartRequired) {
+    if (Get-Confirmation "Would you like to perform an immediate reboot?") {
+        Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
+        # Restart-Computer -force
+    } else {
+        Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
+    }
+} else {
+    Write-Host "Features enabled successfully." -ForegroundColor Green
 }

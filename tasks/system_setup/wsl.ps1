@@ -7,6 +7,15 @@ param (
     $Boot
 )
 
+function Get-Confirmation ($message) {
+    $choice = Read-Host "$message (y/N)"
+    if ($choice -eq "y") {
+        return $true
+    } else {
+        return $false
+    }
+}
+
 function CheckAndInstallFeatures() {
     Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
     if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform").State -eq "Disabled") {
@@ -20,7 +29,7 @@ function CheckAndInstallFeatures() {
 
             Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
             if ($restartRequired) {
-                if (Get-Confirmation "Would you like to perform a immediate reboot? (Y/N)") {
+                if (Get-Confirmation "Would you like to perform a immediate reboot?") {
                     Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
                     ScheduleTaskForNextBoot
                     Restart-Computer -force
@@ -86,7 +95,6 @@ function SetupCustomUser {
     }
 
 }
-
 
 function InstallArchDistro {
     $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
@@ -194,14 +202,14 @@ function RunAnsiblePlaybook {
 
 function SetupWSLDistro {
     param (
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [string] $Distro = "Arch",
         [Parameter(Mandatory = $false)]
         [string] $CustomUser = "jokerwrld",
         [Parameter(Mandatory = $false)]
         [string] $UserPass = $CustomUser,
         [Parameter(Mandatory = $true)]
-        [string] $VaultPass = {Read-Host "Vault pass: " -AsSecureString}
+        [string] $VaultPass = (Read-Host "Vault pass: " -AsSecureString)
     )
 
 #    WSLKernelUpdate
@@ -226,11 +234,30 @@ function SetupWSLDistro {
     RunAnsiblePlaybook -Distro $Distro -CustomUser $CustomUser -VaultPass $VaultPass
 }
 
-$SetupWSLDistro = SetupWSLDistro -Distro Ubuntu #-CustomUser 'username' -UserPass 'password' -VaultPass '<your_vault_pass>'
+do {
+  Write-Host "Choose a distro:"
+  Write-Host "1. Arch"
+  Write-Host "2. Ubuntu"
+  $distroChoice = Read-Host "Enter choice (1 or 2):"
+} until ($distroChoice -eq "1" -or $distroChoice -eq "2")
+$Distro = switch ($distroChoice) {
+  "1" { "Arch" }
+  "2" { "Ubuntu" }
+}
+
+$CustomUser = Read-Host "Custom user (default: jokerwrld):"
+if (!$CustomUser) { $CustomUser = "jokerwrld" }
+
+$UserPass = Read-Host "User password (default: $CustomUser):"
+if (!$UserPass) { $UserPass = $CustomUser }
+
+$VaultPass = (Read-Host "Vault pass: " -AsSecureString)
+
+$SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
+
 if (!$Boot) {
     CheckAndInstallFeatures
 }
 else {
     $SetupWSLDistro
 }
-
