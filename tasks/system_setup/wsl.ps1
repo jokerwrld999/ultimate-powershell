@@ -49,12 +49,17 @@ function CheckAndInstallFeatures() {
 
 function ScheduleTaskForNextBoot() {
     Write-Host "Scheduling task for next boot..." -ForegroundColor Blue
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File $PSCommandPath -Boot"
-    $Trigger = New-ScheduledTaskTrigger -AtStartup
-    $Settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -RunIdeIfIdle -RunIfAvailable
-    $Principal = New-ScheduledTaskPrincipal -UserId "LOCALSERVICE" -LogonType 'Service'
 
-    Register-ScheduledTask -TaskName "Continue After Boot" -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -Description "Continue Setting Up WLS After Boot"
+    $ActionScript = '& {Invoke-Command -ScriptBlock ([scriptblock]::Create([System.Text.Encoding]::UTF8.GetString((New-Object Net.WebClient).DownloadData(''https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1'')))) -ArgumentList $true}'
+
+    $Action = New-ScheduledTaskAction -Execute "PowerShell" -Argument "-NoExit -Command `"$ActionScript`""
+
+    $Trigger = New-ScheduledTaskTrigger -AtLogon
+
+    $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $Principal = New-ScheduledTaskPrincipal -UserId $currentUser
+
+    Register-ScheduledTask -TaskName "WSL" -Action $Action -Trigger $Trigger -Principal $Principal -Description "Continue Setting Up WSL After Boot"
 }
 
 function SetupCustomUser {
