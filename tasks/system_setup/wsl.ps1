@@ -58,7 +58,7 @@ function ScheduleTaskForNextBoot() {
     $Trigger = New-ScheduledTaskTrigger -AtLogon
 
     $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-    $Principal = New-ScheduledTaskPrincipal -UserId $currentUser
+    $Principal = New-ScheduledTaskPrincipal -UserId $currentUser -RunLevel Highest
 
     Register-ScheduledTask -TaskName $scheduledTaskName -Action $Action -Trigger $Trigger -Principal $Principal -Description "Continue Setting Up WSL After Boot"
 }
