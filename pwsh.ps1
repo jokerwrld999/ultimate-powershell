@@ -22,7 +22,7 @@
 
 #         Start-Process msiexec.exe -Wait -ArgumentList '/I $outFile /quiet'
 #         wsl --update
-#         wsl --set-default-version 2 | Out-null
+#         wsl --set-default-version 2 | Out-Null
 #         wsl --shutdown
 
 #         Write-Host "WSL kernel updated and set to version 2."
@@ -65,18 +65,36 @@
 #   Write-Host "Set .ahk association to $env:userprofile\scoop\apps\autohotkey\current\v2\AutoHotkey64"
 # powershell -command "& { . .\files\terminal\pwsh_scripts\SFTA.ps1; Set-FTA 'C:\Users\jokerwrld\scoop\apps\vscode\current\Code.exe' '.ahk' }"
 
-$ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk"
+# $ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk"
 
-function Stream-FileHash {
-    param (
-        $Uri
-    )
+# function Stream-FileHash {
+#     param (
+#         $Uri
+#     )
 
-    $wc = [System.Net.WebClient]::new()
-    $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
-    $FileHash.Hash
+#     $wc = [System.Net.WebClient]::new()
+#     $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
+#     $FileHash.Hash
+# }
+
+# $(Stream-FileHash -Uri $ahkRemoteScript) -eq (Get-Content "$env:USERPROFILE\Documents\AutoHotkey\ultimate_keys.ahk.sha256")
+
+
+$packageInfo = winget list --id Microsoft.Powershell --source winget
+$versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
+if ($versionMatch){
+    $currentVersion = $versionMatch.Matches[0].Groups[1].Value
+    $availableVersion = $versionMatch.Matches.Count -gt 1
+    if ($availableVersion) {
+        Write-Host "An update is available for Google Chrome:"
+        Write-Host "  Current version: $currentVersion"
+        Write-Host "  Available version: $availableVersion"
+                Write-Host " Uninstalling... And Installing"
+    }
+    else {
+    Write-host "Up to date"
+    }
 }
-
-$(Stream-FileHash -Uri $ahkRemoteScript) -eq (Get-Content "$env:USERPROFILE\Documents\AutoHotkey\ultimate_keys.ahk.sha256")
-
-
+else {
+  Write-Host "Installing...."
+}

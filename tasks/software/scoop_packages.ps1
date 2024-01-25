@@ -1,7 +1,7 @@
 # >>> Installing Scoop
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Scoop Module..." -f Blue
-    iex "& {$(irm get.scoop.sh *>$null)} -RunAsAdmin"
+    iex "& {$(irm get.scoop.sh | Out-Null)} -RunAsAdmin"
 } else {
     Write-Host "Scoop is already installed, skip installation." -f Green
 }
@@ -19,7 +19,7 @@ $buckets = @($scoopAppsBucket, $scoopMainBucket, $scoopExtrasBucket, $scoopNonPo
 foreach ($bucket in $buckets) {
     if (!(scoop bucket list | Out-String) -contains $bucket) {
         Write-Host "Adding Scoop bucket: $bucket" -f Blue
-        scoop bucket add $bucket *>$null
+        scoop bucket add $bucket | Out-Null
     } else {
         Write-Host "Scoop bucket $bucket is already added, skip adding." -f Green
     }
@@ -29,14 +29,14 @@ foreach ($bucket in $buckets) {
 $scoopRepoUrl = 'https://github.com/Ash258/Scoop-Core'
 if (!(scoop config SCOOP_REPO | Out-String) -eq $scoopRepoUrl) {
     Write-Host "Setting Scoop repository to $scoopRepoUrl" -f Blue
-    scoop config SCOOP_REPO $scoopRepoUrl *>$null
+    scoop config SCOOP_REPO $scoopRepoUrl | Out-Null
 } else {
     Write-Host "Scoop repository is already set to $scoopRepoUrl, skip setting." -f Green
 }
 
 # Update Scoop
 Write-Host "Updating Scoop Module..." -f Blue
-scoop update *>$null
+scoop update | Out-Null
 
 # Applications to install
 $applications = @(
@@ -62,7 +62,7 @@ $applications = @(
 foreach ($app in $applications) {
     if (!(Get-Command -ErrorAction SilentlyContinue -Name $app.Name)) {
         Write-Host ("Installing $($app.Name)...") -f Blue
-        scoop install $($app.Id) *>$null
+        scoop install $($app.Id) | Out-Null
     } else {
         Write-Host ("$($app.Name) is already installed, skip installation.") -f Green
     }
@@ -72,7 +72,7 @@ foreach ($app in $applications) {
 Write-Host("Installing Nerd Fonts...") -f Blue
 if (!(scoop bucket list | Out-String) -contains 'nerd-fonts') {
     Write-Host "Adding Scoop bucket: nerd-fonts" -f Blue
-    scoop bucket add nerd-fonts *>$null
+    scoop bucket add nerd-fonts | Out-Null
 } else {
     Write-Host "Scoop bucket nerd-fonts is already added, skip adding." -f Green
 }
@@ -80,7 +80,7 @@ if (!(scoop bucket list | Out-String) -contains 'nerd-fonts') {
 $nerdFonts = @('Meslo-NF', 'Meslo-NF-Mono', 'Hack-NF', 'Hack-NF-Mono', 'FiraCode-NF', 'FiraCode-NF-Mono', 'FiraMono-NF', 'FiraMono-NF-Mono')
 foreach ($font in $nerdFonts) {
     if (!(Get-Command -ErrorAction SilentlyContinue -Name $font)) {
-        scoop install $font *>$null
+        scoop install $font | Out-Null
     } else {
         Write-Host ("$font is already installed, skip installation.") -f Green
     }

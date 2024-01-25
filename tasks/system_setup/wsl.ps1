@@ -206,7 +206,7 @@ function SetupWSLDistro {
 
 #    WSLKernelUpdate
     wsl --update
-    wsl --set-default-version 2 | Out-null
+    wsl --set-default-version 2 | Out-Null
     wsl --shutdown
 
     switch ($Distro) {

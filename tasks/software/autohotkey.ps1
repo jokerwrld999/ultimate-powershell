@@ -42,11 +42,6 @@ if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
 
 # Set .ahk association and Run as admin property if not already set
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
-    if (!(Test-Path -Path $sftaScript -PathType Leaf)) {
-        Write-Host "Downloading PowerShell SFTA..." -f Blue
-        Invoke-WebRequest -Uri "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1" -OutFile $sftaScript | Out-Null
-    }
-
     Write-Host "Setting .ahk association and Run as an administrator property..." -f Blue
     powershell.exe -c "& { . $sftaScript; Set-FTA $ahkExe '.ahk' }" | Out-Null
     New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -PropertyType string -Force | Out-Null
@@ -77,7 +72,7 @@ if (!(Test-Path -Path $ahkSourceScript -PathType Leaf) -or
     }
 
     Write-Host "Starting AutoHotkey script..." -f Blue
-    Start-Process -FilePath "$ahkExe" -ArgumentList "$ahkSourceScript" -NoNewWindow *>$null
+    Start-Process -FilePath "$ahkExe" -ArgumentList "$ahkSourceScript" -NoNewWindow | Out-Null
 } else {
     Write-Host "AutoHotkey script is already up-to-date." -f Green
 }

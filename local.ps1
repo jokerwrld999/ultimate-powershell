@@ -7,7 +7,7 @@ if ($ExecutionPolicy -eq "RemoteSigned") {
 }
 else {
     Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned *>$null
+    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned | Out-Null
 }
 
 irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/tasks/main.ps1" | iex
