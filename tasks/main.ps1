@@ -20,4 +20,4 @@ Write-Host "####### Setting Up ShareX....... #######" -f Cyan
 irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/software/sharex.ps1" | iex
 
 # >>> Setting Up WSL2
-# irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1" | iex
+irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1" | iex
