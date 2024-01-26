@@ -49,7 +49,9 @@ if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
 $modulesToInstall = @('PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
     if (!(Get-InstalledModule -Name $module)) {
-        Install-Module -Name $module -Repository PSGallery -Force | Out-Null
+        $ProgressPreference = "SilentlyContinue"
+        Install-Module -Name $module -Repository PSGallery
+        -Confirm:$False -Force | Out-Null
         Write-Host ("Installed module: $module") -f Green
     }
 }
