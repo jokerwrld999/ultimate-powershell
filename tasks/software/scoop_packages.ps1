@@ -1,6 +1,6 @@
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Scoop Module..." -f Blue
-    iex "& {$(irm get.scoop.sh *>$null)} -RunAsAdmin"
+    iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
 }
 
 $buckets = @('main', 'extras', 'nerd-fonts', 'nonportable', 'games', 'Scoop-Apps')
