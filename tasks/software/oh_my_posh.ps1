@@ -46,10 +46,9 @@ if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 }
 
-if (!(Get-Module -ListAvailable -Name NuGet)) {
-  # The NuGet provider is not installed, proceed with installation.
+if (!(Get-packageProvider | Select-Object Name | Select-string "NuGet")) {
+  Install-PackageProvider -Name NuGet -Confirm:$False -Force
 } else {
-  # The NuGet provider is already installed, no need to reinstall.
   Write-Host "NuGet provider is already present."
 }
 
