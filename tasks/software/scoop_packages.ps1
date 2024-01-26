@@ -12,7 +12,7 @@ foreach ($bucket in $buckets) {
 }
 
 $scoopRepoUrl = 'https://github.com/Ash258/Scoop-Core'
-if (!(scoop config SCOOP_REPO | Out-String) -eq $scoopRepoUrl) {
+if (!((scoop config SCOOP_REPO) -eq $scoopRepoUrl)) {
     Write-Host "Setting Scoop repository to $scoopRepoUrl" -f Blue
     scoop config SCOOP_REPO $scoopRepoUrl *>$null
 }
