@@ -110,5 +110,5 @@ if ($oneDriveInstalled) {
 }
 
 Write-Host ("Deleting Temp Files...") -f Blue
-Get-ChildItem -Path "C:\Windows\Temp\" *.* -Recurse | Remove-Item -Force -Recurse *> $null
-Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse *> $null
+Get-ChildItem -Path "C:\Windows\Temp\" *.* -Recurse | Remove-Item -Force -Recurse -EA SilentlyContinue *> $null
+Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse -EA SilentlyContinue *> $null
