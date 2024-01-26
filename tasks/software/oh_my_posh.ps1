@@ -46,10 +46,10 @@ if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 }
 
-$modulesToInstall = 'PowerShellGet', 'PSReadLine', 'Terminal-Icons'
+$modulesToInstall = @('PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
     if (!(Get-InstalledModule -Name $module)) {
-        Install-Module -Name $module -Repository PSGallery -Force -AllowPrerelease | Out-Null
+        Install-Module -Name $module -Repository PSGallery -Force | Out-Null
         Write-Host ("Installed module: $module") -f Green
     }
 }
