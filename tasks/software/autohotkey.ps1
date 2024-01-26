@@ -44,7 +44,7 @@ if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
     Write-Host "Setting .ahk association and Run as an administrator property..." -f Blue
     powershell.exe -c "& { . $sftaScript; Set-FTA $ahkExe '.ahk' }" | Out-Null
-    New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -PropertyType string -Force | Out-Null
+    New-Item -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -PropertyType string -Force | Out-Null
 
     Write-Host ".ahk association and Run as admin property set." -f Green
 } else {
