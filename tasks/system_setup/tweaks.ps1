@@ -67,9 +67,9 @@ if ($UACValue -ne 0) {
     New-Item -Path 'HKCU:\Software\Classes\CLSID' -Name '{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -f | Out-Null
     New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Value '' -f | Out-Null
 
-# Set region(US) and timezone
-Set-WinHomeLocation -GeoID 244
-Set-TimeZone -Name "GTB Standard Time"
+    # Set region(US) and timezone
+    Set-WinHomeLocation -GeoID 244
+    Set-TimeZone -Name "GTB Standard Time"
 
     # Disable prompts to create an MSFT account
     Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000"
