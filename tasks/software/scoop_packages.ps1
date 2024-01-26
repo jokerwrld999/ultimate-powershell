@@ -12,8 +12,6 @@ if (!(scoop bucket list | Select-string $scoopAppsBucket)) {
     scoop bucket add Scoop-Apps 'https://github.com/ACooper81/scoop-apps'
     [Environment]::SetEnvironmentVariable('SCOOP', "$env:UserProfile\scoop", 'User')
     scoop update
-
-    iwr -useb 'https://raw.githubusercontent.com/ACooper81/scoop-apps/master/postinstall.ps1' | iex
 }
 
 $buckets = @('main', 'extras', 'nerd-fonts', 'nonportable', 'games', 'Scoop-Apps')
