@@ -17,5 +17,5 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ## One Line Install (Elevated PowerShell Recommended)
 
 ```
-irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/setup.ps1" | iex
+irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/local.ps1" | iex
 ```

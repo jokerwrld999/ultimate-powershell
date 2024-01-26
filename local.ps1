@@ -10,4 +10,4 @@ else {
     Set-ExecutionPolicy -Scope CurrentUser RemoteSigned | Out-Null
 }
 
-irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/local.ps1" | iex
+irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/tasks/main.ps1" | iex
