@@ -46,7 +46,14 @@ if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 }
 
-$modulesToInstall = @('PowerShellGet', 'PSReadLine', 'Terminal-Icons')
+if (!(Get-Module -ListAvailable -Name NuGet)) {
+  # The NuGet provider is not installed, proceed with installation.
+} else {
+  # The NuGet provider is already installed, no need to reinstall.
+  Write-Host "NuGet provider is already present."
+}
+
+$modulesToInstall = @('NuGet', 'PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
     if (!(Get-InstalledModule -Name $module)) {
         $ProgressPreference = "SilentlyContinue"
