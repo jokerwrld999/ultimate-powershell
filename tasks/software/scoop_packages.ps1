@@ -3,10 +3,11 @@ if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
     iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
 }
 
-$scoopRepoUrl = 'https://github.com/Ash258/Scoop-Core'
-if (!((scoop config SCOOP_REPO) -eq $scoopRepoUrl)) {
-    Write-Host "Setting Scoop repository to $scoopRepoUrl" -f Blue
-    scoop config SCOOP_REPO $scoopRepoUrl *>$null
+$scoopAppsBucket = 'Scoop-Apps'
+if (!(scoop bucket list | Select-string $scoopAppsBucket)) {
+    Write-Host "Setting Scoop Apps Custom Bucket" -f Blue
+    iwr -useb 'https://raw.githubusercontent.com/ACooper81/scoop-apps/master/install.ps1' | iex
+   iwr -useb 'https://raw.githubusercontent.com/ACooper81/scoop-apps/master/postinstall.ps1' | iex
 }
 
 $buckets = @('main', 'extras', 'nerd-fonts', 'nonportable', 'games', 'Scoop-Apps')
