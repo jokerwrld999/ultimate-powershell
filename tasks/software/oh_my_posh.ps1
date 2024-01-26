@@ -50,8 +50,7 @@ $modulesToInstall = @('PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
     if (!(Get-InstalledModule -Name $module)) {
         $ProgressPreference = "SilentlyContinue"
-        Install-Module -Name $module -Repository PSGallery
-        -Confirm:$False -Force | Out-Null
+        Install-Module -Name $module -Confirm:$False -Force | Out-Null
         Write-Host ("Installed module: $module") -f Green
     }
 }
