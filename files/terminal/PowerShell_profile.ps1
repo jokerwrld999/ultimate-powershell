@@ -151,7 +151,7 @@ function pubip {
 
 # Reload $PROFILE
 function reload-profile {
-    & $profile
+     & $PSHOME\profile.ps1
 }
 
 function find-file($name) {
@@ -205,8 +205,7 @@ function pgrep($name) {
 
 function speedtest()
 {
-    $test = & speedtest.exe --accept-license
-    $test
+    & speedtest.exe --accept-license
 }
 
 #######################################################
