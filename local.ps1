@@ -1,6 +1,5 @@
 #Requires -RunAsAdministrator
 
-# Set PowerShell execution policy to RemoteSigned for the current user
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($ExecutionPolicy -eq "RemoteSigned") {
     Write-Host("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green

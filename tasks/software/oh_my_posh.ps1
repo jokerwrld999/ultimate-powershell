@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 $pwshScriptsPath = "$env:USERPROFILE\Documents\Powershell\Scripts"
 $profile5Path = "C:\Windows\System32\WindowsPowerShell\v1.0"
 $profile7Path = "C:\Program Files\PowerShell\7"
@@ -8,6 +10,15 @@ $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/
 $sftaSourceScript = "$pwshScriptsPath\SFTA.ps1"
 $sftaHashFile = "$sftaSourceScript.sha256"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
+
+$ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
+if ($ExecutionPolicy -eq "RemoteSigned") {
+    Write-Host("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green
+}
+else {
+    Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
+    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned | Out-Null
+}
 
 function Stream-FileHash {
     param (
@@ -42,7 +53,7 @@ else {
   winget install --id Microsoft.Powershell --source winget
 }
 
-if (!((Get-Command oh-my-posh).Source)){
+if (!((Get-Command oh-my-posh).Source -EA SilentlyContinue)){
     Write-Host "Installing Oh-My-Posh..." -f Blue
     winget install JanDeDobbeleer.OhMyPosh -s winget | Out-Null
 }
