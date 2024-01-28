@@ -17,7 +17,7 @@ if ($ExecutionPolicy -eq "RemoteSigned") {
 }
 else {
     Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned | Out-Null
+    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -EA SilentlyContinue | Out-Null
 }
 
 function Stream-FileHash {
