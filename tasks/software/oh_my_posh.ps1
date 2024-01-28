@@ -53,7 +53,7 @@ else {
   winget install --id Microsoft.Powershell --source winget
 }
 
-if (!((Get-Command oh-my-posh).Source -EA SilentlyContinue)){
+if (!((Get-Command oh-my-posh -EA SilentlyContinue).Source)){
     Write-Host "Installing Oh-My-Posh..." -f Blue
     winget install JanDeDobbeleer.OhMyPosh -s winget | Out-Null
 }
