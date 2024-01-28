@@ -100,4 +100,8 @@ foreach ($profile in $profiles) {
 & $profile5Source
 & $profile7Source
 
+
+if (!(Test-Path -Path $env:userprofile)) {
+    New-Item -Path $env:userprofile -ItemType Directory | Out-Null
+}
 # Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -f Green

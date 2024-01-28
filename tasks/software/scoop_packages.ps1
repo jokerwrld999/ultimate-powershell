@@ -42,7 +42,7 @@ $applications = @(
     @{ Name = "Parsec"; Id = "nonportable/parsec-np" },
     @{ Name = "Python"; Id = "python" },
     @{ Name = "Sharex"; Id = "extras/sharex" },
-    @{ Name = "Speedtest"; Id = "extras/speedtest" },
+    @{ Name = "Speedtest"; Id = "main/speedtest-cli" },
     @{ Name = "Steam"; Id = "games/steam" },
     @{ Name = "Tailscale"; Id = "extras/tailscale" },
     @{ Name = "Telegram"; Id = "extras/telegram" },

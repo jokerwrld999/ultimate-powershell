@@ -110,7 +110,7 @@ Function checkcommand {
 function lf { Get-ChildItem -Path $pwd -File }
 
 # Go to the github folder
-function g { Set-Location C:\github }
+function g { Set-Location $env:USERPROFILE\github }
 
 # Git commit
 function gcom {
@@ -205,7 +205,7 @@ function pgrep($name) {
 
 function speedtest()
 {
-    $test = & speedtest --accept-license
+    $test = & speedtest.exe --accept-license
     $test
 }
 
