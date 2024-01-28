@@ -122,10 +122,15 @@ function InstallArchDistro {
         }
     }
 
+    $jobName = "InstallArch"
     while($true) {
         wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1"
         if($LASTEXITCODE -eq 0) {
-            Write-Host "####### Arch Installed Successfully#######" -f Green
+            Write-Host "####### Arch Installed Successfully. #######" -f Green
+            if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+                Stop-Job -Name $jobName
+                Remove-Job -Name $jobName
+            }
 
             wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
             if ($LASTEXITCODE -ne 0){
@@ -146,19 +151,21 @@ function InstallArchDistro {
             break
         }
         else {
-            Write-Host "####### Initializing Arch... #######" -f Blue
-            Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe
+            if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
+                Write-Host "####### Initializing Arch... #######" -f Blue
+                Start-Job -Name $jobName -ScriptBlock {Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe}
+            }
             Start-Sleep -s 20
         }
     }
 }
 
 function InstallUbuntuDistro {
-    $jobName = "InstallUbuntu"  # Replace with the actual job name
+    $jobName = "InstallUbuntu"
     while($true) {
         wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1"
         if($LASTEXITCODE -eq 0 ) {
-            Write-Host "####### Ubuntu installed successfully#######" -f Green
+            Write-Host "####### Ubuntu installed successfully. #######" -f Green
             if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
                 Stop-Job -Name $jobName
                 Remove-Job -Name $jobName
@@ -177,8 +184,10 @@ function InstallUbuntuDistro {
             break
         }
         else {
-            Write-Host "####### Initializing Ubuntu... #######" -f Blue
-            Start-Job -Name $jobName -ScriptBlock {wsl --install -d Ubuntu}
+            if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
+                Write-Host "####### Initializing Ubuntu... #######" -f Blue
+                Start-Job -Name $jobName -ScriptBlock {wsl --install -d Ubuntu}
+            }
             Start-Sleep -s 20
         }
     }

@@ -42,20 +42,23 @@ else {
   winget install --id Microsoft.Powershell --source winget
 }
 
+if (!((Get-Command oh-my-posh).Source)){
+    Write-Host "Installing Oh-My-Posh..." -f Blue
+    winget install JanDeDobbeleer.OhMyPosh -s winget | Out-Null
+}
+
 if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 }
 
-if (!(Get-packageProvider | Select-Object Name | Select-string "NuGet")) {
+if (!(Get-PackageProvider | Select-Object Name | Select-string "NuGet")) {
+  Write-Host "Installing NuGet Provider..." -f Blue
   Install-PackageProvider -Name NuGet -Confirm:$False -Force
-} else {
-  Write-Host "NuGet provider is already present."
 }
 
 $modulesToInstall = @('NuGet', 'PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
-    if (!(Get-InstalledModule -Name $module)) {
-        $ProgressPreference = "SilentlyContinue"
+    if (!(Get-Module -ListAvailable -Name $module)) {
         Install-Module -Name $module -Confirm:$False -Force | Out-Null
         Write-Host ("Installed module: $module") -f Green
     }
@@ -85,6 +88,5 @@ foreach ($profile in $profiles) {
 
 & $profile5Source
 & $profile7Source
-
 
 # Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -f Green
