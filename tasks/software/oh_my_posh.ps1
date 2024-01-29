@@ -9,8 +9,6 @@ $profileName = "profile.ps1"
 $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
 $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
-$sftaSourceScript = "$pwshScriptsPath\SFTA.ps1"
-$sftaHashFile = "$sftaSourceScript.sha256"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
 
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
