@@ -2,7 +2,9 @@
 
 $pwshScriptsPath = "$env:USERPROFILE\Documents\Powershell\Scripts"
 $profile5Path = "C:\Windows\System32\WindowsPowerShell\v1.0"
+$profile5ScriptsPath = "$profile5Path\Scripts"
 $profile7Path = "C:\Program Files\PowerShell\7"
+$profile7ScriptsPath = "$profile7Path\Scripts"
 $profileName = "profile.ps1"
 $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
@@ -29,14 +31,17 @@ function Stream-FileHash {
     $FileHash.Hash
 }
 
-if (!(Test-Path -Path $sftaSourceScript -PathType Leaf) -or
-    (Stream-FileHash -Uri $sftaRemoteScript) -ne (Get-Content $sftaHashFile -EA SilentlyContinue)) {
-    if (!(Test-Path -Path $pwshScriptsPath)) {
-        New-Item -Path $pwshScriptsPath -ItemType Directory | Out-Null
-    }
+$scripts = @($profile5ScriptsPath, $profile7ScriptsPath)
+foreach ($script in $scripts) {
+    if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
+        (Stream-FileHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
+        if (!(Test-Path -Path $script)) {
+            New-Item -Path $script -ItemType Directory | Out-Null
+        }
 
-    Invoke-WebRequest -Uri $sftaRemoteScript -OutFile $sftaSourceScript | Out-Null
-    (Get-FileHash $sftaSourceScript).Hash | Out-File $sftaHashFile
+        Invoke-WebRequest -Uri $sftaRemoteScript -OutFile "$script\SFTA.ps1" | Out-Null
+        (Get-FileHash "$script\SFTA.ps1").Hash | Out-File "$script\SFTA.ps1.sha256"
+    }
 }
 
 $packageInfo = winget list --id Microsoft.Powershell --source winget
@@ -101,7 +106,7 @@ foreach ($profile in $profiles) {
 & $profile7Source
 
 
-if (!(Test-Path -Path $env:userprofile)) {
-    New-Item -Path $env:userprofile -ItemType Directory | Out-Null
+if (!(Test-Path -Path "$env:userprofile\github")) {
+    New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
 }
 # Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -f Green

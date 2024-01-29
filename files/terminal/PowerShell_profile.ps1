@@ -4,6 +4,11 @@ $principal = New-Object Security.Principal.WindowsPrincipal $identity
 $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 #######################################################
+# GENERAL SCRIPTS
+#######################################################
+. .\Scripts\SFTA.ps1
+
+#######################################################
 # GENERAL ALIAS'S
 #######################################################
 Set-Alias -Name su -Value admin

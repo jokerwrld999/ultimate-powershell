@@ -19,3 +19,4 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 irm "https://github.com/jokerwrld999/ultimate-powershell/raw/main/local.ps1" | iex
 ```
+""
