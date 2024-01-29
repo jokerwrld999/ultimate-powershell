@@ -6,7 +6,7 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 #######################################################
 # GENERAL SCRIPTS
 #######################################################
-. .\Scripts\SFTA.ps1
+. $PSHOME\Scripts\SFTA.ps1
 
 #######################################################
 # GENERAL ALIAS'S
@@ -83,9 +83,9 @@ function dirs {
 function admin {
     if ($args.Count -gt 0) {
         $argList = "& '" + $args + "'"
-        Start-Process "$psHome\powershell.exe" -Verb runAs -ArgumentList $argList
+        Start-Process "$PSHOME\powershell.exe" -Verb runAs -ArgumentList $argList
     } else {
-        Start-Process "$psHome\powershell.exe" -Verb runAs
+        Start-Process "$PSHOME\powershell.exe" -Verb runAs
     }
 }
 
