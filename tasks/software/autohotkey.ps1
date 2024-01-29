@@ -40,10 +40,12 @@ if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
     Write-Host "AutoHotkey has been already patched." -f Green
 }
 
+powershell.exe -c "& { . $sftaScript; Set-FTA Applications\AutoHotkey64.exe .ahk }" | Out-Null
+
 # Set .ahk association and Run as admin property if not already set
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
     Write-Host "Setting .ahk association and Run as an administrator property..." -f Blue
-    powershell.exe -c "& { . $sftaScript; Set-FTA $ahkExe '.ahk' }" | Out-Null
+    powershell.exe -c "& { . $sftaScript; Set-FTA Applications\AutoHotkey64.exe .ahk }" | Out-Null
     New-Item -Path $runAsAdminReg -Force
     New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -Force | Out-Null
 
