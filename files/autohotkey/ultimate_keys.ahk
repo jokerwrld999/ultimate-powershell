@@ -12,6 +12,11 @@ ProcessSetPriority("H")
 SetWinDelay(-1)
 SetControlDelay(-1)
 
+if (!A_IsAdmin) {
+	Run("*RunAs " A_ScriptFullPath)
+	ExitApp
+}
+
 ; ************************** GLOBAL VARIABLES **************************
 Global USERPROFILE := EnvGet("USERPROFILE")
 Global APPS := USERPROFILE "\scoop\apps\"
@@ -306,7 +311,8 @@ SetDefaultKeyboard(LocaleID){
 	awindows := Array()
 	windows := owindows.Length
 	For v in owindows
-	{   awindows.Push(v)
+	{
+		awindows.Push(v)
 	}
 	Loop awindows.Length {
 		PostMessage(0x50, 0, Lan, , "ahk_id " awindows[A_Index])
