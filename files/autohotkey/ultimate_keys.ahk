@@ -14,7 +14,6 @@ SetControlDelay(-1)
 
 if (!A_IsAdmin) {
 	Run("*RunAs " A_ScriptFullPath)
-	ExitApp
 }
 
 ; ************************** GLOBAL VARIABLES **************************
