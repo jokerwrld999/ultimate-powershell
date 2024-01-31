@@ -7,88 +7,156 @@ else {
     Write-Host("All unwanted packages are already uninstalled.") -f Green
 }
 
-$path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-$name = "ConsentPromptBehaviorAdmin"
-$UACValue = Get-ItemPropertyValue -Path $path -Name $name -ErrorAction SilentlyContinue
+$global:registryChangesCount = 0
+function Set-RegistryTweaks {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path,
+  
+        [Parameter(Mandatory = $true)]
+        [hashtable] $Properties
+    )
+  
+    foreach ($property in $Properties.GetEnumerator()) {
+      $itemValue = Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue
+      if ($itemValue -ne $property.Value) {
+        Set-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force
+        $global:registryChangesCount = $global:registryChangesCount + 1
+      }
+    }
+  }
+  
+  function Create-RegistryTweaks {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path,
+  
+        [Parameter(Mandatory = $true)]
+        [hashtable] $Properties
+    )
+  
+    foreach ($property in $Properties.GetEnumerator()) {
+      $itemValue = Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue
+      if (!(Test-Path $Path)) {
+        New-Item -Path $Path -Force
+      }
+      elseif ($itemValue -ne $property.Value) {
+        New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force
+        $global:registryChangesCount = $global:registryChangesCount + 1
+      }
+    }
+  }
+  
+  $setRegistryTweaks = @(
+    @{
+        Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+        Properties = @{
+            TaskbarGlomLevel = 0
+            TaskbarSmallIcons = 1
+            MMTaskbarEnabled = 1
+            MMTaskbarMode = 2
+            TaskbarMn = 0
+            TaskbarDa = 0
+            ShowTaskViewButton = 0
+            Hidden = 1
+            HideFileExt = 1
+            Start_SearchFiles = 1
+        }
+    },
+    @{
+        Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
+        Properties = @{
+            AppsUseLightTheme = 0
+            SystemUsesLightTheme = 0
+        }
+    },
+    @{
+      Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search'
+      Properties = @{
+        SearchboxTaskbarMode = 0
+      }
+    },
+    @{
+      Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
+      Properties = @{
+        ContentDeliveryAllowed = 1
+        RotatingLockScreenEnabled = 1
+        RotatingLockScreenOverlayEnabled = 0
+        "SubscribedContent-338388Enabled" = 0
+        "SubscribedContent-338389Enabled" = 0
+        "SubscribedContent-88000326Enabled" = 0
+      }
+    },
+    @{
+      Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR'
+      Properties = @{
+        AppCaptureEnabled = 0
+      }
+    },
+    @{
+      Path = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+      Properties = @{
+        NoConnectedUser = 3
+        EnableLUA = 0
+        ConsentPromptBehaviorAdmin = 0
+      }
+    },
+    @{
+      Path = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection'
+      Properties = @{
+        AllowTelemetry = 0
+      }
+    },
+    @{
+      Path = 'HKCU:\Control Panel\Mouse'
+      Properties = @{
+        MouseSpeed = 0
+        MouseThreshold1 = 0
+        MouseThreshold2 = 0
+      }
+    }
+  )
+  
+foreach ($tweak in $setRegistryTweaks) {
+    Set-RegistryTweaks @tweak
+}
+  
+$createRegistryTweaks = @(
+    @{
+        Path = 'HKCU:\Console\%%Startup'
+        Properties = @{
+        DelegationConsole = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+        DelegationTerminal = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+        }
+    },
+    @{
+        Path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}'
+        Properties = @{
+        InprocServer32 = ''
+        }
+    }
+)
 
-if ($UACValue -ne 0) {
-    Write-Host ("Changing registry settings for taskbar, lockscreen, and more...") -f Blue
+  foreach ($tweak in $createRegistryTweaks) {
+    Create-RegistryTweaks @tweak
+  }
 
-    # Set the Windows Taskbar to always combine items
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarGlomLevel' -Value 0
-
-    # Set the Windows Taskbar to use small icons
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarSmallIcons' -Value 1
-
-    # Disable Chat, Widgets Taskbar Buttons
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'MMTaskbarEnabled' -Value 1
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'MMTaskbarMode' -Value 2
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarMn' -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarDa' -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowTaskViewButton' -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Value 0
-
-    # Set Dark Windows Theme
-    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name AppsUseLightTheme -Value 0 -Type Dword -Force
-    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name SystemUsesLightTheme -Value 0 -Type Dword -Force
-
-    # Set Terminal as Default
-    New-Item -Path "HKCU:\Console\%%Startup" -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}" -Force
-    New-Item -Path "HKCU:\Console\%%Startup" -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}" -Force
-
-    # Disable Game Overlays
-    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Name 'AppCaptureEnabled' -Value 0
-
-    # Show hidden files and folders
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Hidden' -Value 1
-
-    # Don't hide file extensions
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'HideFileExt' -Value 1
-
-    # Don't include public folders in search (faster)
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_SearchFiles' -Value 1
-
-    # Disable Taskbar / Cortana Search Box on Windows 11
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -Value "00000000";
-
-    # Don't show ads / nonsense on the lockscreen
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'ContentDeliveryAllowed' -Value 1
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'RotatingLockScreenEnabled' -Value 1
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'RotatingLockScreenOverlayEnabled' -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SubscribedContent-338388Enabled' -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SubscribedContent-338389Enabled' -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SubscribedContent-88000326Enabled' -Value 0
-
-    # Stop pestering to create a Microsoft Account. Local accounts: this is the way.
-    New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Force | Out-Null
-    New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'NoConnectedUser' -PropertyType DWord -Value 3 -Force | Out-Null
-
-    # Get rid of the incredibly stupid "Show More Options" context menu default that NO ONE ASKED FOR
-    New-Item -Path 'HKCU:\Software\Classes\CLSID' -Name '{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -f | Out-Null
-    New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Value '' -f | Out-Null
-
-    # Set region(US) and timezone
-    Set-WinHomeLocation -GeoID 244
-    Set-TimeZone -Name "GTB Standard Time"
-
-    # Disable prompts to create an MSFT account
-    Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "00000000"
-
-    # Disable Uac
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Type DWord -Value 0
-
-    Write-Host ("Disabling as much data collection / mining as we can...") -f Blue
-    Get-Service DiagTrack | Set-Service -StartupType Disabled
-    Get-Service dmwappushservice | Set-Service -StartupType Disabled
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
-
+if ($global:registryChangesCount -ne 0){
     Write-Host ("Restarting Explorer...") -f Blue
     Get-Process -Name explorer | Stop-Process
     Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -comObject Shell.Application).Windows() | foreach-object {$_.quit()}
 }
-else {
-    Write-Host "####### Registry tweaks has been already configured... #######" -ForegroundColor Green
+
+# Set region (US) and time zone if not already set
+if ((Get-WinHomeLocation).GeoId -ne 241) {
+    Set-WinHomeLocation -GeoID 241
 }
+if ((Get-TimeZone).Id -ne "FLE Standard Time") {
+    Set-TimeZone -Name "FLE Standard Time"
+}
+
+Write-Host -ForegroundColor Blue "Disabling data collection..."
+Get-Service DiagTrack, dmwappushservice | Where-Object StartupType -ne Disabled | Set-Service -StartupType Disabled
 
 # Run OOSU10
 irm "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | iex
