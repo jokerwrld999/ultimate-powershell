@@ -1,4 +1,4 @@
-﻿; --------------------------- INITIAL OPTIONS ---------------------------
+; --------------------------- INITIAL OPTIONS ---------------------------
 #Requires AutoHotkey 2.0-
 #SingleInstance Force
 ListLines(false)
@@ -123,7 +123,7 @@ return
 return
 }
 
-; Win+LShift+Ctrl+L - Swithc to Right Virtual Desktop
+; Win+LShift+Ctrl+L - Switch to Right Virtual Desktop
 #<+^L::
 {
 	Send("`"#^{Right}`"")
@@ -203,14 +203,14 @@ return
 }
 
 ; >>>>>>> PER-WINDOW SCOPE
-; LShift+Ctrl+H - Swich Window Tab Left
+; LShift+Ctrl+H - Switch Window Tab Left
 <+^H::
 {
 	Send("^+{Tab}")
 return
 }
 
-; LShift+Ctrl+L - Swich Window Tab Right
+; LShift+Ctrl+L - Switch Window Tab Right
 <+^L::
 {
 	Send("^{Tab}")

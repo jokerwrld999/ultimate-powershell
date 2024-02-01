@@ -13,91 +13,91 @@ $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/mai
 
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($ExecutionPolicy -eq "RemoteSigned") {
-    Write-Host("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green
+  Write-Host ("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green
 }
 else {
-    Write-Host("Setting execution policy to RemoteSigned for the current user...") -f Green
-    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -EA SilentlyContinue | Out-Null
+  Write-Host ("Setting execution policy to RemoteSigned for the current user...") -f Green
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -EA SilentlyContinue | Out-Null
 }
 
 function Stream-FileHash {
-    param (
-        $Uri
-    )
-    $wc = [System.Net.WebClient]::new()
-    $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
-    $FileHash.Hash
+  param(
+    $Uri
+  )
+  $wc = [System.Net.WebClient]::new()
+  $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
+  $FileHash.Hash
 }
 
-$scripts = @($profile5ScriptsPath, $profile7ScriptsPath)
+$scripts = @($profile5ScriptsPath,$profile7ScriptsPath)
 foreach ($script in $scripts) {
-    if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
-        (Stream-FileHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
-        if (!(Test-Path -Path $script)) {
-            New-Item -Path $script -ItemType Directory | Out-Null
-        }
-
-        Invoke-WebRequest -Uri $sftaRemoteScript -OutFile "$script\SFTA.ps1" | Out-Null
-        (Get-FileHash "$script\SFTA.ps1").Hash | Out-File "$script\SFTA.ps1.sha256"
+  if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
+    (Stream-FileHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
+    if (!(Test-Path -Path $script)) {
+      New-Item -Path $script -ItemType Directory | Out-Null
     }
+
+    Invoke-WebRequest -Uri $sftaRemoteScript -OutFile "$script\SFTA.ps1" | Out-Null
+    (Get-FileHash "$script\SFTA.ps1").Hash | Out-File "$script\SFTA.ps1.sha256"
+  }
 }
 
 $packageInfo = winget list --id Microsoft.Powershell --source winget
 $versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
-if ($versionMatch){
-    $currentVersion = $versionMatch.Matches[0].Groups[1].Value
-    $availableVersion = $versionMatch.Matches.Count -gt 1
-    if ($availableVersion) {
-        winget uninstall Microsoft.Powershell
-        winget install --id Microsoft.Powershell --source winget
-    }
+if ($versionMatch) {
+  $currentVersion = $versionMatch.Matches[0].Groups[1].Value
+  $availableVersion = $versionMatch.Matches.Count -gt 1
+  if ($availableVersion) {
+    winget uninstall Microsoft.Powershell
+    winget install --id Microsoft.Powershell --source winget
+  }
 }
 else {
   winget install --id Microsoft.Powershell --source winget
 }
 
-if (!((Get-Command oh-my-posh -EA SilentlyContinue).Source)){
-    Write-Host "Installing Oh-My-Posh..." -f Blue
-    winget install JanDeDobbeleer.OhMyPosh -s winget | Out-Null
+if (!((Get-Command oh-my-posh -EA SilentlyContinue).Source)) {
+  Write-Host "Installing Oh-My-Posh..." -f Blue
+  winget install JanDeDobbeleer.OhMyPosh -s winget | Out-Null
 }
 
 if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
-    Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+  Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 }
 
-if (!(Get-PackageProvider | Select-Object Name | Select-string "NuGet")) {
+if (!(Get-PackageProvider | Select-Object Name | Select-String "NuGet")) {
   Write-Host "Installing NuGet Provider..." -f Blue
   Install-PackageProvider -Name NuGet -Confirm:$False -Force
 }
 
-$modulesToInstall = @('NuGet', 'PowerShellGet', 'PSReadLine', 'Terminal-Icons')
+$modulesToInstall = @('NuGet','PowerShellGet','PSReadLine','Terminal-Icons')
 foreach ($module in $modulesToInstall) {
-    if (!(Get-Module -ListAvailable -Name $module)) {
-        Install-Module -Name $module -Confirm:$False -Force | Out-Null
-        Write-Host ("Installed module: $module") -f Green
-    }
+  if (!(Get-Module -ListAvailable -Name $module)) {
+    Install-Module -Name $module -Confirm:$False -Force | Out-Null
+    Write-Host ("Installed module: $module") -f Green
+  }
 }
 
 if (!(Test-Path -Path $profile5Path)) {
-    New-Item -Path $profile5Path -ItemType Directory | Out-Null
+  New-Item -Path $profile5Path -ItemType Directory | Out-Null
 }
 if (!(Test-Path -Path $profile7Path)) {
-    New-Item -Path $profile7Path -ItemType Directory | Out-Null
+  New-Item -Path $profile7Path -ItemType Directory | Out-Null
 }
 
-$profiles = @($profile5Source, $profile7Source)
+$profiles = @($profile5Source,$profile7Source)
 foreach ($profile in $profiles) {
-    if (!(Test-Path -Path $profile -PathType Leaf) -or
+  if (!(Test-Path -Path $profile -PathType Leaf) -or
     (Stream-FileHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {
 
-        Write-Host ("Creating Powershell Profile...") -f Blue
-        Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile
-        (Get-FileHash $profile).Hash | Out-File "$profile.sha256"
-        Write-Host "The profile @ [$profile] has been created." -f Green
-    }
-    else {
-        Write-Host "The profile @ [$profile] has been already created." -f Green
-    }
+    Write-Host ("Creating Powershell Profile...") -f Blue
+    Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile
+    (Get-FileHash $profile).Hash | Out-File "$profile.sha256"
+    Write-Host "The profile @ [$profile] has been created." -f Green
+  }
+  else {
+    Write-Host "The profile @ [$profile] has been already created." -f Green
+  }
 }
 
 & $profile5Source
@@ -105,6 +105,6 @@ foreach ($profile in $profiles) {
 
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
-    New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
+  New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
 }
 # Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -f Green

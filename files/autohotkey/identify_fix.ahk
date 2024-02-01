@@ -2,11 +2,11 @@
 
 IdentifyBySyntax(code) {
     static identify_regex := get_identify_regex()
-    
+
     ; If script requires a certain version, use that version!
     If RegExMatch(code, "im)^[ |\t]*#Requires[ |\t]+AutoHotkey[ |\t]+[>|<|=]*v?(?P<ver>1|2)\.", &m)
         return {v: m.ver, r:""}
-    
+
     ; If #Requires not found, try to determine version by regex matching
     p := 1, count_1 := count_2 := 0, version := marks := ''
     while p {
@@ -16,14 +16,14 @@ IdentifyBySyntax(code) {
         ; If error is caught, break out of check loop
         catch
             break
-            
+
         ; If no match was found, break out of loop
         if (m = "")
             break
-        
+
         p += m.Len
         if SubStr(m.mark,1,1) = 'v' {
-            switch SubStr(m.mark,2,1) {   
+            switch SubStr(m.mark,2,1) {
                 case '1': count_1++
                 case '2': count_2++
             }
@@ -31,7 +31,7 @@ IdentifyBySyntax(code) {
                 marks .= m.mark ' '
         }
     }
-    
+
     v := 0, marks := Trim(marks)
     if !count_1 && !count_2
         r := "no tell-tale matches"
@@ -44,4 +44,3 @@ IdentifyBySyntax(code) {
         ,r := marks
     return {v:v, r:r}
 }
-

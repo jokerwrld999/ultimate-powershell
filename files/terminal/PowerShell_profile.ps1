@@ -14,29 +14,29 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
-Set-Alias -Name ll -Value dir
+Set-Alias -Name ll -Value Get-ChildItem
 
 #######################################################
 # GENERAL FUNCTIONS
 #######################################################
 # Useful shortcuts for traversing directories
 function cd.. { Set-Location .. }
-function .. { Set-Location .. }
+function.. { Set-Location .. }
 function ... { Set-Location ..\.. }
 function .... { Set-Location ..\..\.. }
 function ..... { Set-Location ..\..\..\.. }
 function cdls {
-	cd "$args"
-	ls .
+  Set-Location "$args"
+  ls .
 }
 
 # Force remove
 function rmf { rm -r -fo $args }
 
 # Compute file hashes - useful for checking successful downloads
-function md5 { Get-FileHash -Algorithm MD5 $args }
-function sha1 { Get-FileHash -Algorithm SHA1 $args }
-function sha256 { Get-FileHash -Algorithm SHA256 $args }
+function md5 { Get-FileHash -Algorithm md5 $args }
+function sha1 { Get-FileHash -Algorithm sha1 $args }
+function sha256 { Get-FileHash -Algorithm sha256 $args }
 
 # Quick shortcut to start code
 function c { code "$args" }
@@ -48,67 +48,67 @@ function Env: { Set-Location Env: }
 
 # Creates drive shortcut for Work Folders, if current user account is using it
 if (Test-Path "$env:USERPROFILE\Work Folders") {
-    New-PSDrive -Name Work -PSProvider FileSystem -Root "$env:USERPROFILE\Work Folders" -Description "Work Folders"
-    function Work: { Set-Location Work: }
+  New-PSDrive -Name Work -PSProvider FileSystem -Root "$env:USERPROFILE\Work Folders" -Description "Work Folders"
+  function Work: { Set-Location Work: }
 }
 
 # Set up command prompt and window title. Use UNIX-style convention for identifying
 # whether user is elevated (root) or not. Window title shows current version of PowerShell
 # and appends [ADMIN] if appropriate for easy taskbar identification
 function prompt {
-    if ($isAdmin) {
-        "[" + (Get-Location) + "] # "
-    } else {
-        "[" + (Get-Location) + "] $ "
-    }
+  if ($isAdmin) {
+    "[" + (Get-Location) + "] # "
+  } else {
+    "[" + (Get-Location) + "] $ "
+  }
 }
 
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}" -f $PSVersionTable.PSVersion.ToString()
 if ($isAdmin) {
-    $Host.UI.RawUI.WindowTitle += " [ADMIN]"
+  $Host.UI.RawUI.WindowTitle += " [ADMIN]"
 }
 
 # Does the the rough equivalent of dir /s /b. For example, dirs *.png is dir /s /b *.png
 function dirs {
-    if ($args.Count -gt 0) {
-        Get-ChildItem -Recurse -Include "$args" | Foreach-Object FullName
-    } else {
-        Get-ChildItem -Recurse | Foreach-Object FullName
-    }
+  if ($args.Count -gt 0) {
+    Get-ChildItem -Recurse -Include "$args" | ForEach-Object FullName
+  } else {
+    Get-ChildItem -Recurse | ForEach-Object FullName
+  }
 }
 
 # Simple function to start a new elevated process. If arguments are supplied then
 # a single command is started with admin rights; if not then a new admin instance
 # of PowerShell is started.
 function admin {
-    if ($args.Count -gt 0) {
-        $argList = "& '" + $args + "'"
-        Start-Process "$PSHOME\powershell.exe" -Verb runAs -ArgumentList $argList
-    } else {
-        Start-Process "$PSHOME\powershell.exe" -Verb runAs
-    }
+  if ($args.Count -gt 0) {
+    $argList = "& '" + $args + "'"
+    Start-Process "$PSHOME\powershell.exe" -Verb runAs -ArgumentList $argList
+  } else {
+    Start-Process "$PSHOME\powershell.exe" -Verb runAs
+  }
 }
 
 # Make it easy to edit this profile once it's installed
 function Edit-Profile {
-    if ($host.Name -match "ise") {
-        $psISE.CurrentPowerShellTab.Files.Add($profile.CurrentUserAllHosts)
-    } else {
-        notepad $profile.CurrentUserAllHosts
-    }
+  if ($host.Name -match "ise") {
+    $psISE.CurrentPowerShellTab.Files.Add($profile.CurrentUserAllHosts)
+  } else {
+    notepad $profile.CurrentUserAllHosts
+  }
 }
 
 # Delete temporary variables to get to $isAdmin.
 Remove-Variable identity
 Remove-Variable principal
 
-Function checkcommand {
-    Param ($command)
-    $oldPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'SilentlyContinue'
-    try { if (Get-Command $command) { RETURN $true } }
-    Catch { Write-Host "$command does not exist"; RETURN $false }
-    Finally { $ErrorActionPreference = $oldPreference }
+function checkcommand {
+  param($command)
+  $oldPreference = $ErrorActionPreference
+  $ErrorActionPreference = 'SilentlyContinue'
+  try { if (Get-Command $command) { return $true } }
+  catch { Write-Host "$command does not exist"; return $false }
+  finally { $ErrorActionPreference = $oldPreference }
 }
 
 # List files
@@ -119,29 +119,29 @@ function g { Set-Location $env:USERPROFILE\github }
 
 # Git commit
 function gcom {
-    git add .
-    git commit -m "$args"
+  git add .
+  git commit -m "$args"
 }
 
 # Lazy git push
 function lazyg {
-    git add .
-    git commit -m "$args"
-    git push
+  git add .
+  git commit -m "$args"
+  git push
 }
 
 # Git clone repo and go to the directory
 function gclone {
-	$basename = [io.path]::GetFileNameWithoutExtension($args)
-	git clone $args
-	cd $basename
+  $basename = [io.path]::GetFileNameWithoutExtension($args)
+  git clone $args
+  Set-Location $basename
 }
 
 # Gh clone repo and go to the directory
 function ghclone {
-	$basename = "$args" -replace '^.*?/'
-	gh repo clone $args
-	cd $basename
+  $basename = "$args" -replace '^.*?/'
+  gh repo clone $args
+  Set-Location $basename
 }
 # Git push
 function gpush { git push }
@@ -151,66 +151,66 @@ function gs { git status }
 
 # Get My Public IP
 function pubip {
-    ( Invoke-RestMethod http://ifconfig.me/ip ).Content
+  (Invoke-RestMethod http://ifconfig.me/ip).Content
 }
 
 # Reload $PROFILE
 function reload-profile {
-     & $PSHOME\profile.ps1
+  & $PSHOME\profile.ps1
 }
 
-function find-file($name) {
-    Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
-        $place_path = $_.directory
-        Write-Output "${place_path}\${_}"
-    }
+function find-file ($name) {
+  Get-ChildItem -Recurse -Filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
+    $place_path = $_.Directory
+    Write-Output "${place_path}\${_}"
+  }
 }
 
 function unzip ($file) {
-    Write-Output("Extracting", $file, "to", $pwd)
-    $fullFile = Get-ChildItem -Path $pwd -Filter .\cove.zip | ForEach-Object { $_.FullName }
-    Expand-Archive -Path $fullFile -DestinationPath $pwd
+  Write-Output ("Extracting",$file,"to",$pwd)
+  $fullFile = Get-ChildItem -Path $pwd -Filter .\cove.zip | ForEach-Object { $_.FullName }
+  Expand-Archive -Path $fullFile -DestinationPath $pwd
 }
 
-function grep($regex, $dir) {
-    if ( $dir ) {
-        Get-ChildItem $dir | select-string $regex
-        return
-    }
-    $input | select-string $regex
+function grep ($regex,$dir) {
+  if ($dir) {
+    Get-ChildItem $dir | Select-String $regex
+    return
+  }
+  $input | Select-String $regex
 }
 
-function touch($file) {
-    "" | Out-File $file -Encoding ASCII
+function touch ($file) {
+  "" | Out-File $file -Encoding ASCII
 }
 
 function df {
-    get-volume
+  Get-Volume
 }
 
-function sed($file, $find, $replace) {
-    (Get-Content $file).replace("$find", $replace) | Set-Content $file
+function sed ($file,$find,$replace) {
+  (Get-Content $file).Replace("$find",$replace) | Set-Content $file
 }
 
-function which($name) {
-    Get-Command $name | Select-Object -ExpandProperty Definition
+function which ($name) {
+  Get-Command $name | Select-Object -ExpandProperty Definition
 }
 
-function export($name, $value) {
-    set-item -force -path "env:$name" -value $value;
+function export ($name,$value) {
+  Set-Item -Force -Path "env:$name" -Value $value;
 }
 
-function pkill($name) {
-    Get-Process $name -ErrorAction SilentlyContinue | Stop-Process
+function pkill ($name) {
+  Get-Process $name -ErrorAction SilentlyContinue | Stop-Process
 }
 
-function pgrep($name) {
-    Get-Process $name
+function pgrep ($name) {
+  Get-Process $name
 }
 
-function speedtest()
+function speedtest ()
 {
-    & speedtest.exe --accept-license
+  & speedtest.exe --accept-license
 }
 
 #######################################################
@@ -218,15 +218,15 @@ function speedtest()
 #######################################################
 Import-Module -Name Terminal-Icons
 Import-Module -Name PSReadLine
-Set-PSReadlineOption -EditMode Emacs
+Set-PSReadLineOption -EditMode Emacs
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
 Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
 
 # Import the Chocolatey Profile that contains the necessary code to enable
 # tab-completions to function for `choco`.
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
+if (Test-Path ($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
 }
 
 #######################################################

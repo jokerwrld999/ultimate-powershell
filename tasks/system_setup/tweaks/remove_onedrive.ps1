@@ -13,8 +13,8 @@ Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \"$env:localappdata\\M
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \"$env:programdata\\Microsoft OneDrive\"
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \"$env:systemdrive\\OneDriveTemp\"
 # check if directory is empty before removing:
-If ((Get-ChildItem \"$env:userprofile\\OneDrive\" -Recurse | Measure-Object).Count -eq 0) {
-    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \"$env:userprofile\\OneDrive\"
+if ((Get-ChildItem \"$env:userprofile\\OneDrive\" -Recurse | Measure-Object).Count -eq 0) {
+  Remove-Item -Recurse -Force -ErrorAction SilentlyContinue \"$env:userprofile\\OneDrive\"
 }
 
 Write-Host \"Remove Onedrive from explorer sidebar\"
@@ -30,7 +30,7 @@ Write-Host \"Removing startmenu entry\"
 Remove-Item -Force -ErrorAction SilentlyContinue \"$env:userprofile\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\OneDrive.lnk\"
 
 Write-Host \"Removing scheduled task\"
-Get-ScheduledTask -TaskPath '\\' -TaskName 'OneDrive*' -ea SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
+Get-ScheduledTask -TaskPath '\\' -TaskName 'OneDrive*' -EA SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
 
 # Add Shell folders restoring default locations
 Write-Host \"Shell Fixing\"

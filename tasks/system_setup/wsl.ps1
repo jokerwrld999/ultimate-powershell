@@ -1,89 +1,89 @@
 #Requires -RunAsAdministrator
 
 [CmdletBinding()]
-param (
-    [Parameter()]
-    [switch] $Boot
+param(
+  [Parameter()]
+  [switch]$Boot
 )
 
 function Get-Confirmation ($message) {
-    $choice = Read-Host "$message (y/N)"
-    if ($choice -eq "y") {
-        return $true
-    } else {
-        return $false
-    }
+  $choice = Read-Host "$message (y/N)"
+  if ($choice -eq "y") {
+    return $true
+  } else {
+    return $false
+  }
 }
 
 $scheduledTaskName = "WSL"
-function CheckAndInstallFeatures() {
-    Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
-    # if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform").State -eq "Disabled") {
-        wsl -v | Out-Null
-    if ($LASTEXITCODE -ne 0){
-        try {
-            Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
-            Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online", "/enable-feature", "/featurename:Microsoft-Windows-Subsystem-Linux", "/all", "/norestart"
-            Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online", "/enable-feature", "/featurename:VirtualMachinePlatform", "/all", "/norestart"
+function CheckAndInstallFeatures () {
+  Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
+  # if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform").State -eq "Disabled") {
+  wsl -v | Out-Null
+  if ($LASTEXITCODE -ne 0) {
+    try {
+      Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
+      Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online","/enable-feature","/featurename:Microsoft-Windows-Subsystem-Linux","/all","/norestart"
+      Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online","/enable-feature","/featurename:VirtualMachinePlatform","/all","/norestart"
 
-            wsl --install --no-distribution
+      wsl --install --no-distribution
 
-            $pendingRenameOperations = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name PendingFileRenameOperations -EA SilentlyContinue
-            $restartRequired = $pendingRenameOperations -ne $null
+      # $pendingRenameOperations = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name PendingFileRenameOperations -EA SilentlyContinue
+      # $restartRequired = $pendingRenameOperations -ne $null
 
-            Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
-            if ($restartRequired) {
-                if (Get-Confirmation "Would you like to perform a immediate reboot?") {
-                    Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
-                    ScheduleTaskForNextBoot
-                    Restart-Computer -force
-                } else {
-                    Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
-                }
-            } else {
-                Write-Host "Features enabled successfully." -ForegroundColor Green
-                $SetupWSLDistro
-            }
-        } catch {
-            Write-Host "An error occurred while configuring features." -ForegroundColor Red
-        }
-    } else {
-        Write-Host "Features are already enabled." -ForegroundColor Green
-        $SetupWSLDistro
+      # Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
+      # if ($restartRequired) {
+      # if (Get-Confirmation "Would you like to perform a immediate reboot?") {
+      Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
+      ScheduleTaskForNextBoot
+      Restart-Computer -Force
+      #   } else {
+      #     Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
+      #   }
+      # } else {
+      #   Write-Host "Features enabled successfully." -ForegroundColor Green
+      #   $SetupWSLDistro
+      # }
+    } catch {
+      Write-Host "An error occurred while configuring features." -ForegroundColor Red
     }
+  } else {
+    Write-Host "Features are already enabled." -ForegroundColor Green
+    $SetupWSLDistro
+  }
 }
 
-function ScheduleTaskForNextBoot() {
-    Write-Host "Scheduling task for next boot..." -ForegroundColor Blue
+function ScheduleTaskForNextBoot () {
+  Write-Host "Scheduling task for next boot..." -ForegroundColor Blue
 
-    $ActionScript = '& {Invoke-Command -ScriptBlock ([scriptblock]::Create([System.Text.Encoding]::UTF8.GetString((New-Object Net.WebClient).DownloadData(''https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1''))))' # -ArgumentList $true}'
+  $ActionScript = '& {Invoke-Command -ScriptBlock ([scriptblock]::Create([System.Text.Encoding]::UTF8.GetString((New-Object Net.WebClient).DownloadData(''https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1''))))' # -ArgumentList $true}'
 
-    $Action = New-ScheduledTaskAction -Execute "PowerShell" -Argument "-NoExit -Command `"$ActionScript`""
+  $Action = New-ScheduledTaskAction -Execute "PowerShell" -Argument "-NoExit -Command `"$ActionScript`""
 
-    $Trigger = New-ScheduledTaskTrigger -AtLogon
+  $Trigger = New-ScheduledTaskTrigger -AtLogon
 
-    $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-    $Principal = New-ScheduledTaskPrincipal -UserId $currentUser -RunLevel Highest
+  $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+  $Principal = New-ScheduledTaskPrincipal -UserId $currentUser -RunLevel Highest
 
-    Register-ScheduledTask -TaskName $scheduledTaskName -Action $Action -Trigger $Trigger -Principal $Principal -Description "Continue Setting Up WSL After Boot"
+  Register-ScheduledTask -TaskName $scheduledTaskName -Action $Action -Trigger $Trigger -Principal $Principal -Description "Continue Setting Up WSL After Boot"
 }
 
 function SetupCustomUser {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $Distro,
-        [Parameter(Mandatory = $true)]
-        [string] $CustomUser,
-        [Parameter(Mandatory = $false)]
-        [string] $UserPass = $CustomUser,
-        [Parameter(Mandatory = $true)]
-        [string] $SudoGroup
-    )
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Distro,
+    [Parameter(Mandatory = $true)]
+    [string]$CustomUser,
+    [Parameter(Mandatory = $false)]
+    [string]$UserPass = $CustomUser,
+    [Parameter(Mandatory = $true)]
+    [string]$SudoGroup
+  )
 
-    $UserHomeDirectoryExists = Test-Path "\\wsl$\$Distro\home\$CustomUser"
-    if (!$UserHomeDirectoryExists){
-        Write-Host "####### Setting Up Custom User $CustomUser... #######" -ForegroundColor Blue
-        wsl -d $Distro -u root /bin/bash -c @"
+  $UserHomeDirectoryExists = Test-Path "\\wsl$\$Distro\home\$CustomUser"
+  if (!$UserHomeDirectoryExists) {
+    Write-Host "####### Setting Up Custom User $CustomUser... #######" -ForegroundColor Blue
+    wsl -d $Distro -u root /bin/bash -c @"
             if ! grep -q '%$SudoGroup ALL=(ALL) NOPASSWD: ALL' /etc/sudoers.d/$SudoGroup; then
                 echo '%$SudoGroup ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/$SudoGroup
             fi
@@ -97,45 +97,45 @@ function SetupCustomUser {
                 usermod -a -G $SudoGroup $CustomUser
             fi
 "@
-        wsl --shutdown $Distro
-        Write-Host "####### Custom User $CustomUser set up is finished successfully. #######" -f Green
-    }
-    else {
-        Write-Host "####### Custom User $CustomUser has been already configured... #######" -ForegroundColor Green
-    }
+    wsl --shutdown $Distro
+    Write-Host "####### Custom User $CustomUser set up is finished successfully. #######" -f Green
+  }
+  else {
+    Write-Host "####### Custom User $CustomUser has been already configured... #######" -ForegroundColor Green
+  }
 
 }
 
 function InstallArchDistro {
-    $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
+  $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
 
-    if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
-        Write-Host "####### Downloading Arch Distro... #######" -f Blue
-        (new-Object System.Net.WebClient).DownloadFile("https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip", "$wsl_dir\Arch.zip")
+  if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
+    Write-Host "####### Downloading Arch Distro... #######" -f Blue
+    (New-Object System.Net.WebClient).DownloadFile("https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip","$wsl_dir\Arch.zip")
 
-        Write-Host "####### Extracting Arch Distro... #######" -f Green
-        Expand-Archive -Path $wsl_dir\Arch.zip -DestinationPath $wsl_dir\Arch
+    Write-Host "####### Extracting Arch Distro... #######" -f Green
+    Expand-Archive -Path $wsl_dir\Arch.zip -DestinationPath $wsl_dir\Arch
 
-        if (!(Test-Path -Path "$wsl_dir\Arch.zip") ){
-            Write-Host "####### Removing Temp Files... #######" -f Green
-            Remove-Item -Recurse -Force $wsl_dir\Arch.zip
-        }
+    if (!(Test-Path -Path "$wsl_dir\Arch.zip")) {
+      Write-Host "####### Removing Temp Files... #######" -f Green
+      Remove-Item -Recurse -Force $wsl_dir\Arch.zip
     }
+  }
 
-    $jobName = "InstallArch"
-    while($true) {
-        wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1"
-        if($LASTEXITCODE -eq 0) {
-            Write-Host "####### Arch Installed Successfully. #######" -f Green
-            if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-                Stop-Job -Name $jobName
-                Remove-Job -Name $jobName
-            }
+  $jobName = "InstallArch"
+  while ($true) {
+    wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1"
+    if ($LASTEXITCODE -eq 0) {
+      Write-Host "####### Arch Installed Successfully. #######" -f Green
+      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+        Stop-Job -Name $jobName
+        Remove-Job -Name $jobName
+      }
 
-            wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
-            if ($LASTEXITCODE -ne 0){
-                Write-Host "####### Running Arch First Setup... #######" -f Blue
-                wsl -d Arch -u root /bin/bash -c @"
+      wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "####### Running Arch First Setup... #######" -f Blue
+        wsl -d Arch -u root /bin/bash -c @"
                     rm -rf /var/lib/pacman/db.lck
                     pacman -Syyu --noconfirm >/dev/null 2>&1
                     pacman -S archlinux-keyring --needed --noconfirm >/dev/null 2>&1
@@ -143,68 +143,68 @@ function InstallArchDistro {
                     pacman -Suy --noconfirm >/dev/null 2>&1
                     pacman -S ansible git --noconfirm >/dev/null 2>&1
 "@
-                Write-Host "####### Arch First Setup is finished successfully. #######" -f Green
-            }
-            else {
-                Write-Host "####### Arch First Setup has been already completed. #######" -f Green
-            }
-            break
-        }
-        else {
-            if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
-                Write-Host "####### Initializing Arch... #######" -f Blue
-                Start-Job -Name $jobName -ScriptBlock {Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe}
-            }
-            Start-Sleep -s 20
-        }
+        Write-Host "####### Arch First Setup is finished successfully. #######" -f Green
+      }
+      else {
+        Write-Host "####### Arch First Setup has been already completed. #######" -f Green
+      }
+      break
     }
+    else {
+      if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
+        Write-Host "####### Initializing Arch... #######" -f Blue
+        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe }
+      }
+      Start-Sleep -s 20
+    }
+  }
 }
 
 function InstallUbuntuDistro {
-    $jobName = "InstallUbuntu"
-    while($true) {
-        wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1"
-        if($LASTEXITCODE -eq 0 ) {
-            Write-Host "####### Ubuntu installed successfully. #######" -f Green
-            if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-                Stop-Job -Name $jobName
-                Remove-Job -Name $jobName
-            }
+  $jobName = "InstallUbuntu"
+  while ($true) {
+    wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1"
+    if ($LASTEXITCODE -eq 0) {
+      Write-Host "####### Ubuntu installed successfully. #######" -f Green
+      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+        Stop-Job -Name $jobName
+        Remove-Job -Name $jobName
+      }
 
-            wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "####### Running Ubuntu First Setup... #######" -f Blue
-                wsl -d Ubuntu -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y >/dev/null 2>&1"
+      wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "####### Running Ubuntu First Setup... #######" -f Blue
+        wsl -d Ubuntu -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y >/dev/null 2>&1"
 
-                Write-Host "####### Ubuntu First Setup is finished successfully. #######" -f Green
-            }
-            else {
-                Write-Host "####### Ubuntu First Setup has been already completed. #######" -f Green
-            }
-            break
-        }
-        else {
-            if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
-                Write-Host "####### Initializing Ubuntu... #######" -f Blue
-                Start-Job -Name $jobName -ScriptBlock {wsl --install -d Ubuntu}
-            }
-            Start-Sleep -s 20
-        }
+        Write-Host "####### Ubuntu First Setup is finished successfully. #######" -f Green
+      }
+      else {
+        Write-Host "####### Ubuntu First Setup has been already completed. #######" -f Green
+      }
+      break
     }
+    else {
+      if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
+        Write-Host "####### Initializing Ubuntu... #######" -f Blue
+        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu }
+      }
+      Start-Sleep -s 20
+    }
+  }
 }
 
 function RunAnsiblePlaybook {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $Distro,
-        [Parameter(Mandatory = $true)]
-        [string] $CustomUser,
-        [Parameter(Mandatory = $true)]
-        [string] $VaultPass
-    )
-    Write-Host "####### Running Ansible Playbook on $Distro... #######" -f Blue
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Distro,
+    [Parameter(Mandatory = $true)]
+    [string]$CustomUser,
+    [Parameter(Mandatory = $true)]
+    [string]$VaultPass
+  )
+  Write-Host "####### Running Ansible Playbook on $Distro... #######" -f Blue
 
-    wsl -d $Distro -u $CustomUser bash -c @"
+  wsl -d $Distro -u $CustomUser bash -c @"
         mkdir -p ~/github
         cd ~/github
         if [ ! -d ansible-linux ]; then
@@ -215,42 +215,42 @@ function RunAnsiblePlaybook {
         ansible-galaxy collection install -r requirements.yml >/dev/null 2>&1
         ansible-playbook local.yml
 "@
-    Write-Host "####### Finished Ansible Playbook on $Distro... #######" -f Green
+  Write-Host "####### Finished Ansible Playbook on $Distro... #######" -f Green
 }
 
 function SetupWSLDistro {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $Distro = "Arch",
-        [Parameter(Mandatory = $false)]
-        [string] $CustomUser = "jokerwrld",
-        [Parameter(Mandatory = $false)]
-        [string] $UserPass = $CustomUser,
-        [Parameter(Mandatory = $true)]
-        [string] $VaultPass = (Read-Host "Vault pass: " -AsSecureString)
-    )
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Distro = "Arch",
+    [Parameter(Mandatory = $false)]
+    [string]$CustomUser = "jokerwrld",
+    [Parameter(Mandatory = $false)]
+    [string]$UserPass = $CustomUser,
+    [Parameter(Mandatory = $true)]
+    [string]$VaultPass = (Read-Host "Vault pass: " -AsSecureString)
+  )
 
-    Write-Host "####### Installing $Distro... #######" -f Blue
-#    WSLKernelUpdate
-    wsl --update
-    wsl --set-default-version 2 | Out-Null
-    wsl --shutdown
+  Write-Host "####### Installing $Distro... #######" -f Blue
+  #    WSLKernelUpdate
+  wsl --update
+  wsl --set-default-version 2 | Out-Null
+  wsl --shutdown
 
-    switch ($Distro) {
-        "Arch" {
-            InstallArchDistro
-            SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'wheel'
-        }
-        "Ubuntu" {
-            InstallUbuntuDistro
-            SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'sudo'
-        }
-        default {
-            Write-Host "No such distro in the list" -ForegroundColor Yellow
-            return
-        }
+  switch ($Distro) {
+    "Arch" {
+      InstallArchDistro
+      SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'wheel'
     }
-    RunAnsiblePlaybook -Distro $Distro -CustomUser $CustomUser -VaultPass $VaultPass
+    "Ubuntu" {
+      InstallUbuntuDistro
+      SetupCustomUser -Distro $Distro -CustomUser $CustomUser -SudoGroup 'sudo'
+    }
+    default {
+      Write-Host "No such distro in the list" -ForegroundColor Yellow
+      return
+    }
+  }
+  RunAnsiblePlaybook -Distro $Distro -CustomUser $CustomUser -VaultPass $VaultPass
 }
 
 do {
@@ -277,11 +277,11 @@ $VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 $SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
 if (!$Boot) {
-    CheckAndInstallFeatures
+  CheckAndInstallFeatures
 }
 else {
-    $SetupWSLDistro
-    if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
-        Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
-    }
+  $SetupWSLDistro
+  if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
+    Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
+  }
 }

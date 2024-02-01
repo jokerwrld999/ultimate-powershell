@@ -15,63 +15,63 @@ $ahkFixRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/m
 $getSFTAApp = Get-FTA .ahk
 
 function Stream-FileHash {
-    param (
-        $Uri
-    )
-    $wc = [System.Net.WebClient]::new()
-    $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
-    $FileHash.Hash
+  param(
+    $Uri
+  )
+  $wc = [System.Net.WebClient]::new()
+  $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
+  $FileHash.Hash
 }
 
 if (!(Test-Path -Path $ahkScriptsFolder -PathType Container)) {
-    Write-Host "Creating $ahkScriptsFolder folder..." -f Blue
-    New-Item -Path $ahkScriptsFolder -ItemType Directory -Force | Out-Null
+  Write-Host "Creating $ahkScriptsFolder folder..." -f Blue
+  New-Item -Path $ahkScriptsFolder -ItemType Directory -Force | Out-Null
 }
 
 if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
-    (Stream-FileHash -Uri $ahkFixRemoteScript) -ne (Get-Content $ahkFixHashFile -EA SilentlyContinue)) {
+  (Stream-FileHash -Uri $ahkFixRemoteScript) -ne (Get-Content $ahkFixHashFile -EA SilentlyContinue)) {
 
-    Write-Host "Patching AutoHotkey..." -f Blue
-    Invoke-WebRequest -Uri $ahkFixRemoteScript -OutFile $ahkFixSourceScript | Out-Null
-    (Get-FileHash $ahkFixSourceScript).Hash | Out-File $ahkFixHashFile
+  Write-Host "Patching AutoHotkey..." -f Blue
+  Invoke-WebRequest -Uri $ahkFixRemoteScript -OutFile $ahkFixSourceScript | Out-Null
+  (Get-FileHash $ahkFixSourceScript).Hash | Out-File $ahkFixHashFile
 
-    Write-Host "AutoHotkey was successfully patched @ [$ahkFixSourceScript]." -f Green
+  Write-Host "AutoHotkey was successfully patched @ [$ahkFixSourceScript]." -f Green
 } else {
-    Write-Host "AutoHotkey has been already patched." -f Green
+  Write-Host "AutoHotkey has been already patched." -f Green
 }
 
-if ( $getSFTAAPP -ne $ahkExe ) {
-    Write-Host "Setting SFTA..." -f Blue
-    Set-FTA $ahkExe .ahk
+if ($getSFTAAPP -ne $ahkExe) {
+  Write-Host "Setting SFTA..." -f Blue
+  Set-FTA $ahkExe .ahk
 }
 
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
-    New-Item -Path $runAsAdminReg -Force
-    New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -Force | Out-Null
+  New-Item -Path $runAsAdminReg -Force
+  New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -Force | Out-Null
 }
 
 if (!(Test-Path -Path $ahkSourceScript -PathType Leaf) -or
-    (Stream-FileHash -Uri $ahkRemoteScript) -ne (Get-Content $ahkHashFile -EA SilentlyContinue) -or
-    !(Test-Path -Path $ahkStartupShortcut -PathType Leaf)) {
-    Write-Host "Downloading or updating AutoHotkey script..." -f Blue
+  (Stream-FileHash -Uri $ahkRemoteScript) -ne (Get-Content $ahkHashFile -EA SilentlyContinue) -or
+  !(Test-Path -Path $ahkStartupShortcut -PathType Leaf)) {
+  Write-Host "Downloading or updating AutoHotkey script..." -f Blue
 
-    Invoke-WebRequest -Uri $ahkRemoteScript -OutFile $ahkSourceScript | Out-Null
-    (Get-FileHash $ahkSourceScript).Hash | Out-File $ahkHashFile
+  Invoke-WebRequest -Uri $ahkRemoteScript -OutFile $ahkSourceScript | Out-Null
+  (Get-FileHash $ahkSourceScript).Hash | Out-File $ahkHashFile
 
-    if (!(Test-Path -Path $ahkStartupShortcut -PathType Leaf)) {
-        Write-Host "Creating a shortcut at the Startup folder..." -f Blue
-        $WshShell = New-Object -ComObject WScript.Shell
-        $Shortcut = $WshShell.CreateShortcut($ahkStartupShortcut)
-        $Shortcut.TargetPath = $ahkSourceScript
-        $Shortcut.Save() | Out-Null
+  if (!(Test-Path -Path $ahkStartupShortcut -PathType Leaf)) {
+    Write-Host "Creating a shortcut at the Startup folder..." -f Blue
+    $WshShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut($ahkStartupShortcut)
+    $Shortcut.TargetPath = $ahkSourceScript
+    $Shortcut.Save() | Out-Null
 
-        Write-Host "Startup Shortcut is created successfully." -f Green
-    } else {
-        Write-Host "Startup Shortcut has been already created." -f Green
-    }
+    Write-Host "Startup Shortcut is created successfully." -f Green
+  } else {
+    Write-Host "Startup Shortcut has been already created." -f Green
+  }
 
-    Write-Host "Starting AutoHotkey script..." -f Blue
-    Start-Process -FilePath "$ahkStartupShortcut" | Out-Null
+  Write-Host "Starting AutoHotkey script..." -f Blue
+  Start-Process -FilePath "$ahkStartupShortcut" | Out-Null
 } else {
-    Write-Host "AutoHotkey script is already up-to-date." -f Green
+  Write-Host "AutoHotkey script is already up-to-date." -f Green
 }

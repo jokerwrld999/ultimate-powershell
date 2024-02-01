@@ -1,0 +1,39 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    # keep it before yamllint
+    rev: v3.0.2
+    hooks:
+      - name: Prettier
+        id: prettier
+        # Temporary excludes so we can gradually normalize the formatting
+        exclude: >
+          (?x)^(
+            .pre-commit-config.yaml
+          )$
+        always_run: true
+        additional_dependencies:
+          - prettier
+          - prettier-plugin-toml
+          - prettier-plugin-sort-json
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v4.4.0
+    hooks:
+      - name: Fix End Of File
+        id: end-of-file-fixer
+      - name: Fix Trailing Spaces
+        id: trailing-whitespace
+      - name: Fix Mixed Line Endings
+        id: mixed-line-ending
+      - name: Fix UTF-8
+        id: fix-byte-order-marker
+      - name: Check Merge Conflicts
+        id: check-merge-conflict
+  # - repo: https://github.com/codespell-project/codespell
+  #   rev: v2.2.5
+  #   hooks:
+  #     - name: Codespell
+  #       id: codespell
+  #       additional_dependencies:
+  #         - tomli
