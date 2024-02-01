@@ -29,7 +29,7 @@ function Stream-FileHash {
   $FileHash.Hash
 }
 
-$scripts = @($profile5ScriptsPath,$profile7ScriptsPath)
+$scripts = @($profile5ScriptsPath, $profile7ScriptsPath)
 foreach ($script in $scripts) {
   if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
     (Stream-FileHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
@@ -70,7 +70,7 @@ if (!(Get-PackageProvider | Select-Object Name | Select-String "NuGet")) {
   Install-PackageProvider -Name NuGet -Confirm:$False -Force
 }
 
-$modulesToInstall = @('NuGet','PowerShellGet','PSReadLine','Terminal-Icons')
+$modulesToInstall = @('NuGet', 'PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
   if (!(Get-Module -ListAvailable -Name $module)) {
     Install-Module -Name $module -Confirm:$False -Force | Out-Null
@@ -85,7 +85,7 @@ if (!(Test-Path -Path $profile7Path)) {
   New-Item -Path $profile7Path -ItemType Directory | Out-Null
 }
 
-$profiles = @($profile5Source,$profile7Source)
+$profiles = @($profile5Source, $profile7Source)
 foreach ($profile in $profiles) {
   if (!(Test-Path -Path $profile -PathType Leaf) -or
     (Stream-FileHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {

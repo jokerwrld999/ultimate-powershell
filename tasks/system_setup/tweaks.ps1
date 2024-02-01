@@ -20,7 +20,7 @@ function Set-RegistryTweaks {
   foreach ($property in $Properties.GetEnumerator()) {
     $itemValue = Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue
     if ($itemValue -ne $property.Value) {
-      Set-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force
+      Set-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
       $global:registryChangesCount = $global:registryChangesCount + 1
     }
   }
@@ -38,10 +38,10 @@ function Create-RegistryTweaks {
   foreach ($property in $Properties.GetEnumerator()) {
     $itemValue = Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue
     if (!(Test-Path $Path)) {
-      New-Item -Path $Path -Force
+      New-Item -Path $Path -Force | Out-Null
     }
     elseif ($itemValue -ne $property.Value) {
-      New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force
+      New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
       $global:registryChangesCount = $global:registryChangesCount + 1
     }
   }
@@ -143,7 +143,7 @@ foreach ($tweak in $createRegistryTweaks) {
 
 if ($global:registryChangesCount -ne 0) {
   Write-Host ("Restarting Explorer...") -f Blue
-  Get-Process -Name explorer | Stop-Process
+  Get-Process -Name explorer -EA SilentlyContinue | Stop-Process
   Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -ComObject Shell.Application).Windows() | ForEach-Object { $_.quit() }
 }
 
@@ -156,7 +156,7 @@ if ((Get-TimeZone).Id -ne "FLE Standard Time") {
   Set-TimeZone -Name "FLE Standard Time"
 }
 
-Get-Service DiagTrack,dmwappushservice | Where-Object StartupType -NE Disabled | Set-Service -StartupType Disabled
+Get-Service DiagTrack,dmwappushservice | Where-Object StartupType -ne Disabled | Set-Service -StartupType Disabled
 
 # Run OOSU10
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | Invoke-Expression

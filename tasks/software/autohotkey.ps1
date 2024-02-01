@@ -12,7 +12,7 @@ $ahkHashFile = "$ahkSourceScript.sha256"
 $ahkFixHashFile = "$ahkFixSourceScript.sha256"
 $ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk"
 $ahkFixRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/identify_fix.ahk"
-$getSFTAApp = Get-FTA .ahk
+$getSFTAApp =  PowerShell -Command  "& { . $PSHome\Scripts\SFTA.ps1; Get-FTA .ahk }"
 
 function Stream-FileHash {
   param(
@@ -40,9 +40,9 @@ if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
   Write-Host "AutoHotkey has been already patched." -f Green
 }
 
-if ($getSFTAAPP -ne $ahkExe) {
+if ($getSFTAAPP -ne "SFTA.AutoHotkey64.ahk") {
   Write-Host "Setting SFTA..." -f Blue
-  Set-FTA $ahkExe .ahk
+  PowerShell -Command  "& { . $PSHome\Scripts\SFTA.ps1; Register-FTA $ahkExe .ahk }"
 }
 
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
