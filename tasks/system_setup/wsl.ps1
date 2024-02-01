@@ -259,6 +259,7 @@ $VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 $SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
 if (!$Boot) {
+  Write-Host "CCCCCCCCCCC......." -f Red
   CheckAndInstallFeatures
 }
 else {
