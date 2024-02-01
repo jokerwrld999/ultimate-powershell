@@ -18,32 +18,14 @@ function Get-Confirmation ($message) {
 $scheduledTaskName = "WSL"
 function CheckAndInstallFeatures () {
   Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
-  # if ((Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform").State -eq "Disabled") {
-  wsl -v | Out-Null
-  if ($LASTEXITCODE -ne 0) {
+  if (![bool](wsl --status)) {
     try {
       Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
-      Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online","/enable-feature","/featurename:Microsoft-Windows-Subsystem-Linux","/all","/norestart"
-      Start-Process -Wait -NoNewWindow dism.exe -ArgumentList "/online","/enable-feature","/featurename:VirtualMachinePlatform","/all","/norestart"
-
       wsl --install --no-distribution
 
-      # $pendingRenameOperations = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name PendingFileRenameOperations -EA SilentlyContinue
-      # $restartRequired = $pendingRenameOperations -ne $null
-
-      # Write-Host "Restart is required: $restartRequired" -ForegroundColor Blue
-      # if ($restartRequired) {
-      # if (Get-Confirmation "Would you like to perform a immediate reboot?") {
       Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
       ScheduleTaskForNextBoot
       Restart-Computer -Force
-      #   } else {
-      #     Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
-      #   }
-      # } else {
-      #   Write-Host "Features enabled successfully." -ForegroundColor Green
-      #   $SetupWSLDistro
-      # }
     } catch {
       Write-Host "An error occurred while configuring features." -ForegroundColor Red
     }
