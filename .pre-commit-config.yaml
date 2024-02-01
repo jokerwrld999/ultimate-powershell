@@ -37,3 +37,28 @@ repos:
   #       id: codespell
   #       additional_dependencies:
   #         - tomli
+
+  - repo: local
+    hooks:
+      - id: powershell-script  # Choose a descriptive ID
+        name: Run PowerShell script
+        entry: pwsh -Command ".\pre-commit.ps1"  # Invoke PowerShell
+        language: system  # Mark as system language
+        pass_filenames: false  # Don't pass filenames by default
+        always_run: true  # Run on every commit
+        files: ''  # Run on all files (adjust as needed)
+        stages: [commit]  # Run during the commit stage
+        verbose: false
+
+  # -   id: powershell_scriptanalyzer
+  #     name: Powershell lint with PSScriptAnalyzer
+  #     description: This runs PSScriptAnalyzer on your powershell files
+  #     entry: pre-commit powershell_scriptanalyzer
+  #     language: script
+  #     files: ^.*\.ps1$
+  #     types: [text]
+  #     entry: pwsh -Command "Invoke-ScriptAnalyzer -Settings PSGallery -Recurse -ReportSummary -EnableExit -Path ."
+  #     require_serial: false
+  #     additional_dependencies: []
+  #     minimum_pre_commit_version: '0'
+  #     pass_filenames: false
