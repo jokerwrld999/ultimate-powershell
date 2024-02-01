@@ -31,7 +31,8 @@ function CheckAndInstallFeatures () {
     }
   } else {
     Write-Host "Features are already enabled." -ForegroundColor Green
-    $SetupWSLDistro
+    SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
+    # $SetupWSLDistro
   }
 }
 
@@ -256,14 +257,14 @@ $VaultPass = (Read-Host "Vault pass: " -AsSecureString)
 $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($VaultPass)
 $VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 
-$SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
+# $SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
 if (!$Boot) {
   Write-Host "CCCCCCCCCCC......." -f Red
   CheckAndInstallFeatures
 }
 else {
-  $SetupWSLDistro
+  SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
   if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
     Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
   }
