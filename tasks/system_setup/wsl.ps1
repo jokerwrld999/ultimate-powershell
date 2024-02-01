@@ -18,7 +18,8 @@ function Get-Confirmation ($message) {
 $scheduledTaskName = "WSL"
 function CheckAndInstallFeatures () {
   Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
-  if (![bool](wsl --status)) {
+  wsl --status | Out-Null
+  if ($LASTEXITCODE -ne 0) {
       Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
       wsl --install --no-distribution
 
