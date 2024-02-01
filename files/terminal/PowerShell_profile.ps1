@@ -21,7 +21,7 @@ Set-Alias -Name ll -Value Get-ChildItem
 #######################################################
 # Useful shortcuts for traversing directories
 function cd.. { Set-Location .. }
-function.. { Set-Location .. }
+function .. { Set-Location .. }
 function ... { Set-Location ..\.. }
 function .... { Set-Location ..\..\.. }
 function ..... { Set-Location ..\..\..\.. }
