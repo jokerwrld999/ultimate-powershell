@@ -19,16 +19,12 @@ $scheduledTaskName = "WSL"
 function CheckAndInstallFeatures () {
   Write-Host "########## Checking WLS 2 features... ############" -ForegroundColor Blue
   if (![bool](wsl --status)) {
-    try {
       Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
       wsl --install --no-distribution
 
       Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
       ScheduleTaskForNextBoot
       Restart-Computer -Force
-    } catch {
-      Write-Host "An error occurred while configuring features." -ForegroundColor Red
-    }
   } else {
     Write-Host "Features are already enabled." -ForegroundColor Green
     SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
