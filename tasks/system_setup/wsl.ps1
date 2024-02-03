@@ -21,10 +21,13 @@ function CheckAndInstallFeatures () {
   wsl --status | Out-Null
   if ($LASTEXITCODE -ne 0) {
       Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
-      wsl --install --no-distribution
+      Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -All -NoRestart | Out-Null
+      Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -All -NoRestart | Out-Null
+      wsl --install --no-distribution | Out-Null
 
-      if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
-        Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
+      $getScheduledTaskName = (Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName
+      if ($getScheduledTaskName -eq $scheduledTaskName) {
+        Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False | Out-Null
         ScheduleTaskForNextBoot
       } else {
         ScheduleTaskForNextBoot
@@ -297,6 +300,6 @@ if (!$Boot) {
   SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
   if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
-    Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
+    Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False | Out-Null
   }
 }
