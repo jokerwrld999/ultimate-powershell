@@ -113,15 +113,15 @@ function InstallArchDistro {
 
   $jobName = "InstallArch"
   while ($true) {
-    wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1"
+    wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Arch Installed Successfully. #######" -f Green
       if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-        Stop-Job -Name $jobName
-        Remove-Job -Name $jobName
+        Stop-Job -Name $jobName | Out-Null
+        Remove-Job -Name $jobName | Out-Null
       }
 
-      wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
+      wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
         Write-Host "####### Running Arch First Setup... #######" -f Blue
         wsl -d Arch -u root /bin/bash -c @"
@@ -140,7 +140,7 @@ function InstallArchDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Arch... #######" -f Blue
-        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe }
+        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe } | Out-Null
       }
       Start-Sleep -s 20
     }
@@ -150,18 +150,18 @@ function InstallArchDistro {
 function InstallUbuntuDistro {
   $jobName = "InstallUbuntu"
   while ($true) {
-    wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1"
+    wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Ubuntu installed successfully. #######" -f Green
       if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-        Stop-Job -Name $jobName
-        Remove-Job -Name $jobName
+        Stop-Job -Name $jobName | Out-Null
+        Remove-Job -Name $jobName | Out-Null
       }
 
-      wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1"
+      wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
         Write-Host "####### Running Ubuntu First Setup... #######" -f Blue
-        wsl -d Ubuntu -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y >/dev/null 2>&1"
+        wsl -d Ubuntu -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y >/dev/null 2>&1" | Out-Null
 
         Write-Host "####### Ubuntu First Setup is finished successfully. #######" -f Green
       } else {
@@ -171,7 +171,7 @@ function InstallUbuntuDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Ubuntu... #######" -f Blue
-        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu }
+        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Out-Null
       }
       Start-Sleep -s 20
     }

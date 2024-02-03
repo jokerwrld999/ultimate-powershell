@@ -46,7 +46,7 @@ if ($getSFTAAPP -ne "SFTA.AutoHotkey64.ahk") {
 }
 
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
-  New-Item -Path $runAsAdminReg -Force
+  New-Item -Path $runAsAdminReg -Force | Out-Null
   New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -Force | Out-Null
 }
 

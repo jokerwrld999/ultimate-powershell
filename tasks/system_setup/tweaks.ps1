@@ -1,9 +1,65 @@
-if ([bool](DISM /Online /Get-ProvisionedAppxPackages | Select-String Packagename | Select-String BingNews)) {
-  Write-Host ("Uninstalling some unwanted packages...") -f Blue
+$packagesToRemove = @(
+  'Microsoft.AppConnector'
+  'Microsoft.BingFinance'
+  'Microsoft.BingNews'
+  'Microsoft.BingSports'
+  'Microsoft.BingTranslator'
+  'Microsoft.BingWeather'
+  'Microsoft.BingFoodAndDrink'
+  'Microsoft.BingHealthAndFitness'
+  'Microsoft.BingTravel'
+  'Microsoft.MinecraftUWP'
+  'Microsoft.GamingServices'
+  'Microsoft.GamingApp'
+  'Microsoft.GetHelp'
+  'Microsoft.Getstarted'
+  'Microsoft.Messaging'
+  'Microsoft.Microsoft3DViewer'
+  'Microsoft.MicrosoftOfficeHub'
+  'Microsoft.MicrosoftSolitaireCollection'
+  'Microsoft.NetworkSpeedTest'
+  'Microsoft.News'
+  'Microsoft.Office.Lens'
+  'Microsoft.Office.Sway'
+  'Microsoft.MicrosoftStickyNotes'
+  'Microsoft.MixedReality.Portal'
+  'Microsoft.Office.OneNote'
+  'Microsoft.OneConnect'
+  'Microsoft.People'
+  'Microsoft.PowerAutomateDesktop'
+  'Microsoft.Print3D'
+  'Microsoft.ScreenSketch'
+  'Microsoft.SkypeApp'
+  'Microsoft.Todos'
+  'Microsoft.Windows.Photos'
+  'Microsoft.WindowsAlarms'
+  'Microsoft.Wallet'
+  'Microsoft.Whiteboard'
+  'Microsoft.WindowsCamera'
+  'microsoft.windowscommunicationsapps'
+  'Microsoft.WindowsFeedbackHub'
+  'Microsoft.WindowsMaps'
+  'Microsoft.WindowsSoundRecorder'
+  'Microsoft.Xbox'
+  'Microsoft.Xbox.TCUI'
+  'Microsoft.XboxApp'
+  'Microsoft.XboxGameOverlay'
+  'Microsoft.XboxSpeechToTextOverlay'
+  'Microsoft.MixedReality.Portal'
+  'Microsoft.XboxIdentityProvider'
+  'Microsoft.ConnectivityStore'
+  'Microsoft.CommsPhone'
+  'Microsoft.YourPhone'
+  'Microsoft.ZuneMusic'
+  'Microsoft.ZuneVideo'
+  'MicrosoftTeams'
+)
 
-  DISM /Online /Get-ProvisionedAppxPackages | Select-String Packagename | ForEach-Object { $_ -replace ("PackageName : ","") } | Select-String "^((?!WindowsStore).)*$" | Select-String "^((?!DesktopAppInstaller).)*$" | Select-String "^((?!Photos).)*$" | Select-String "^((?!Notepad).)*$" | Select-String "^((?!Terminal).)*$" | ForEach-Object { Remove-AppxPackage -allusers -package $_ }
-} else {
-  Write-Host ("All unwanted packages are already uninstalled.") -f Green
+foreach ($package in $packagesToRemove) {
+  if (Get-AppxPackage -Name $package -AllUsers) {
+    Write-Host "Removing package: $package"
+    Get-AppxPackage -Name $package -AllUsers | Remove-AppxPackage -AllUsers
+  }
 }
 
 $global:registryChangesCount = 0
@@ -17,8 +73,7 @@ function Set-RegistryTweaks {
   )
 
   foreach ($property in $Properties.GetEnumerator()) {
-    $itemValue = Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue
-    if ($itemValue -ne $property.Value) {
+    if ((Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue) -ne $property.Value) {
       Set-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
       $global:registryChangesCount = $global:registryChangesCount + 1
     }
@@ -35,11 +90,10 @@ function Create-RegistryTweaks {
   )
 
   foreach ($property in $Properties.GetEnumerator()) {
-    $itemValue = Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue
     if (!(Test-Path $Path)) {
       New-Item -Path $Path -Force | Out-Null
     }
-    elseif ($itemValue -ne $property.Value) {
+    elseif ((Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue) -ne $property.Value) {
       New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
       $global:registryChangesCount = $global:registryChangesCount + 1
     }
@@ -146,7 +200,6 @@ if ($global:registryChangesCount -ne 0) {
   Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -ComObject Shell.Application).Windows() | ForEach-Object { $_.quit() }
 }
 
-# Set region (US) and time zone if not already set
 if ((Get-WinHomeLocation).GeoId -ne 241) {
   Set-WinHomeLocation -GeoID 241
 }
@@ -157,7 +210,6 @@ if ((Get-TimeZone).Id -ne "FLE Standard Time") {
 
 Get-Service DiagTrack,dmwappushservice | Where-Object StartupType -ne Disabled | Set-Service -StartupType Disabled
 
-# Run OOSU10
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | Invoke-Expression
 
 $edgePackage = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name msedge

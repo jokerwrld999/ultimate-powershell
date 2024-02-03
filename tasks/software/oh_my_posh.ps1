@@ -41,17 +41,20 @@ foreach ($script in $scripts) {
   }
 }
 
-$packageInfo = winget list --id Microsoft.Powershell --source winget
-$versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
-if ($versionMatch) {
-  $currentVersion = $versionMatch.Matches[0].Groups[1].Value
-  $availableVersion = $versionMatch.Matches.Count -gt 1
-  if ($availableVersion) {
-    winget uninstall Microsoft.Powershell
-    winget install --id Microsoft.Powershell --source winget
+$packages = @('Microsoft.Powershell', 'Microsoft.WindowsTerminal')
+foreach ($package in $packages) {
+  $packageInfo = winget list --id $package --source winget
+  $versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
+  if ($versionMatch) {
+    $currentVersion = $versionMatch.Matches[0].Groups[1].Value
+    $availableVersion = $versionMatch.Matches.Count -gt 1
+    if ($availableVersion) {
+      winget uninstall $package
+      winget install --id $package --source winget
+    }
+  } else {
+    winget install --id $package --source winget
   }
-} else {
-  winget install --id Microsoft.Powershell --source winget
 }
 
 if (!((Get-Command oh-my-posh -EA SilentlyContinue).Source)) {
@@ -99,7 +102,6 @@ foreach ($profile in $profiles) {
 
 & $profile5Source
 & $profile7Source
-
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
   New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
