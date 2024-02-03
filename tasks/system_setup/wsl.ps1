@@ -36,7 +36,7 @@ function CheckAndInstallFeatures () {
 function ScheduleTaskForNextBoot () {
   Write-Host "Scheduling task for next boot..." -ForegroundColor Blue
 
-  $ActionScript = '& {Invoke-Command -ScriptBlock ([scriptblock]::Create([System.Text.Encoding]::UTF8.GetString((New-Object Net.WebClient).DownloadData(''https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1''))))' # -ArgumentList $true}'
+  $ActionScript = '& {Invoke-Command -ScriptBlock ([scriptblock]::Create([System.Text.Encoding]::UTF8.GetString((New-Object Net.WebClient).DownloadData(''https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1''))))}' # -ArgumentList $true}'
 
   $Action = New-ScheduledTaskAction -Execute "PowerShell" -Argument "-NoExit -Command `"$ActionScript`""
 
@@ -257,7 +257,6 @@ $VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 # $SetupWSLDistro = SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
 if (!$Boot) {
-  Write-Host "CCCCCCCCCCC......." -f Red
   CheckAndInstallFeatures
 }
 else {
