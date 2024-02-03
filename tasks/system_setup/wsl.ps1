@@ -29,7 +29,6 @@ function CheckAndInstallFeatures () {
   } else {
     Write-Host "Features are already enabled." -ForegroundColor Green
     SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
-    # $SetupWSLDistro
   }
 }
 
@@ -264,8 +263,18 @@ function Get-UserInput {
   }
 }
 
-function Save-UserInput {
-    $wslVarsFile = "$env:userprofile\.wsl_vars.json"
+$wslVarsFile = "$env:userprofile\.wsl_vars.json"
+function Get-WSLVars {
+  if (Test-Path -Path $wslVarsFile) {
+      # Read variables from file if it exists
+      return Get-Content -Path $wslVarsFile -Raw | ConvertFrom-Json
+  } else {
+      # Prompt for user input if file doesn't exist
+      return Save-UserInput
+  }
+}
+
+function Set-WSLVars {
 
     $setWSLVars = Get-UserInput
     $setWSLVars | ConvertTo-Json | Out-File -FilePath $wslVarsFile
@@ -273,9 +282,8 @@ function Save-UserInput {
     return $setWSLVars
 }
 
-$getWSLVars = Save-UserInput
+$getWSLVars = if (!$Boot) { Set-WSLVars } else { Get-WSLVars }
 
-# Access the variables
 $Distro = $getWSLVars.Distro
 $CustomUser = $getWSLVars.CustomUser
 $UserPass = $getWSLVars.UserPass
@@ -286,6 +294,7 @@ if (!$Boot) {
 }
 else {
   SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
+
   if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
     Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
   }
