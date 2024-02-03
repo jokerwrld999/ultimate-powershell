@@ -23,9 +23,17 @@ function CheckAndInstallFeatures () {
       Write-Host "Enabling WLS 2 features..." -ForegroundColor Blue
       wsl --install --no-distribution
 
-      Write-Host "Rescheduling task for next boot..." -ForegroundColor Blue
-      ScheduleTaskForNextBoot
-      Restart-Computer -Force
+      if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
+        Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$False
+        ScheduleTaskForNextBoot
+      } else {
+        ScheduleTaskForNextBoot
+      }
+      if (Get-Confirmation "Would you like to perform a immediate reboot?") {
+        Restart-Computer -Force
+      } else {
+          Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
+      }
   } else {
     Write-Host "Features are already enabled." -ForegroundColor Green
     SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
@@ -78,8 +86,7 @@ function SetupCustomUser {
 "@
     wsl --shutdown $Distro
     Write-Host "####### Custom User $CustomUser set up is finished successfully. #######" -f Green
-  }
-  else {
+  } else {
     Write-Host "####### Custom User $CustomUser has been already configured... #######" -ForegroundColor Green
   }
 
@@ -123,13 +130,11 @@ function InstallArchDistro {
                     pacman -S ansible git --noconfirm >/dev/null 2>&1
 "@
         Write-Host "####### Arch First Setup is finished successfully. #######" -f Green
-      }
-      else {
+      } else {
         Write-Host "####### Arch First Setup has been already completed. #######" -f Green
       }
       break
-    }
-    else {
+    } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Arch... #######" -f Blue
         Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe }
@@ -156,13 +161,11 @@ function InstallUbuntuDistro {
         wsl -d Ubuntu -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y >/dev/null 2>&1"
 
         Write-Host "####### Ubuntu First Setup is finished successfully. #######" -f Green
-      }
-      else {
+      } else {
         Write-Host "####### Ubuntu First Setup has been already completed. #######" -f Green
       }
       break
-    }
-    else {
+    } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Ubuntu... #######" -f Blue
         Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu }
@@ -266,10 +269,8 @@ function Get-UserInput {
 $wslVarsFile = "$env:userprofile\.wsl_vars.json"
 function Get-WSLVars {
   if (Test-Path -Path $wslVarsFile) {
-      # Read variables from file if it exists
       return Get-Content -Path $wslVarsFile -Raw | ConvertFrom-Json
   } else {
-      # Prompt for user input if file doesn't exist
       return Save-UserInput
   }
 }
@@ -291,8 +292,8 @@ $VaultPass = $getWSLVars.VaultPass
 
 if (!$Boot) {
   CheckAndInstallFeatures
-}
-else {
+} else {
+  Write-Host "After Boot"
   SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
   if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {

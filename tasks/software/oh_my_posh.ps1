@@ -14,8 +14,7 @@ $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/mai
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($ExecutionPolicy -eq "RemoteSigned") {
   Write-Host ("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green
-}
-else {
+} else {
   Write-Host ("Setting execution policy to RemoteSigned for the current user...") -f Green
   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -EA SilentlyContinue | Out-Null
 }
@@ -51,8 +50,7 @@ if ($versionMatch) {
     winget uninstall Microsoft.Powershell
     winget install --id Microsoft.Powershell --source winget
   }
-}
-else {
+} else {
   winget install --id Microsoft.Powershell --source winget
 }
 
@@ -94,8 +92,7 @@ foreach ($profile in $profiles) {
     Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile
     (Get-FileHash $profile).Hash | Out-File "$profile.sha256"
     Write-Host "The profile @ [$profile] has been created." -f Green
-  }
-  else {
+  } else {
     Write-Host "The profile @ [$profile] has been already created." -f Green
   }
 }

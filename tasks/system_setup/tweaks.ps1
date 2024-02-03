@@ -2,8 +2,7 @@ if ([bool](DISM /Online /Get-ProvisionedAppxPackages | Select-String Packagename
   Write-Host ("Uninstalling some unwanted packages...") -f Blue
 
   DISM /Online /Get-ProvisionedAppxPackages | Select-String Packagename | ForEach-Object { $_ -replace ("PackageName : ","") } | Select-String "^((?!WindowsStore).)*$" | Select-String "^((?!DesktopAppInstaller).)*$" | Select-String "^((?!Photos).)*$" | Select-String "^((?!Notepad).)*$" | Select-String "^((?!Terminal).)*$" | ForEach-Object { Remove-AppxPackage -allusers -package $_ }
-}
-else {
+} else {
   Write-Host ("All unwanted packages are already uninstalled.") -f Green
 }
 
