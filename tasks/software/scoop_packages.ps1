@@ -6,19 +6,19 @@ if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
 $scoopAppsBucket = 'Scoop-Apps'
 if (!(scoop bucket list | Select-String $scoopAppsBucket)) {
   Write-Host "Setting Scoop Apps Custom Bucket" -f Blue
-  scoop install gsudo git scoop-search
-  scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core'
-  scoop bucket add 'Base'
-  scoop bucket add Scoop-Apps 'https://github.com/ACooper81/scoop-apps'
+  scoop install gsudo git scoop-search *> $null
+  scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core' *> $null
+  scoop bucket add 'Base' *> $null
+  scoop bucket add Scoop-Apps 'https://github.com/ACooper81/scoop-apps' *> $null
   [Environment]::SetEnvironmentVariable('SCOOP',"$env:UserProfile\scoop",'User')
-  scoop update
+  scoop update *> $null
 }
 
 $buckets = @('main','extras','nerd-fonts','nonportable','games','Scoop-Apps')
 foreach ($bucket in $buckets) {
   if (!(scoop bucket list | Select-String $bucket)) {
     Write-Host "Adding Scoop bucket: $bucket" -f Blue
-    scoop bucket add $bucket
+    scoop bucket add $bucket *> $null
   }
 }
 
