@@ -25,7 +25,7 @@ function Get-UserInput {
       Distro = $Distro
       CustomUser = $CustomUser
       UserPass = $UserPass
-      VaultPass = $VaultPass  # Don't store sensitive data in plain text
+      VaultPass = $VaultPass
   }
 }
 
@@ -38,7 +38,6 @@ function Get-AndSaveUserInput {
     return $setWSLVars
 }
 
-# Usage
 $getWSLVars = Get-AndSaveUserInput
 
 
@@ -47,8 +46,8 @@ $getWSLVars = Get-AndSaveUserInput
 Write-Host "Get Wsl Vars: $getWSLVars"
 Write-Host "Get Wsl Vars:" $getWSLVars.Distro
 
-# # Access the variables
-# $Distro = $wslVariables.Distro
-# $CustomUser = $wslVariables.CustomUser
-# $UserPass = $wslVariables.UserPass
-# $VaultPass = $wslVariables.VaultPass  # Not recommended for sensitive data
+# Access the variables
+$Distro = $wslVariables.Distro
+$CustomUser = $wslVariables.CustomUser
+$UserPass = $wslVariables.UserPass
+$VaultPass = $wslVariables.VaultPass
