@@ -1,5 +1,10 @@
 #Requires -RunAsAdministrator
 
+$ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
+if ($ExecutionPolicy -ne "RemoteSigned") {
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+}
+
 $pwshScriptsPath = "$env:USERPROFILE\Documents\Powershell\Scripts"
 $profile5Path = "C:\Windows\System32\WindowsPowerShell\v1.0"
 $profile5ScriptsPath = "$profile5Path\Scripts"
@@ -10,14 +15,6 @@ $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
 $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
-
-$ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
-if ($ExecutionPolicy -eq "RemoteSigned") {
-  Write-Host ("Execution policy is already set to RemoteSigned for the current user, skipping...") -f Green
-} else {
-  Write-Host ("Setting execution policy to RemoteSigned for the current user...") -f Green
-  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -EA SilentlyContinue | Out-Null
-}
 
 function Stream-FileHash {
   param(
