@@ -41,6 +41,13 @@ foreach ($script in $scripts) {
   }
 }
 
+if (!(Get-PSSessionConfiguration -Name 'Microsoft.PowerShell').Enabled) {
+    Enable-PSRemoting -SkipNetworkProfileCheck -Force *>$null
+    Write-Verbose "PowerShell Remoting enabled successfully."
+} else {
+    Write-Verbose "PowerShell Remoting is already enabled."
+}
+
 $packages = @('Microsoft.Powershell', 'Microsoft.WindowsTerminal')
 foreach ($package in $packages) {
   $packageInfo = winget list --id $package --source winget
@@ -49,11 +56,11 @@ foreach ($package in $packages) {
     $currentVersion = $versionMatch.Matches[0].Groups[1].Value
     $availableVersion = $versionMatch.Matches.Count -gt 1
     if ($availableVersion) {
-      winget uninstall $package
-      winget install --id $package --source winget
+      Get-AppxPackage $package -AllUsers | Remove-AppxPackage -AllUsers | Out-Null
+      winget install --id $package --source winget | Out-Null
     }
   } else {
-    winget install --id $package --source winget
+    winget install --id $package --source winget | Out-Null
   }
 }
 
