@@ -44,8 +44,6 @@ foreach ($script in $scripts) {
 if (!(Get-PSSessionConfiguration -Name 'Microsoft.PowerShell').Enabled) {
     Enable-PSRemoting -SkipNetworkProfileCheck -Force *>$null
     Write-Verbose "PowerShell Remoting enabled successfully."
-} else {
-    Write-Verbose "PowerShell Remoting is already enabled."
 }
 
 $packages = @('Microsoft.Powershell', 'Microsoft.WindowsTerminal')
@@ -57,16 +55,16 @@ foreach ($package in $packages) {
     $availableVersion = $versionMatch.Matches.Count -gt 1
     if ($availableVersion) {
       Get-AppxPackage $package -AllUsers | Remove-AppxPackage -AllUsers | Out-Null
-      winget install --id $package --source winget | Out-Null
+      winget install --silent --id $package --source winget | Out-Null
     }
   } else {
-    winget install --id $package --source winget | Out-Null
+    winget install --silent --id $package --source winget | Out-Null
   }
 }
 
 if (!((Get-Command oh-my-posh -EA SilentlyContinue).Source)) {
   Write-Host "Installing Oh-My-Posh..." -f Blue
-  winget install JanDeDobbeleer.OhMyPosh -s winget | Out-Null
+  winget install --silent JanDeDobbeleer.OhMyPosh -s winget | Out-Null
 }
 
 if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
