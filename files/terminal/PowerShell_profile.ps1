@@ -15,6 +15,7 @@ Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
 Set-Alias -Name ll -Value Get-ChildItem
+Set-Alias -Name ssh-copy -Value win-ssh-copy-id
 
 #######################################################
 # GENERAL FUNCTIONS
@@ -213,18 +214,14 @@ function speedtest ()
   & speedtest.exe --accept-license
 }
 
-function ssh-copy-id ($pcName) {
+function win-ssh-copy-id ($pcName) {
   $authorizedKey = Get-Content -Path "$env:USERPROFILE\.ssh\id_ed25519.pub"
 
-  try {
-      Invoke-Command -ComputerName $pcName -ScriptBlock {
-          Add-Content -Force -Path $env:ProgramData\ssh\administrators_authorized_keys -Value $args[0]
-          icacls.exe "$env:ProgramData\ssh\administrators_authorized_keys" /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
-      } -ArgumentList $authorizedKey
-      Write-Host "Public key copied to $pcName successfully." -ForegroundColor Green
-  } catch {
-      Write-Host "Error copying public key to $pcName: $_" -ForegroundColor Red
-  }
+  Invoke-Command -ComputerName $pcName -ScriptBlock {
+      Add-Content -Force -Path $env:ProgramData\ssh\administrators_authorized_keys -Value $args[0]
+      icacls.exe "$env:ProgramData\ssh\administrators_authorized_keys" /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
+  } -ArgumentList $authorizedKey
+  Write-Host "Public key copied to $pcName successfully." -ForegroundColor Green
 }
 
 #######################################################
