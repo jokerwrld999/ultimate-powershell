@@ -28,8 +28,13 @@ if ((Get-Service -Name ssh-agent -ErrorAction SilentlyContinue).Status -eq 'Stop
     Start-Service ssh-agent
 }
 
-$keyPath = "$env:USERPROFILE\.ssh\id_ed25519"
+$sshPath = "$env:USERPROFILE\.ssh"
+$keyPath = "$sshPath\id_ed25519"
 if (!(Test-Path $keyPath)) {
+  if (!(Test-Path -Path $sshPath)) {
+    New-Item -Path $sshPath -ItemType Directory | Out-Null
+  }
+
   ssh-keygen -q -t ed25519 -f $keyPath -N '""'
 
   ssh-add -l | Out-Null
