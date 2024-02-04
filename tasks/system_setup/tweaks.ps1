@@ -65,7 +65,7 @@ foreach ($package in $packagesToRemove) {
 }
 
 $global:registryChangesCount = 0
-function Set-RegistryTweaks {
+function Set-Registry {
   param(
     [Parameter(Mandatory = $true)]
     [string]$Path,
@@ -82,7 +82,7 @@ function Set-RegistryTweaks {
   }
 }
 
-function Create-RegistryTweaks {
+function New-Registry {
   param(
     [Parameter(Mandatory = $true)]
     [string]$Path,
@@ -173,7 +173,7 @@ $setRegistryTweaks = @(
 )
 
 foreach ($tweak in $setRegistryTweaks) {
-  Set-RegistryTweaks @tweak
+  Set-Registry @tweak
 }
 
 $createRegistryTweaks = @(
@@ -193,7 +193,7 @@ $createRegistryTweaks = @(
 )
 
 foreach ($tweak in $createRegistryTweaks) {
-  Create-RegistryTweaks @tweak
+  New-Registry @tweak
 }
 
 if ($global:registryChangesCount -ne 0) {

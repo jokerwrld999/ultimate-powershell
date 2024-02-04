@@ -15,7 +15,7 @@ function Get-Hostname {
 
             if ($ipAddress -match $ipv4Pattern) {
                 Write-Host "Checking hostname..." -ForegroundColor Blue
-                $hostname = ([system.net.dns]::gethostentry($ipAddress)).HostName
+                $hostname = ([system.net.dns]::GetHostEntry($ipAddress)).HostName
                 Write-Host "Hostname $hostname exists with IP address $ipAddress." -ForegroundColor Green
                 return $hostname
             } elseif ($ipAddress -eq '') {

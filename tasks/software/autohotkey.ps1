@@ -15,7 +15,7 @@ $ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main
 $ahkFixRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/identify_fix.ahk"
 $getSFTAApp =  PowerShell -Command  "& { . $PSHome\Scripts\SFTA.ps1; Get-FTA .ahk }"
 
-function Stream-FileHash {
+function Get-UriHash {
   param(
     $Uri
   )
@@ -30,7 +30,7 @@ if (!(Test-Path -Path $ahkScriptsFolder -PathType Container)) {
 }
 
 if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
-  (Stream-FileHash -Uri $ahkFixRemoteScript) -ne (Get-Content $ahkFixHashFile -EA SilentlyContinue)) {
+  (Get-UriHash -Uri $ahkFixRemoteScript) -ne (Get-Content $ahkFixHashFile -EA SilentlyContinue)) {
 
   Write-Host "Patching AutoHotkey..." -f Blue
   Invoke-WebRequest -Uri $ahkFixRemoteScript -OutFile $ahkFixSourceScript | Out-Null
@@ -52,7 +52,7 @@ if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction Sile
 }
 
 if (!(Test-Path -Path $ahkSourceScript -PathType Leaf) -or
-  (Stream-FileHash -Uri $ahkRemoteScript) -ne (Get-Content $ahkHashFile -EA SilentlyContinue) -or
+  (Get-UriHash -Uri $ahkRemoteScript) -ne (Get-Content $ahkHashFile -EA SilentlyContinue) -or
   !(Test-Path -Path $ahkStartupShortcut -PathType Leaf)) {
   Write-Host "Downloading or updating AutoHotkey script..." -f Blue
 

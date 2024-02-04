@@ -5,7 +5,6 @@ if ($ExecutionPolicy -ne "RemoteSigned") {
   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 }
 
-$pwshScriptsPath = "$env:USERPROFILE\Documents\Powershell\Scripts"
 $profile5Path = "C:\Windows\System32\WindowsPowerShell\v1.0"
 $profile5ScriptsPath = "$profile5Path\Scripts"
 $profile7Path = "C:\Program Files\PowerShell\7"
@@ -16,7 +15,7 @@ $profile7Source = "$profile7Path\$profileName"
 $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
 
-function Stream-FileHash {
+function Get-UriHash {
   param(
     $Uri
   )
@@ -28,7 +27,7 @@ function Stream-FileHash {
 $scripts = @($profile5ScriptsPath, $profile7ScriptsPath)
 foreach ($script in $scripts) {
   if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
-    (Stream-FileHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
+    (Get-UriHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
     if (!(Test-Path -Path $script)) {
       New-Item -Path $script -ItemType Directory | Out-Null
     }
@@ -48,7 +47,6 @@ foreach ($package in $packages) {
   $packageInfo = winget list --id $package --source winget
   $versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
   if ($versionMatch) {
-    $currentVersion = $versionMatch.Matches[0].Groups[1].Value
     $availableVersion = $versionMatch.Matches.Count -gt 1
     if ($availableVersion) {
       Get-AppxPackage $package -AllUsers | Remove-AppxPackage -AllUsers | Out-Null
@@ -91,7 +89,7 @@ if (!(Test-Path -Path $profile7Path)) {
 $profiles = @($profile5Source, $profile7Source)
 foreach ($profile in $profiles) {
   if (!(Test-Path -Path $profile -PathType Leaf) -or
-    (Stream-FileHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {
+    (Get-UriHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {
 
     Write-Host ("Creating Powershell Profile...") -f Blue
     Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile

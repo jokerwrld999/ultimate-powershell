@@ -206,7 +206,7 @@ function RunAnsiblePlaybook {
 function SetupWSLDistro {
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Distro = "Arch",
+    [string]$Distro,
     [Parameter(Mandatory = $false)]
     [string]$CustomUser = "jokerwrld",
     [Parameter(Mandatory = $false)]

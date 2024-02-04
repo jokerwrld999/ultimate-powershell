@@ -6,7 +6,7 @@ $sharexBackupSource = "$sharexBackupFolder\ShareX_backup.sxb"
 $sharexHashFile = "$sharexBackupSource.sha256"
 $sharexRemoteFile = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/sharex/ShareX_backup.sxb"
 
-function Stream-FileHash {
+function Get-UriHash {
   param(
     $Uri
   )
@@ -21,7 +21,7 @@ if (!(Test-Path -Path $sharexBackupFolder -PathType Container)) {
 }
 
 if (!(Test-Path -Path $sharexBackupSource -PathType Leaf) -or
-  (Stream-FileHash -Uri $sharexRemoteFile) -ne (Get-Content $sharexHashFile -EA SilentlyContinue)) {
+  (Get-UriHash -Uri $sharexRemoteFile) -ne (Get-Content $sharexHashFile -EA SilentlyContinue)) {
 
   Write-Host "Restoring ShareX Backup..." -f Blue
   Invoke-WebRequest -Uri $sharexRemoteFile -OutFile $sharexBackupSource

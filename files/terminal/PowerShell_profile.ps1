@@ -233,13 +233,6 @@ Set-PSReadLineOption -EditMode Emacs
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
 Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
 
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path ($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
-}
-
 #######################################################
 # SET PWSH PROMPT
 #######################################################

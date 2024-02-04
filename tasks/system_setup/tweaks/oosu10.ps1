@@ -4,7 +4,7 @@ $cfgFilePath = "$folderPath\ooshutup10.cfg"
 $cfgHashFile = "$folderPath\ooshutup10.cfg.sha256"
 $exeFilePath = "$folderPath\OOSU10.exe"
 
-function Stream-FileHash {
+function Get-UriHash {
   param(
     $Uri
   )
@@ -23,7 +23,7 @@ if (!(Test-Path -Path $exeFilePath)) {
 }
 
 if (!(Test-Path -Path $cfgFilePath) -or
-  (Stream-FileHash -Uri $cfgRemoteScript) -ne (Get-Content $cfgHashFile -EA SilentlyContinue)) {
+  (Get-UriHash -Uri $cfgRemoteScript) -ne (Get-Content $cfgHashFile -EA SilentlyContinue)) {
 
   Invoke-WebRequest -Uri $cfgRemoteScript -OutFile $cfgFilePath | Out-Null
   (Get-FileHash $cfgFilePath).Hash | Out-File $cfgHashFile
