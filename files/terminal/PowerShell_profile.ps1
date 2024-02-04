@@ -213,6 +213,20 @@ function speedtest ()
   & speedtest.exe --accept-license
 }
 
+function ssh-copy-id ($pcName) {
+  $authorizedKey = Get-Content -Path "$env:USERPROFILE\.ssh\id_ed25519.pub"
+
+  try {
+      Invoke-Command -ComputerName $pcName -ScriptBlock {
+          Add-Content -Force -Path $env:ProgramData\ssh\administrators_authorized_keys -Value $args[0]
+          icacls.exe "$env:ProgramData\ssh\administrators_authorized_keys" /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
+      } -ArgumentList $authorizedKey
+      Write-Host "Public key copied to $pcName successfully." -ForegroundColor Green
+  } catch {
+      Write-Host "Error copying public key to $pcName: $_" -ForegroundColor Red
+  }
+}
+
 #######################################################
 # IMPORT MODULES
 #######################################################
