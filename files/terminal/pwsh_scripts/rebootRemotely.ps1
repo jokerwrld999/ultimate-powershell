@@ -1,22 +1,54 @@
-$hostname = ([system.net.dns]::gethostentry('192.168.200.111')).HostName
-$pingTimeout = 10
+function Get-Confirmation ($message) {
+    $choice = Read-Host "$message (y/N)"
+    if ($choice -eq "y") {
+      return $true
+    } else {
+      return $false
+    }
+}
 
-try {
+function Get-Hostname {
+    $ipAddress = Read-Host "Enter a valid IPv4 address OR Press {Enter} to exit:"
+    while ($true) {
+        try {
+            $ipv4Pattern = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+            if ($ipAddress -match $ipv4Pattern) {
+                Write-Host "Checking hostname..." -ForegroundColor Blue
+                $hostname = ([system.net.dns]::gethostentry($ipAddress)).HostName
+                Write-Host "Hostname $hostname exists with IP address $ipAddress." -ForegroundColor Green
+                return $hostname
+            } elseif ($ipAddress -eq '') {
+                Write-Host "Exiting..." -ForegroundColor Blue
+                exit
+            } else {
+                Write-Host "IPv4 Address is invalid." -ForegroundColor DarkMagenta
+            }
+        } catch {
+            Write-Host "Failed to resolve hostname $Hostname" -ForegroundColor DarkMagenta
+        }
+        $ipAddress = Read-Host "Enter a valid IPv4 address OR Press {Enter} to exit:"
+    }
+}
+
+$hostname = Get-Hostname
+$pingTimeout = 5
+
+if (Get-Confirmation "Are you sure you want to reboot $hostname's machine?") {
     $initialBootTime = (Get-CimInstance -ClassName Win32_OperatingSystem -ComputerName $hostname).LastBootUpTime
-
-    # Initiate remote reboot
+    Write-Host "Reboot is in progress..." -ForegroundColor Blue
     Invoke-Command -ComputerName $hostname -ScriptBlock {
         cmd /c "shutdown /r /t 0 /f"
     }
 
-    # Wait for reboot with pings
     $success = $false
     for ($i = 0; $i -lt $pingTimeout; $i++) {
-        Start-Sleep -Seconds 5
-        if (Test-Connection -ComputerName $hostname -Quiet) {
+        if (Test-Connection -TargetName $hostname -Count 5 -Delay 4 -Quiet) {
             $success = $true
+            Start-Sleep -Seconds 5
             break
         }
+        Start-Sleep -Seconds 1
     }
 
     if ($success) {
@@ -29,6 +61,6 @@ try {
     } else {
         Write-Error "Failed to establish connection after reboot."
     }
-} catch {
-    Write-Error "Error during remote reboot: $_"
+} else {
+    Write-Host "Reboot is paused." -ForegroundColor Magenta
 }

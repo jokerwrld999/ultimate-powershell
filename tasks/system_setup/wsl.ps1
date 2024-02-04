@@ -32,7 +32,7 @@ function CheckAndInstallFeatures () {
       } else {
         ScheduleTaskForNextBoot
       }
-      if (Get-Confirmation "Would you like to perform a immediate reboot?") {
+      if (Get-Confirmation "Would you like to perform an immediate reboot?") {
         Restart-Computer -Force
       } else {
           Write-Host "Installation paused. Please reboot manually to complete setup." -ForegroundColor Magenta
