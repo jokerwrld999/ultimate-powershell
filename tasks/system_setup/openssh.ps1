@@ -1,48 +1,40 @@
-# Set PowerShell execution policy to RemoteSigned for the current user
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
-if ($ExecutionPolicy -eq "RemoteSigned") {
-  Write-Verbose "Execution policy is already set to RemoteSigned for the current user, skipping..." -Verbose
-}
-else {
-  Write-Verbose "Setting execution policy to RemoteSigned for the current user..." -Verbose
+if ($ExecutionPolicy -ne "RemoteSigned") {
   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 }
 
-# Install chocolatey
-if ([bool](Get-Command -Name 'choco' -ErrorAction SilentlyContinue)) {
-  Write-Verbose "Chocolatey is already installed, skip installation." -Verbose
-}
-else {
-  Write-Verbose "Installing Chocolatey..." -Verbose
-  Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-# Install OpenSSH Server
-if ([bool](Get-Service -Name sshd -ErrorAction SilentlyContinue)) {
-  Write-Verbose "OpenSSH is already installed, skip installation." -Verbose
-}
-else {
-  Write-Verbose "Installing OpenSSH..." -Verbose
+if (!(Get-Service -Name sshd -ErrorAction SilentlyContinue)) {
+  Write-Host "Installing OpenSSH..." -f Blue
   $openSSHpackages = Get-WindowsCapability -Online | Where-Object Name -Like 'OpenSSH.Server*' | Select-Object -ExpandProperty Name
-
   foreach ($package in $openSSHpackages) {
-    Add-WindowsCapability -Online -Name $package
+    Add-WindowsCapability -Online -Name $package | Out-Null
   }
-
-  # Start the sshd service
-  Write-Verbose "Starting OpenSSH service..." -Verbose
+  Get-Service -Name sshd | Set-Service -StartupType Automatic
   Start-Service sshd
-  Set-Service -Name sshd -StartupType 'Automatic'
-
-  # Confirm the Firewall rule is configured. It should be created automatically by setup. Run the following to verify
-  Write-Verbose "Confirm the Firewall rule is configured..." -Verbose
-  if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name,Enabled)) {
-    Write-Output "Firewall Rule 'OpenSSH-Server-In-TCP' does not exist, creating it..."
-    New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
-  }
-  else {
-    Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
-  }
 }
 
-#Fix firewall rule config.
+if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue)) {
+    New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+}
+
+if (!(Get-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -ErrorAction SilentlyContinue)) {
+  New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -ErrorAction SilentlyContinue -Force | Out-Null
+}
+
+if ((Get-Service -Name ssh-agent -ErrorAction SilentlyContinue).Status -eq 'Stopped') {
+    Get-Service ssh-agent | Set-Service -StartupType Automatic
+    Start-Service ssh-agent
+}
+
+$keyPath = "$env:USERPROFILE\.ssh\id_ed25519"
+if (!(Test-Path $keyPath)) {
+  ssh-keygen -q -t ed25519 -f $keyPath -N '""'
+
+  ssh-add -l | Out-Null
+  if ($LASTEXITCODE -ne 0) {
+      ssh-add -q $keyPath
+  } else {
+    ssh-add -D
+    ssh-add -q $keyPath
+  }
+}

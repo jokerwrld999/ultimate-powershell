@@ -3,6 +3,10 @@
 Write-Host "####### Running Tweaks....... #######" -f Cyan
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks.ps1" | Invoke-Expression
 
+# >>> Setting Up OpenSSH
+Write-Host "####### Setting Up OpenSSH....... #######" -f Cyan
+Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/openssh.ps1" | Invoke-Expression
+
 # >>> Installing Scoop Packages
 Write-Host "####### Installing Scoop Packages....... #######" -f Cyan
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/software/scoop_packages.ps1" | Invoke-Expression
