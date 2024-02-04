@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -f Blue
   Invoke-Expression "& {$(irm get.scoop.sh)} -RunAsAdmin"

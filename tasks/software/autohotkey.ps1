@@ -1,4 +1,5 @@
-# Paths and variables
+#Requires -RunAsAdministrator
+
 $ahkScriptsFolder = "$env:USERPROFILE\Documents\AutoHotkey"
 $ahkScriptName = "ultimate_keys.ahk"
 $ahkSourceScript = "$ahkScriptsFolder\$ahkScriptName"

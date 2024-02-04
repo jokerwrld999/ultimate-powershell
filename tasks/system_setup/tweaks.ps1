@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 $packagesToRemove = @(
   'Microsoft.AppConnector'
   'Microsoft.BingFinance'
