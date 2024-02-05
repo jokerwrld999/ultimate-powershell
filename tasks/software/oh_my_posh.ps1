@@ -49,7 +49,7 @@ foreach ($package in $packages) {
   if ($versionMatch) {
     $availableVersion = $versionMatch.Matches.Count -gt 1
     if ($availableVersion) {
-      Get-AppxPackage $package -AllUsers | Remove-AppxPackage -AllUsers | Out-Null
+      Get-AppxPackage $package -AllUsers | Remove-AppxPackage | Out-Null
       winget install --silent --id $package --source winget | Out-Null
     }
   } else {
