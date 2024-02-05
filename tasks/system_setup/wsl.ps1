@@ -7,12 +7,18 @@ param(
 )
 
 function Get-Confirmation ($message) {
-  $choice = Read-Host "$message (y/N)"
-  if ($choice -eq "y") {
-    return $true
-  } else {
-    return $false
-  }
+    while ($true) {
+        $choice = $(Write-Host "$message (Y/N)" -ForegroundColor DarkCyan -NoNewLine; Read-Host)
+        $choice = $choice.ToLower()
+
+        if ($choice -eq "y" -or $choice -eq "yes") {
+            return $true
+        } elseif ($choice -eq "n" -or $choice -eq "no") {
+            return $false
+        } else {
+            Write-Host "Invalid input. Please enter 'y' or 'n'." -ForegroundColor DarkMagenta
+        }
+    }
 }
 
 $scheduledTaskName = "WSL"
@@ -212,7 +218,7 @@ function SetupWSLDistro {
     [Parameter(Mandatory = $false)]
     [string]$UserPass = $CustomUser,
     [Parameter(Mandatory = $true)]
-    [string]$VaultPass = (Read-Host "Vault pass: " -AsSecureString)
+    [string]$VaultPass
   )
 
   Write-Host "####### Installing $Distro... #######" -f Blue
@@ -243,7 +249,7 @@ function Get-UserInput {
       Write-Host "Choose a distro:"
       Write-Host "1. Arch"
       Write-Host "2. Ubuntu"
-      $distroChoice = Read-Host "Enter choice (1 or 2):"
+      $distroChoice = $(Write-Host "Enter choice (1 or 2): " -ForegroundColor DarkCyan -NoNewLine; Read-Host)
   } until ($distroChoice -eq "1" -or $distroChoice -eq "2")
 
   $Distro = switch ($distroChoice) {
@@ -251,13 +257,13 @@ function Get-UserInput {
       "2" { "Ubuntu" }
   }
 
-  $CustomUser = Read-Host "Custom user (default: jokerwrld):"
+  $CustomUser = $(Write-Host "Custom user (default: jokerwrld): " -ForegroundColor DarkCyan -NoNewLine; Read-Host)
   if (!$CustomUser) { $CustomUser = "jokerwrld" }
 
-  $UserPass = Read-Host "User password (default: $CustomUser):"
+  $UserPass = $(Write-Host "User password (default: $CustomUser): " -ForegroundColor DarkCyan -NoNewLine; Read-Host)
   if (!$UserPass) { $UserPass = $CustomUser }
 
-  $VaultPass = (Read-Host "Vault pass: " -AsSecureString)
+  $VaultPass = $(Write-Host "Vault pass: " -ForegroundColor DarkCyan -NoNewLine; Read-Host -AsSecureString)
   $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($VaultPass)
   $VaultPass = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
 
