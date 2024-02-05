@@ -43,7 +43,7 @@ if (Get-Confirmation "Are you sure you want to reboot $hostname's machine?") {
 
     $success = $false
     for ($i = 0; $i -lt $pingTimeout; $i++) {
-        if (Test-Connection -TargetName $hostname -Count 5 -Delay 4 -Quiet) {
+        if (Test-Connection -ComputerName $hostname -Count 5 -Delay 4 -Quiet) {
             $success = $true
             Start-Sleep -Seconds 5
             break
