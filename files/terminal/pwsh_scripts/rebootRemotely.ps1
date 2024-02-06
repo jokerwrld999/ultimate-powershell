@@ -87,7 +87,7 @@ if (Get-Confirmation $confirmationMessage) {
 
     $success = $false
     for ($i = 0; $i -lt $pingTimeout; $i++) {
-        if (Test-Connection -ComputerName $hostname -Count 5 -Delay 4 -Quiet) {
+        if (Test-Connection -ComputerName $hostname -Count 8 -Delay 4 -Quiet) {
             $success = $true
             Start-Sleep -Seconds 5
             break
