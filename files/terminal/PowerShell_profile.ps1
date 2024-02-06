@@ -14,8 +14,9 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
+Set-Alias -Name rebootRemote -Value Restart-Remote
+Set-Alias -Name ssh-copy-id -Value Copy-SshPublicKey
 Set-Alias -Name ll -Value Get-ChildItem
-Set-Alias -Name ssh-copy -Value win-ssh-copy-id
 
 #######################################################
 # GENERAL FUNCTIONS
@@ -156,7 +157,7 @@ function pubip {
 }
 
 # Reload $PROFILE
-function reload-profile {
+function restart-profile {
   & $PSHOME\profile.ps1
 }
 
@@ -214,15 +215,9 @@ function speedtest ()
   & speedtest.exe --accept-license
 }
 
-function win-ssh-copy-id ($pcName) {
-  $authorizedKey = Get-Content -Path "$env:USERPROFILE\.ssh\id_ed25519.pub"
+function Restart-Remote {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/pwsh_scripts/rebootRemotely.ps1" | Invoke-Expression}
 
-  Invoke-Command -ComputerName $pcName -ScriptBlock {
-      Add-Content -Force -Path $env:ProgramData\ssh\administrators_authorized_keys -Value $args[0]
-      icacls.exe "$env:ProgramData\ssh\administrators_authorized_keys" /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
-  } -ArgumentList $authorizedKey
-  Write-Host "Public key copied to $pcName successfully." -ForegroundColor Green
-}
+function Copy-SshPublicKey {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/pwsh_scripts/sshCopyID.ps1" | Invoke-Expression}
 
 #######################################################
 # IMPORT MODULES
