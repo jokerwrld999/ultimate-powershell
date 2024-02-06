@@ -103,8 +103,24 @@ if (Get-Confirmation $confirmationMessage) {
             }
             Write-Host "Final Boot Time: $finalBootTime" -ForegroundColor Cyan
         } catch {
-            Write-Error "Failed to retrieve final boot time: $_"
-            exit
+            Write-Host "Failed to retrieve final boot time. Testing network connectivity..." -ForegroundColor Blue
+            $connectionRetryCount = 0
+            $maxConnectionRetries = 5
+            while ($connectionRetryCount -lt $maxConnectionRetries) {
+                if (Test-Connection -ComputerName $hostname -Count 1 -Quiet) {
+                    Write-Host "Network connection established. Assuming reboot completed." -ForegroundColor Cyan
+                    break
+                } else {
+                    Write-Host "Machine still unreachable. Waiting 10 seconds before retry..." -ForegroundColor Blue
+                    Start-Sleep -Seconds 10
+                }
+                $connectionRetryCount++
+            }
+
+            if ($connectionRetryCount -ge $maxConnectionRetries) {
+                Write-Error "Failed to establish connection after multiple retries."
+                exit
+            }
         }
 
         if ($finalBootTime -gt $initialBootTime) {
