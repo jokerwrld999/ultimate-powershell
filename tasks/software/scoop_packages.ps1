@@ -24,11 +24,9 @@ foreach ($bucket in $buckets) {
   }
 }
 
-# Update Scoop
 Write-Host "Updating Scoop Module..." -f Blue
 scoop update * *> $null
 
-# Applications to install
 $applications = @(
   @{ Name = "AdobeAcrobatReader"; Id = "Scoop-Apps/AdobeAcrobatReader-Install" },
   @{ Name = "Autohotkey"; Id = "extras/autohotkey" },
@@ -41,7 +39,6 @@ $applications = @(
   @{ Name = "Nano"; Id = "nano" },
   @{ Name = "NTop"; Id = "ntop" },
   @{ Name = "Oh-My-Posh"; Id = "main/oh-my-posh" },
-  @{ Name = "OpenSSH"; Id = "openssh" },
   @{ Name = "Parsec"; Id = "nonportable/parsec-np" },
   @{ Name = "Python"; Id = "python" },
   @{ Name = "Sharex"; Id = "extras/sharex" },
