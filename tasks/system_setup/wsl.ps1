@@ -287,7 +287,13 @@ function Set-WSLVars {
     return $setWSLVars
 }
 
-$getWSLVars = if (!$Boot) { Set-WSLVars } else { Get-WSLVars }
+if ((Get-ComputerInfo -property "HyperV*").HyperVisorPresent -eq 'True' -or
+   (Get-ComputerInfo -property "HyperV*").HyperVRequirementVirtualizationFirmwareEnabled -eq 'True') {
+     $getWSLVars = if (!$Boot) { Set-WSLVars } else { Get-WSLVars }
+} else {
+    Write-Host "Virtualization is disabled in BIOS." -ForegroundColor DarkMagenta
+    exit
+}
 
 $Distro = $getWSLVars.Distro
 $CustomUser = $getWSLVars.CustomUser
@@ -295,11 +301,7 @@ $UserPass = $getWSLVars.UserPass
 $VaultPass = $getWSLVars.VaultPass
 
 if (!$Boot) {
-  if ((Get-ComputerInfo -property "HyperV*").HyperVRequirementVirtualizationFirmwareEnabled) {
-    CheckAndInstallFeatures
-  } else {
-    Write-Host "Virtualization is disabled in BIOS." -ForegroundColor DarkMagenta
-  }
+  CheckAndInstallFeatures
 } else {
   Start-Process powershell.exe -ArgumentList "-Command  `"&{wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown}`"" -Wait -NoNewWindow
 
