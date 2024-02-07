@@ -297,7 +297,7 @@ if ($hyperVInfo.HyperVisorPresent -eq 'True') {
   } else {
     Write-Host "Your system does not meet the hardware requirements for virtualization." -ForegroundColor DarkMagenta
   }
-  exit
+  return
 }
 
 $Distro = $getWSLVars.Distro
