@@ -39,7 +39,7 @@ foreach ($script in $scripts) {
 
 if (!(Get-PSSessionConfiguration -Name 'Microsoft.PowerShell').Enabled) {
     Enable-PSRemoting -SkipNetworkProfileCheck -Force *>$null
-    Write-Verbose "PowerShell Remoting enabled successfully."
+    Write-Host "PowerShell Remoting enabled successfully." -ForegroundColor Green
 }
 
 $packages = @('Microsoft.Powershell', 'Microsoft.WindowsTerminal')
@@ -60,7 +60,7 @@ foreach ($package in $packages) {
 }
 
 if (!((Get-Command oh-my-posh -EA SilentlyContinue).Source)) {
-  Write-Host "Installing Oh-My-Posh..." -f Blue
+  Write-Host "Installing Oh-My-Posh..." -ForegroundColor Blue
   winget install --silent JanDeDobbeleer.OhMyPosh -s winget | Out-Null
 }
 
@@ -69,7 +69,7 @@ if (!(Get-PSRepository -Name 'PSGallery').InstallationPolicy -eq 'Trusted') {
 }
 
 if (!(Get-PackageProvider | Select-Object Name | Select-String "NuGet")) {
-  Write-Host "Installing NuGet Provider..." -f Blue
+  Write-Host "Installing NuGet Provider..." -ForegroundColor Blue
   Install-PackageProvider -Name NuGet -Confirm:$False -Force
 }
 
@@ -77,7 +77,7 @@ $modulesToInstall = @('NuGet', 'PowerShellGet', 'PSReadLine', 'Terminal-Icons')
 foreach ($module in $modulesToInstall) {
   if (!(Get-Module -ListAvailable -Name $module)) {
     Install-Module -Name $module -Confirm:$False -Force | Out-Null
-    Write-Host ("Installed module: $module") -f Green
+    Write-Host ("Installed module: $module") -ForegroundColor Green
   }
 }
 
@@ -93,12 +93,12 @@ foreach ($profile in $profiles) {
   if (!(Test-Path -Path $profile -PathType Leaf) -or
     (Get-UriHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {
 
-    Write-Host ("Creating Powershell Profile...") -f Blue
+    Write-Host ("Creating Powershell Profile...") -ForegroundColor Blue
     Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile
     (Get-FileHash $profile).Hash | Out-File "$profile.sha256"
-    Write-Host "The profile @ [$profile] has been created." -f Green
+    Write-Host "The profile @ [$profile] has been created." -ForegroundColor Green
   } else {
-    Write-Host "The profile @ [$profile] has been already created." -f Green
+    Write-Host "The profile @ [$profile] has been already created." -ForegroundColor Green
   }
 }
 
@@ -108,4 +108,4 @@ foreach ($profile in $profiles) {
 if (!(Test-Path -Path "$env:userprofile\github")) {
   New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
 }
-# Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -f Green
+# Write-Host ("Walls successfully downloaded @ [$wallsFolder\$folderPath]...") -ForegroundColor Green

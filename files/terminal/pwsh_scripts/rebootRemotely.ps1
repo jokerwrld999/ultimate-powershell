@@ -64,14 +64,14 @@ if (Get-Confirmation $confirmationMessage) {
         exit
     }
 
-    Write-Host "Retrieving initial boot time..." -ForegroundColor Cyan
+    Write-Host "Retrieving initial boot time..." -ForegroundColor Blue
     try {
         $initialBootTime = Invoke-Command -ComputerName $hostname -Credential $credentials -ScriptBlock {
             (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
         }
-        Write-Host "Initial Boot Time: $initialBootTime" -ForegroundColor Cyan
+        Write-Host "Initial Boot Time: $initialBootTime" -ForegroundColor Green
     } catch {
-        Write-Error "Failed to retrieve initial boot time: $_"
+        Write-Host "Failed to retrieve initial boot time: $_" -ForegroundColor DarkMagenta
         exit
     }
 
@@ -81,7 +81,7 @@ if (Get-Confirmation $confirmationMessage) {
             cmd /c "shutdown /r /t 0 /f"
         }
     } catch {
-        Write-Error "Failed to initiate reboot: $_"
+        Write-Host "Failed to initiate reboot: $_" -ForegroundColor DarkMagenta
         exit
     }
 
@@ -96,12 +96,12 @@ if (Get-Confirmation $confirmationMessage) {
     }
 
     if ($success) {
-        Write-Host "Retrieving final boot time..." -ForegroundColor Cyan
+        Write-Host "Retrieving final boot time..." -ForegroundColor Blue
         try {
             $finalBootTime = Invoke-Command -ComputerName $hostname -Credential $credentials -ScriptBlock {
                 (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
             }
-            Write-Host "Final Boot Time: $finalBootTime" -ForegroundColor Cyan
+            Write-Host "Final Boot Time: $finalBootTime" -ForegroundColor Green
         } catch {
             Write-Host "Failed to retrieve final boot time. Testing network connectivity..." -ForegroundColor Blue
             $connectionRetryCount = 0
@@ -118,7 +118,7 @@ if (Get-Confirmation $confirmationMessage) {
             }
 
             if ($connectionRetryCount -ge $maxConnectionRetries) {
-                Write-Error "Failed to establish connection after multiple retries."
+                Write-Host "Failed to establish connection after multiple retries." -ForegroundColor DarkMagenta
                 exit
             }
         }
@@ -126,10 +126,10 @@ if (Get-Confirmation $confirmationMessage) {
         if ($finalBootTime -gt $initialBootTime) {
             Write-Host "Machine rebooted successfully." -ForegroundColor Green
         } else {
-            Write-Warning "Machine did not reboot successfully."
+            Write-Host "Machine did not reboot successfully." -ForegroundColor DarkMagenta
         }
     } else {
-        Write-Error "Failed to establish connection after reboot."
+        Write-Host "Failed to establish connection after reboot." -ForegroundColor DarkMagenta
     }
 } else {
     Write-Host "Reboot has been canceled." -ForegroundColor Magenta

@@ -6,7 +6,7 @@ if ($ExecutionPolicy -ne "RemoteSigned") {
 }
 
 if (!(Get-Service -Name sshd -ErrorAction SilentlyContinue)) {
-  Write-Host "Installing OpenSSH..." -f Blue
+  Write-Host "Installing OpenSSH..." -ForegroundColor Blue
   $openSSHpackages = Get-WindowsCapability -Online | Where-Object Name -Like 'OpenSSH.Server*' | Select-Object -ExpandProperty Name
   foreach ($package in $openSSHpackages) {
     Add-WindowsCapability -Online -Name $package | Out-Null

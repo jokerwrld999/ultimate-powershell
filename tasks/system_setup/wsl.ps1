@@ -94,7 +94,7 @@ function SetupCustomUser {
             fi
 "@
     wsl --shutdown $Distro
-    Write-Host "####### Custom User $CustomUser set up is finished successfully. #######" -f Green
+    Write-Host "####### Custom User $CustomUser set up is finished successfully. #######" -ForegroundColor Green
   } else {
     Write-Host "####### Custom User $CustomUser has been already configured... #######" -ForegroundColor Green
   }
@@ -105,14 +105,14 @@ function InstallArchDistro {
   $wsl_dir = "$env:userprofile\AppData\Local\Packages\"
 
   if (!(Test-Path -Path "$wsl_dir\Arch\rootfs.tar.gz")) {
-    Write-Host "####### Downloading Arch Distro... #######" -f Blue
+    Write-Host "####### Downloading Arch Distro... #######" -ForegroundColor Blue
     (New-Object System.Net.WebClient).DownloadFile("https://github.com/yuk7/ArchWSL/releases/download/22.10.16.0/Arch.zip","$wsl_dir\Arch.zip")
 
-    Write-Host "####### Extracting Arch Distro... #######" -f Green
+    Write-Host "####### Extracting Arch Distro... #######" -ForegroundColor Green
     Expand-Archive -Path $wsl_dir\Arch.zip -DestinationPath $wsl_dir\Arch
 
     if (!(Test-Path -Path "$wsl_dir\Arch.zip")) {
-      Write-Host "####### Removing Temp Files... #######" -f Green
+      Write-Host "####### Removing Temp Files... #######" -ForegroundColor Green
       Remove-Item -Recurse -Force $wsl_dir\Arch.zip
     }
   }
@@ -121,7 +121,7 @@ function InstallArchDistro {
   while ($true) {
     wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
-      Write-Host "####### Arch Installed Successfully. #######" -f Green
+      Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
       if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
         Stop-Job -Name $jobName | Out-Null
         Remove-Job -Name $jobName | Out-Null
@@ -129,7 +129,7 @@ function InstallArchDistro {
 
       wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
-        Write-Host "####### Running Arch First Setup... #######" -f Blue
+        Write-Host "####### Running Arch First Setup... #######" -ForegroundColor Blue
         wsl -d Arch -u root /bin/bash -c @"
                     rm -rf /var/lib/pacman/db.lck
                     pacman -Syyu --noconfirm >/dev/null 2>&1
@@ -138,14 +138,14 @@ function InstallArchDistro {
                     pacman -Suy --noconfirm >/dev/null 2>&1
                     pacman -S ansible git --noconfirm >/dev/null 2>&1
 "@
-        Write-Host "####### Arch First Setup is finished successfully. #######" -f Green
+        Write-Host "####### Arch First Setup is finished successfully. #######" -ForegroundColor Green
       } else {
-        Write-Host "####### Arch First Setup has been already completed. #######" -f Green
+        Write-Host "####### Arch First Setup has been already completed. #######" -ForegroundColor Green
       }
       break
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
-        Write-Host "####### Initializing Arch... #######" -f Blue
+        Write-Host "####### Initializing Arch... #######" -ForegroundColor Blue
         Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe } | Out-Null
       }
       Start-Sleep -s 20
@@ -158,7 +158,7 @@ function InstallUbuntuDistro {
   while ($true) {
     wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
-      Write-Host "####### Ubuntu installed successfully. #######" -f Green
+      Write-Host "####### Ubuntu installed successfully. #######" -ForegroundColor Green
       if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
         Stop-Job -Name $jobName | Out-Null
         Remove-Job -Name $jobName | Out-Null
@@ -166,17 +166,17 @@ function InstallUbuntuDistro {
 
       wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
-        Write-Host "####### Running Ubuntu First Setup... #######" -f Blue
+        Write-Host "####### Running Ubuntu First Setup... #######" -ForegroundColor Blue
         wsl -d Ubuntu -u root /bin/bash -c "apt update && apt upgrade -y; apt install ansible git -y >/dev/null 2>&1" | Out-Null
 
-        Write-Host "####### Ubuntu First Setup is finished successfully. #######" -f Green
+        Write-Host "####### Ubuntu First Setup is finished successfully. #######" -ForegroundColor Green
       } else {
-        Write-Host "####### Ubuntu First Setup has been already completed. #######" -f Green
+        Write-Host "####### Ubuntu First Setup has been already completed. #######" -ForegroundColor Green
       }
       break
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
-        Write-Host "####### Initializing Ubuntu... #######" -f Blue
+        Write-Host "####### Initializing Ubuntu... #######" -ForegroundColor Blue
         Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Out-Null
       }
       Start-Sleep -s 20
@@ -193,7 +193,7 @@ function RunAnsiblePlaybook {
     [Parameter(Mandatory = $true)]
     [string]$VaultPass
   )
-  Write-Host "####### Running Ansible Playbook on $Distro... #######" -f Blue
+  Write-Host "####### Running Ansible Playbook on $Distro... #######" -ForegroundColor Blue
 
   wsl -d $Distro -u $CustomUser bash -c @"
         mkdir -p ~/github
@@ -206,7 +206,7 @@ function RunAnsiblePlaybook {
         ansible-galaxy collection install -r requirements.yml >/dev/null 2>&1
         ansible-playbook local.yml
 "@
-  Write-Host "####### Finished Ansible Playbook on $Distro... #######" -f Green
+  Write-Host "####### Finished Ansible Playbook on $Distro... #######" -ForegroundColor Green
 }
 
 function SetupWSLDistro {
@@ -221,7 +221,7 @@ function SetupWSLDistro {
     [string]$VaultPass
   )
 
-  Write-Host "####### Installing $Distro... #######" -f Blue
+  Write-Host "####### Installing $Distro... #######" -ForegroundColor Blue
   switch ($Distro) {
     "Arch" {
       InstallArchDistro
@@ -295,7 +295,11 @@ $UserPass = $getWSLVars.UserPass
 $VaultPass = $getWSLVars.VaultPass
 
 if (!$Boot) {
-  CheckAndInstallFeatures
+  if ((Get-ComputerInfo -property "HyperV*").HyperVRequirementVirtualizationFirmwareEnabled) {
+    CheckAndInstallFeatures
+  } else {
+    Write-Host "Virtualization is disabled in BIOS." -ForegroundColor DarkMagenta
+  }
 } else {
   Start-Process powershell.exe -ArgumentList "-Command  `"&{wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown}`"" -Wait -NoNewWindow
 

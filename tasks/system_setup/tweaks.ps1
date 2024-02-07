@@ -174,7 +174,7 @@ foreach ($tweak in $RegistryTweaks) {
 }
 
 if ($global:registryChangesCount -ne 0) {
-  Write-Host ("Restarting Explorer...") -f Blue
+  Write-Host ("Restarting Explorer...") -ForegroundColor Blue
   Get-Process -Name explorer -EA SilentlyContinue | Stop-Process
   Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -ComObject Shell.Application).Windows() | ForEach-Object { $_.quit() }
 }
@@ -193,20 +193,20 @@ Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-power
 
 $edgePackage = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name msedge
 if ($edgePackage) {
-  Write-Host "Removing Microsoft Edge..." -f Blue
+  Write-Host "Removing Microsoft Edge..." -ForegroundColor Blue
   Invoke-RestMethod "https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/edgeremoval.ps1" | Invoke-Expression *> $null
 } else {
-  Write-Host "Microsoft Edge has been already uninstalled." -f Green
+  Write-Host "Microsoft Edge has been already uninstalled." -ForegroundColor Green
 }
 
 $oneDriveInstalled = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer -Name OneDrive -ErrorAction SilentlyContinue)
 if ($oneDriveInstalled) {
-  Write-Host ("Removing OneDrive...") -f Blue
+  Write-Host ("Removing OneDrive...") -ForegroundColor Blue
   Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/remove_onedrive.ps1" | Invoke-Expression *> $null
 } else {
-  Write-Host "OneDrive has been already uninstalled." -f Green
+  Write-Host "OneDrive has been already uninstalled." -ForegroundColor Green
 }
 
-Write-Host ("Deleting Temp Files...") -f Blue
+Write-Host ("Deleting Temp Files...") -ForegroundColor Blue
 Get-ChildItem -Path "C:\Windows\Temp\" *.* -Recurse | Remove-Item -Force -Recurse -EA SilentlyContinue *> $null
 Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse -EA SilentlyContinue *> $null

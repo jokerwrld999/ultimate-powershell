@@ -1,13 +1,13 @@
 #Requires -RunAsAdministrator
 
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
-  Write-Host "Installing Scoop Module..." -f Blue
+  Write-Host "Installing Scoop Module..." -ForegroundColor Blue
   Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin"
 }
 
 $scoopAppsBucket = 'Scoop-Apps'
 if (!(scoop bucket list | Select-String $scoopAppsBucket)) {
-  Write-Host "Setting Scoop Apps Custom Bucket" -f Blue
+  Write-Host "Setting Scoop Apps Custom Bucket" -ForegroundColor Blue
   scoop install gsudo git scoop-search *> $null
   scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core' *> $null
   scoop bucket add 'Base' *> $null
@@ -19,12 +19,12 @@ if (!(scoop bucket list | Select-String $scoopAppsBucket)) {
 $buckets = @('main','extras','nerd-fonts','nonportable','games','Scoop-Apps')
 foreach ($bucket in $buckets) {
   if (!(scoop bucket list | Select-String $bucket)) {
-    Write-Host "Adding Scoop bucket: $bucket" -f Blue
+    Write-Host "Adding Scoop bucket: $bucket" -ForegroundColor Blue
     scoop bucket add $bucket *> $null
   }
 }
 
-Write-Host "Updating Scoop Module..." -f Blue
+Write-Host "Updating Scoop Module..." -ForegroundColor Blue
 scoop update * *> $null
 
 $applications = @(
