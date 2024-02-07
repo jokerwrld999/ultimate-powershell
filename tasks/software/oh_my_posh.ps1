@@ -44,19 +44,18 @@ if (!(Get-PSSessionConfiguration -Name 'Microsoft.PowerShell').Enabled) {
 
 $packages = @('Microsoft.Powershell', 'Microsoft.WindowsTerminal')
 foreach ($package in $packages) {
-  $packageInfo = winget list --id $package --source winget
-  $versionMatch = $packageInfo | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
+  $versionMatch = winget list $package --source winget --accept-source-agreements | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' -AllMatches
 
   if ($versionMatch.Matches.Count) {
     $updateAvailable = $versionMatch.Matches.Count -gt 1
     if ($updateAvailable) {
             Get-AppxPackage $package -AllUsers | Remove-AppxPackage -ErrorAction SilentlyContinue | Out-Null
-            winget install --silent --id $package --source winget -ErrorAction Stop
+            winget install --silent --id $package --source winget
         } else {
             continue
         }
     } else {
-        winget install --silent --id $package --source winget -ErrorAction Stop
+        winget install --silent --id $package --source winget
     }
 }
 
