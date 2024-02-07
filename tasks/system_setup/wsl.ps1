@@ -222,11 +222,6 @@ function SetupWSLDistro {
   )
 
   Write-Host "####### Installing $Distro... #######" -f Blue
-  #    WSLKernelUpdate
-  wsl --update
-  wsl --set-default-version 2 | Out-Null
-  wsl --shutdown
-
   switch ($Distro) {
     "Arch" {
       InstallArchDistro
@@ -302,7 +297,8 @@ $VaultPass = $getWSLVars.VaultPass
 if (!$Boot) {
   CheckAndInstallFeatures
 } else {
-  Write-Host "After Boot"
+  Start-Process powershell.exe -ArgumentList "-Command  `"&{wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown}`"" -Wait -NoNewWindow
+
   SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
   if ($(Get-ScheduledTask -TaskName $scheduledTaskName -ErrorAction SilentlyContinue).TaskName -eq $scheduledTaskName) {
