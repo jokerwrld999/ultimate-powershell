@@ -287,12 +287,17 @@ function Set-WSLVars {
     return $setWSLVars
 }
 
-if ((Get-ComputerInfo -property "HyperV*").HyperVisorPresent -eq 'True' -or
-   (Get-ComputerInfo -property "HyperV*").HyperVRequirementVirtualizationFirmwareEnabled -eq 'True') {
-     $getWSLVars = if (!$Boot) { Set-WSLVars } else { Get-WSLVars }
+$hyperVInfo = Get-ComputerInfo -Property "HyperV*"
+
+if ($hyperVInfo.HyperVisorPresent -eq 'True') {
+  $getWSLVars = if (!$Boot) { Set-WSLVars } else { Get-WSLVars }
 } else {
-    Write-Host "Virtualization is disabled in BIOS." -ForegroundColor DarkMagenta
-    exit
+  if ($hyperVInfo.HyperVRequirementVirtualizationFirmwareEnabled -eq 'True') {
+    Write-Host "Virtualization is disabled in BIOS. Please enable it to use WSL." -ForegroundColor DarkMagenta
+  } else {
+    Write-Host "Your system does not meet the hardware requirements for virtualization." -ForegroundColor DarkMagenta
+  }
+  exit
 }
 
 $Distro = $getWSLVars.Distro
