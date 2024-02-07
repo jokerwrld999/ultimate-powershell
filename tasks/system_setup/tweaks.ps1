@@ -79,7 +79,7 @@ function New-Registry {
       New-Item -Path $Path -Force | Out-Null
     }
 
-    if ((Get-ItemProperty -Path $Path -EA SilentlyContinue).PSObject.Properties.Name -contains $property.Key -or(Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue) -ne $property.Value) {
+    if ((Get-ItemProperty -Path $Path -EA SilentlyContinue).PSObject.Properties[$property.Key].value -ne $property.Value) {
       New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
       $global:registryChangesCount = $global:registryChangesCount + 1
     }
