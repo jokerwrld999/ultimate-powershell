@@ -60,28 +60,11 @@ $packagesToRemove = @(
 foreach ($package in $packagesToRemove) {
   if (Get-AppxPackage -Name $package -AllUsers) {
     Write-Host "Removing package: $package"
-    Get-AppxPackage -Name $package -AllUsers | Remove-AppxPackage | Out-Null
+    Get-AppxPackage -Name $package -AllUsers | Remove-AppxPackage *>$null
   }
 }
 
 $global:registryChangesCount = 0
-function Set-Registry {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Path,
-
-    [Parameter(Mandatory = $true)]
-    [hashtable]$Properties
-  )
-
-  foreach ($property in $Properties.GetEnumerator()) {
-    if ((Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue) -ne $property.Value) {
-      Set-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
-      $global:registryChangesCount = $global:registryChangesCount + 1
-    }
-  }
-}
-
 function New-Registry {
   param(
     [Parameter(Mandatory = $true)]
@@ -95,14 +78,15 @@ function New-Registry {
     if (!(Test-Path $Path)) {
       New-Item -Path $Path -Force | Out-Null
     }
-    elseif ((Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue) -ne $property.Value) {
+
+    if ((Get-ItemProperty -Path $Path -EA SilentlyContinue).PSObject.Properties.Name -contains $property.Key -or(Get-ItemPropertyValue -Path $Path -Name $property.Key -ErrorAction SilentlyContinue) -ne $property.Value) {
       New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
       $global:registryChangesCount = $global:registryChangesCount + 1
     }
   }
 }
 
-$setRegistryTweaks = @(
+$RegistryTweaks = @(
   @{
     Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
     Properties = @{
@@ -169,14 +153,7 @@ $setRegistryTweaks = @(
       MouseThreshold1 = 0
       MouseThreshold2 = 0
     }
-  }
-)
-
-foreach ($tweak in $setRegistryTweaks) {
-  Set-Registry @tweak
-}
-
-$createRegistryTweaks = @(
+  },
   @{
     Path = 'HKCU:\Console\%%Startup'
     Properties = @{
@@ -192,7 +169,7 @@ $createRegistryTweaks = @(
   }
 )
 
-foreach ($tweak in $createRegistryTweaks) {
+foreach ($tweak in $RegistryTweaks) {
   New-Registry @tweak
 }
 
