@@ -15,7 +15,6 @@ Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
 Set-Alias -Name rebootRemote -Value Restart-Remote
-Set-Alias -Name reload-profile -Value . Restart-Profile
 Set-Alias -Name ssh-copy-id -Value Copy-SshPublicKey
 Set-Alias -Name ll -Value Get-ChildItem
 
