@@ -163,7 +163,7 @@ function pubip {
 # Reload $PROFILE
 function Restart-Profile {
     @(
-        $Profile.AllUsersAllHosts
+        "$PSHOME\profile.ps1"
     ) | % {
         if(Test-Path $_){
             Write-Verbose "Running $_"
