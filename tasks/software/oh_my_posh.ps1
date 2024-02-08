@@ -14,7 +14,7 @@ $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
 $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
-$sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/wakeOnLan.ps1"
+$wakeOnLanRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/wakeOnLan.ps1"
 
 function Restart-Profile {
   @(
