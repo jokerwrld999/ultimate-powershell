@@ -2,6 +2,7 @@
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = New-Object Security.Principal.WindowsPrincipal $identity
 $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$Env:currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 
 #######################################################
 # GENERAL SCRIPTS
