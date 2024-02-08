@@ -26,3 +26,20 @@ Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-power
 # >>> Setting Up WSL2
 Write-Host "####### Setting Up WSL....... #######" -ForegroundColor Cyan
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1" | Invoke-Expression
+
+Write-Host ("Deleting Temp Files...") -ForegroundColor Blue
+
+$tempFolders = @(
+    "C:\Windows\Temp\*",
+    "C:\Windows\Prefetch\*",
+    "C:\Users\*\AppData\Local\Temp\*"
+)
+
+foreach ($folder in $tempFolders) {
+    if (Test-Path -Path $folder) {
+        Remove-Item $folder -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host ("Deleted files from $folder") -ForegroundColor Green
+    } else {
+        Write-Host ("Folder $folder does not exist or is already empty.") -ForegroundColor Yellow
+    }
+}

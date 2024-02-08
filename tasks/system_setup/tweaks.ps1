@@ -205,7 +205,3 @@ if ($oneDriveInstalled) {
 } else {
   Write-Host "OneDrive has been already uninstalled." -ForegroundColor Green
 }
-
-Write-Host ("Deleting Temp Files...") -ForegroundColor Blue
-Get-ChildItem -Path "C:\Windows\Temp\" *.* -Recurse | Remove-Item -Force -Recurse -EA SilentlyContinue *> $null
-Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse -EA SilentlyContinue *> $null

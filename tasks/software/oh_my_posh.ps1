@@ -116,7 +116,7 @@ foreach ($profile in $profiles) {
 
 Install-Module PsReadLine -Force
 
-. Restart-Profile *>$null
+. Restart-Profile
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
   New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
