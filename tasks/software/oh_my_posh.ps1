@@ -14,6 +14,7 @@ $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
 $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
+$sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/wakeOnLan.ps1"
 
 function Restart-Profile {
   @(
@@ -37,17 +38,25 @@ function Get-UriHash {
 }
 
 $scripts = @($profile5ScriptsPath, $profile7ScriptsPath)
+
 foreach ($script in $scripts) {
-  if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
-    (Get-UriHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
     if (!(Test-Path -Path $script)) {
-      New-Item -Path $script -ItemType Directory | Out-Null
+        New-Item -Path $script -ItemType Directory | Out-Null
     }
 
-    Invoke-WebRequest -Uri $sftaRemoteScript -OutFile "$script\SFTA.ps1" | Out-Null
-    (Get-FileHash "$script\SFTA.ps1").Hash | Out-File "$script\SFTA.ps1.sha256"
-  }
+    if (!(Test-Path -Path "$script\SFTA.ps1" -PathType Leaf) -or
+       (Get-UriHash -Uri $sftaRemoteScript) -ne (Get-Content "$script\SFTA.ps1.sha256" -EA SilentlyContinue)) {
+        Invoke-WebRequest -Uri $sftaRemoteScript -OutFile "$script\SFTA.ps1" | Out-Null
+        (Get-FileHash "$script\SFTA.ps1").Hash | Out-File "$script\SFTA.ps1.sha256"
+    }
+
+    if (!(Test-Path -Path "$script\wakeOnLan.ps1" -PathType Leaf) -or
+       (Get-UriHash -Uri $wakeOnLanRemoteScript) -ne (Get-Content "$script\wakeOnLan.ps1.sha256" -EA SilentlyContinue)) {
+        Invoke-WebRequest -Uri $wakeOnLanRemoteScript -OutFile "$script\wakeOnLan.ps1" | Out-Null
+        (Get-FileHash "$script\wakeOnLan.ps1").Hash | Out-File "$script\wakeOnLan.ps1.sha256"
+    }
 }
+
 
 if (!(Get-PSSessionConfiguration -Name 'Microsoft.PowerShell').Enabled) {
     Enable-PSRemoting -SkipNetworkProfileCheck -Force *>$null
@@ -113,8 +122,6 @@ foreach ($profile in $profiles) {
     Write-Host "The profile @ [$profile] has been already created." -ForegroundColor Green
   }
 }
-
-Install-Module PsReadLine -Force
 
 . Restart-Profile
 

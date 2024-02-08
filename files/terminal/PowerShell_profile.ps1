@@ -7,6 +7,7 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 # GENERAL SCRIPTS
 #######################################################
 . $PSHOME\Scripts\SFTA.ps1
+. $PSHOME\Scripts\wakeOnLan.ps1
 
 #######################################################
 # GENERAL ALIAS'S
@@ -15,8 +16,10 @@ Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
 Set-Alias -Name rebootRemote -Value Restart-Remote
+Set-Alias -Name profile -Value Restart-Profile
 Set-Alias -Name ssh-copy-id -Value Copy-SshPublicKey
 Set-Alias -Name ll -Value Get-ChildItem
+Set-Alias -Name wol -Value Invoke-WakeOnLan
 
 #######################################################
 # GENERAL FUNCTIONS
