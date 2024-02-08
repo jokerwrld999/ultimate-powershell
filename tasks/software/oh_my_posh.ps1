@@ -15,6 +15,18 @@ $profile7Source = "$profile7Path\$profileName"
 $profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
 
+function Restart-Profile {
+  @(
+    $profile5Source,
+    $profile7Source
+  ) | % {
+      if(Test-Path $_){
+          Write-Verbose "Running $_"
+          . $_
+      }
+  }
+}
+
 function Get-UriHash {
   param(
     $Uri
@@ -102,8 +114,7 @@ foreach ($profile in $profiles) {
   }
 }
 
-& $profile5Source
-& $profile7Source
+. Restart-Profile
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
   New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
