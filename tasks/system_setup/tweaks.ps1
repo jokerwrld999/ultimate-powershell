@@ -59,7 +59,6 @@ $packagesToRemove = @(
 
 foreach ($package in $packagesToRemove) {
   if (Get-AppxPackage -Name $package -AllUsers) {
-    Write-Host "Removing package: $package"
     Get-AppxPackage -Name $package -AllUsers | Remove-AppxPackage *>$null
   }
 }

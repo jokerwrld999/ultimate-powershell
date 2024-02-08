@@ -114,7 +114,7 @@ foreach ($profile in $profiles) {
   }
 }
 
-. Restart-Profile
+. Restart-Profile *>$null
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
   New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
