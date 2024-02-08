@@ -162,14 +162,7 @@ function pubip {
 
 # Reload $PROFILE
 function Restart-Profile {
-    @(
-        "$PSHOME\profile.ps1"
-    ) | % {
-        if(Test-Path $_){
-            Write-Verbose "Running $_"
-            . $_
-        }
-    }
+  & "$PSHOME\profile.ps1"
 }
 
 function find-file ($name) {
