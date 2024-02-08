@@ -114,6 +114,8 @@ foreach ($profile in $profiles) {
   }
 }
 
+Install-Module PsReadLine -Force
+
 . Restart-Profile *>$null
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
