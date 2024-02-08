@@ -227,6 +227,7 @@ function Copy-SshPublicKey {Invoke-RestMethod "https://raw.githubusercontent.com
 #######################################################
 # IMPORT MODULES
 #######################################################
+Import-Module -UseWindowsPowerShell -Name AppX *>$null
 Import-Module -Name Terminal-Icons
 Import-Module -Name PSReadLine
 Set-PSReadLineOption -EditMode Emacs
