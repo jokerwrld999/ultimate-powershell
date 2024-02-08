@@ -12,7 +12,8 @@ $profile7ScriptsPath = "$profile7Path\Scripts"
 $profileName = "profile.ps1"
 $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
-$profileRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell_profile.ps1"
+$profile5RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell5_profile.ps1"
+$profile7RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell7_profile.ps1"
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
 $wakeOnLanRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/wakeOnLan.ps1"
 
@@ -35,6 +36,25 @@ function Get-UriHash {
   $wc = [System.Net.WebClient]::new()
   $FileHash = Get-FileHash -InputStream ($wc.OpenRead($Uri))
   $FileHash.Hash
+}
+
+function Update-Profile {
+  param(
+      $ProfileSource,
+      $RemoteScript
+  )
+
+  if (!(Test-Path -Path $ProfileSource -PathType Leaf) -or
+      (Get-UriHash -Uri $RemoteScript) -ne (Get-Content "$ProfileSource.sha256" -ErrorAction SilentlyContinue)) {
+
+      Write-Host ("Updating PowerShell Profile: $ProfileSource") -ForegroundColor Blue
+      Invoke-WebRequest -Uri $RemoteScript -OutFile $ProfileSource
+      (Get-FileHash $ProfileSource).Hash | Out-File "$ProfileSource.sha256"
+
+      Write-Host "The profile @ [$ProfileSource] has been created." -ForegroundColor Green
+  } else {
+      Write-Host "The profile @ [$ProfileSource] has already been created." -ForegroundColor Green
+  }
 }
 
 $scripts = @($profile5ScriptsPath, $profile7ScriptsPath)
@@ -109,19 +129,11 @@ if (!(Test-Path -Path $profile7Path)) {
   New-Item -Path $profile7Path -ItemType Directory | Out-Null
 }
 
-$profiles = @($profile5Source, $profile7Source)
-foreach ($profile in $profiles) {
-  if (!(Test-Path -Path $profile -PathType Leaf) -or
-    (Get-UriHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {
+# Update Profile 5
+Update-Profile -ProfileSource $profile5Source -RemoteScript $profile5RemoteScript
 
-    Write-Host ("Updating Powershell Profile...") -ForegroundColor Blue
-    Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile
-    (Get-FileHash $profile).Hash | Out-File "$profile.sha256"
-    Write-Host "The profile @ [$profile] has been created." -ForegroundColor Green
-  } else {
-    Write-Host "The profile @ [$profile] has been already created." -ForegroundColor Green
-  }
-}
+# Update Profile 7
+Update-Profile -ProfileSource $profile7Source -RemoteScript $profile7RemoteScript
 
 . Restart-Profile
 
