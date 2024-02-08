@@ -247,7 +247,7 @@ function Get-UserInput {
       $distroChoice = $(Write-Host "Enter choice (1 or 2), or type 'exit' to quit: " -ForegroundColor DarkCyan -NoNewLine; Read-Host)
 
       if ([string]::IsNullOrWhiteSpace($distroChoice) -or $distroChoice.ToLower() -eq 'exit') {
-          exit
+         return $Global:break = $true
       }
   } until ($distroChoice -eq "1" -or $distroChoice -eq "2")
 
