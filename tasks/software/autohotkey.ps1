@@ -13,7 +13,7 @@ $ahkHashFile = "$ahkSourceScript.sha256"
 $ahkFixHashFile = "$ahkFixSourceScript.sha256"
 $ahkRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/ultimate_keys.ahk"
 $ahkFixRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/autohotkey/identify_fix.ahk"
-$getSFTAApp =  PowerShell -Command  "& { . $PSHome\Scripts\SFTA.ps1; Get-FTA .ahk }"
+$getSFTAApp =  PowerShell -Command  "& { . `"$PSHome\Scripts\SFTA.ps1`"; Get-FTA .ahk }"
 
 function Get-UriHash {
   param(

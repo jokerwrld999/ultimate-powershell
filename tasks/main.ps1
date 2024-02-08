@@ -27,8 +27,7 @@ Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-power
 Write-Host "####### Setting Up WSL....... #######" -ForegroundColor Cyan
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/wsl.ps1" | Invoke-Expression
 
-Write-Host ("Deleting Temp Files...") -ForegroundColor Blue
-
+Write-Host "####### Deleting Temporary Files....... #######" -ForegroundColor Cyan
 $tempFolders = @(
     "C:\Windows\Temp\*",
     "C:\Windows\Prefetch\*",
