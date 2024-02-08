@@ -245,6 +245,10 @@ function Get-UserInput {
       Write-Host "1. Arch"
       Write-Host "2. Ubuntu"
       $distroChoice = $(Write-Host "Enter choice (1 or 2): " -ForegroundColor DarkCyan -NoNewLine; Read-Host)
+
+      if ([string]::IsNullOrWhiteSpace($distroChoice) -or $distroChoice.ToLower() -eq 'exit') {
+        exit
+      }
   } until ($distroChoice -eq "1" -or $distroChoice -eq "2")
 
   $Distro = switch ($distroChoice) {
