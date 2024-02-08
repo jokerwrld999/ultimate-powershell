@@ -12,6 +12,7 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 #######################################################
 # GENERAL ALIAS'S
 #######################################################
+Set-Alias -Name pss -Value Enter-PSSession
 Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
