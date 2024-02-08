@@ -63,7 +63,7 @@ foreach ($package in $packagesToRemove) {
   }
 }
 
-$global:registryChangesCount = 0
+$Global:registryChangesCount = 0
 function New-Registry {
   param(
     [Parameter(Mandatory = $true)]
@@ -80,7 +80,7 @@ function New-Registry {
 
     if ((Get-ItemProperty -Path $Path -EA SilentlyContinue).PSObject.Properties[$property.Key].value -ne $property.Value) {
       New-ItemProperty -Path $Path -Name $property.Key -Value $property.Value -Force | Out-Null
-      $global:registryChangesCount = $global:registryChangesCount + 1
+      $Global:registryChangesCount = $Global:registryChangesCount + 1
     }
   }
 }
@@ -172,7 +172,7 @@ foreach ($tweak in $RegistryTweaks) {
   New-Registry @tweak
 }
 
-if ($global:registryChangesCount -ne 0) {
+if ($Global:registryChangesCount -ne 0) {
   Write-Host ("Restarting Explorer...") -ForegroundColor Blue
   Get-Process -Name explorer -EA SilentlyContinue | Stop-Process
   Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -ComObject Shell.Application).Windows() | ForEach-Object { $_.quit() }
