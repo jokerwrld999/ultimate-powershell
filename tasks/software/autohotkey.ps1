@@ -43,7 +43,7 @@ if (!(Test-Path -Path $ahkFixHashFile -PathType Leaf) -or
 
 if ($getSFTAAPP -ne "SFTA.AutoHotkey64.ahk") {
   Write-Host "Setting SFTA..." -ForegroundColor Blue
-  PowerShell -Command  "& { . $PSHome\Scripts\SFTA.ps1; Register-FTA $ahkExe .ahk }"
+  PowerShell -Command  "& { . `"$PSHome\Scripts\SFTA.ps1`"; Register-FTA $ahkExe .ahk }"
 }
 
 if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
