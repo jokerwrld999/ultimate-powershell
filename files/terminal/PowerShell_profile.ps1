@@ -233,7 +233,7 @@ Import-Module -Name Terminal-Icons
 Import-Module -Name PSReadLine
 Set-PSReadLineOption -EditMode Emacs
 Set-PSReadLineKeyHandler -Key "Ctrl+Backspace" -Function BackwardKillWord
-Set-PSReadLineKeyHandler -Key "Ctrl+Space" -Function SelectForwardChar
+Set-PSReadLineKeyHandler -Key "Ctrl+Spacebar" -Function SelectForwardChar
 
 #######################################################
 # SET PWSH PROMPT
