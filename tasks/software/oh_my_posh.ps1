@@ -114,7 +114,7 @@ foreach ($profile in $profiles) {
   if (!(Test-Path -Path $profile -PathType Leaf) -or
     (Get-UriHash -Uri $profileRemoteScript) -ne (Get-Content "$profile.sha256" -EA SilentlyContinue)) {
 
-    Write-Host ("Creating Powershell Profile...") -ForegroundColor Blue
+    Write-Host ("Updating Powershell Profile...") -ForegroundColor Blue
     Invoke-WebRequest -Uri $profileRemoteScript -OutFile $profile
     (Get-FileHash $profile).Hash | Out-File "$profile.sha256"
     Write-Host "The profile @ [$profile] has been created." -ForegroundColor Green

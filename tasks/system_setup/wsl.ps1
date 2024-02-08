@@ -297,7 +297,7 @@ if ($hyperVInfo.HyperVisorPresent -eq 'True') {
   } else {
     Write-Host "Your system does not meet the hardware requirements for virtualization." -ForegroundColor DarkMagenta
   }
-  break
+  $break = $true
 }
 
 $Distro = $getWSLVars.Distro
@@ -306,7 +306,9 @@ $UserPass = $getWSLVars.UserPass
 $VaultPass = $getWSLVars.VaultPass
 
 if (!$Boot) {
-  CheckAndInstallFeatures
+  if (!$break) {
+    CheckAndInstallFeatures
+  }
 } else {
   Start-Process powershell.exe -ArgumentList "-Command  `"&{wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown}`"" -Wait -NoNewWindow
 
