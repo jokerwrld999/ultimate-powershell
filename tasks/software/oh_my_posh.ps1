@@ -17,18 +17,6 @@ $profile7RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw
 $sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
 $wakeOnLanRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/wakeOnLan.ps1"
 
-function Restart-Profile {
-  @(
-    $profile5Source,
-    $profile7Source
-  ) | % {
-      if(Test-Path $_){
-          Write-Verbose "Running $_"
-          . $_
-      }
-  }
-}
-
 function Get-UriHash {
   param(
     $Uri
@@ -50,6 +38,8 @@ function Update-Profile {
       Write-Host ("Updating PowerShell Profile: $ProfileSource") -ForegroundColor Blue
       Invoke-WebRequest -Uri $RemoteScript -OutFile $ProfileSource
       (Get-FileHash $ProfileSource).Hash | Out-File "$ProfileSource.sha256"
+
+      & $ProfileSource
 
       Write-Host "The profile @ [$ProfileSource] has been created." -ForegroundColor Green
   } else {
@@ -134,8 +124,6 @@ Update-Profile -ProfileSource $profile5Source -RemoteScript $profile5RemoteScrip
 
 # Update Profile 7
 Update-Profile -ProfileSource $profile7Source -RemoteScript $profile7RemoteScript
-
-. Restart-Profile
 
 if (!(Test-Path -Path "$env:userprofile\github")) {
   New-Item -Path "$env:userprofile\github" -ItemType Directory | Out-Null
