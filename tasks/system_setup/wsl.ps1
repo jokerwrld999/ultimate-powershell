@@ -122,6 +122,8 @@ function InstallArchDistro {
     wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
+      wsl -d Arch -u root /bin/bash -c "ls -la" | Out-Null
+      Start-Sleep 5
       # if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
       #   Stop-Job -Name $jobName | Out-Null
       #   Remove-Job -Name $jobName | Out-Null
