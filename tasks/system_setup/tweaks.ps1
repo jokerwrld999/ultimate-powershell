@@ -58,8 +58,8 @@ $packagesToRemove = @(
 )
 
 foreach ($package in $packagesToRemove) {
-  if (Get-AppxPackage -Name $package -AllUsers) {
-    Get-AppxPackage -Name $package -AllUsers | Remove-AppxPackage *>$null
+  if (Get-AppxPackage -all -Name $package) {
+    Get-AppxPackage -all -Name $package | Remove-AppxPackage -AllUsers *>$null
   }
 }
 
