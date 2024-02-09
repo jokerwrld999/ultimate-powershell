@@ -80,7 +80,7 @@ function SetupCustomUser {
   if (!$UserHomeDirectoryExists) {
     Write-Host "####### Setting Up Custom User $CustomUser... #######" -ForegroundColor Blue
     wsl -d $Distro -u root /bin/bash -c @"
-            if ! grep -q '%$SudoGroup ALL=(ALL) NOPASSWD: ALL' /etc/sudoers.d/$SudoGroup; then
+            if ! grep -q '%$SudoGroup ALL=(ALL) NOPASSWD: ALL' /etc/sudoers.d/$SudoGroup >/dev/null 2>&1; then
                 echo '%$SudoGroup ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/$SudoGroup
             fi
 
@@ -153,7 +153,7 @@ function InstallArchDistro {
           Start-Process -WindowStyle hidden "$env:userprofile\AppData\Local\Packages\Arch\Arch.exe"
         } | Receive-Job -AutoRemoveJob -Wait | Out-Null
       }
-      Start-Sleep -s 5
+      Start-Sleep -s 10
     }
   }
 }
@@ -184,7 +184,7 @@ function InstallUbuntuDistro {
         Write-Host "####### Initializing Ubuntu... #######" -ForegroundColor Blue
         Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Receive-Job -AutoRemoveJob -Wait | Out-Null
       }
-      Start-Sleep -s 5
+      Start-Sleep -s 10
     }
   }
 }
