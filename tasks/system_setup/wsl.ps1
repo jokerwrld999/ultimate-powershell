@@ -111,7 +111,7 @@ function InstallArchDistro {
     Write-Host "####### Extracting Arch Distro... #######" -ForegroundColor Green
     Expand-Archive -Path $wsl_dir\Arch.zip -DestinationPath $wsl_dir\Arch
 
-    if (!(Test-Path -Path "$wsl_dir\Arch.zip")) {
+    if (Test-Path -Path "$wsl_dir\Arch.zip") {
       Write-Host "####### Removing Temp Files... #######" -ForegroundColor Green
       Remove-Item -Recurse -Force $wsl_dir\Arch.zip
     }
@@ -122,10 +122,10 @@ function InstallArchDistro {
     wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
-      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-        Stop-Job -Name $jobName | Out-Null
-        Remove-Job -Name $jobName | Out-Null
-      }
+      # if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+      #   Stop-Job -Name $jobName | Out-Null
+      #   Remove-Job -Name $jobName | Out-Null
+      # }
 
       wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
@@ -146,9 +146,9 @@ function InstallArchDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Arch... #######" -ForegroundColor Blue
-        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe } | Out-Null
+        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe } | Receive-Job -AutoRemoveJob -Wait | Out-Null
       }
-      Start-Sleep -s 20
+      Start-Sleep -s 5
     }
   }
 }
@@ -159,10 +159,10 @@ function InstallUbuntuDistro {
     wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Ubuntu installed successfully. #######" -ForegroundColor Green
-      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-        Stop-Job -Name $jobName | Out-Null
-        Remove-Job -Name $jobName | Out-Null
-      }
+      # if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+      #   Stop-Job -Name $jobName | Out-Null
+      #   Remove-Job -Name $jobName | Out-Null
+      # }
 
       wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
@@ -177,9 +177,9 @@ function InstallUbuntuDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Ubuntu... #######" -ForegroundColor Blue
-        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Out-Null
+        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Receive-Job -AutoRemoveJob -Wait | Out-Null
       }
-      Start-Sleep -s 20
+      Start-Sleep -s 5
     }
   }
 }
@@ -310,7 +310,11 @@ if (!$Boot) {
     CheckAndInstallFeatures
   }
 } else {
-  Start-Process powershell.exe -ArgumentList "-Command  `"&{wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown}`"" -Wait -NoNewWindow
+  $jobName = "Update WSL Kernel"
+  if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
+    Write-Host "####### Updating WSL Kernel... #######" -ForegroundColor Blue
+    Start-Job -Name $jobName -ScriptBlock { wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown } | Receive-Job -AutoRemoveJob -Wait | Out-Null
+  }
 
   SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
 
