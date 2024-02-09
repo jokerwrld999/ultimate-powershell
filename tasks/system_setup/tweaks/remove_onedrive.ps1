@@ -1,24 +1,18 @@
-# Kill OneDrive process
 Write-Host "Kill OneDrive process" -ForegroundColor Cyan
-taskkill.exe /F /IM "OneDrive.exe" -ErrorAction SilentlyContinue
-taskkill.exe /F /IM "explorer.exe" -ErrorAction SilentlyContinue
+taskkill.exe /IM "OneDrive.exe" /F /FI "STATUS eq RUNNING"
 
-# Copy all OneDrive to Root UserProfile
 Write-Host "Copy all OneDrive to Root UserProfile" -ForegroundColor Cyan
 Start-Process -FilePath robocopy -ArgumentList "$env:USERPROFILE\OneDrive $env:USERPROFILE /e /xj" -NoNewWindow -Wait
 
-# Remove OneDrive
 Write-Host "Remove OneDrive" -ForegroundColor Cyan
 Start-Process -FilePath winget -ArgumentList "uninstall -e --purge --force --silent Microsoft.OneDrive " -NoNewWindow -Wait
 
-# Removing OneDrive leftovers
 Write-Host "Removing OneDrive leftovers" -ForegroundColor Cyan
 $OneDriveFolders = @("$env:localappdata\Microsoft\OneDrive", "$env:programdata\Microsoft OneDrive", "$env:systemdrive\OneDriveTemp")
 $OneDriveFolders | ForEach-Object {
     Remove-Item -Path $_ -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# Check if OneDrive directory is empty before removing
 if (!(Get-ChildItem "$env:userprofile\OneDrive" -Recurse | Measure-Object).Count) {
     Remove-Item -Path "$env:userprofile\OneDrive" -Recurse -Force -ErrorAction SilentlyContinue
 }
@@ -48,21 +42,17 @@ foreach ($path in $registryPaths) {
     }
 }
 
-# Removing run hook for new users
 Write-Host "Removing run hook for new users" -ForegroundColor Cyan
 reg load "hku\Default" "C:\Users\Default\NTUSER.DAT"
 reg delete "HKEY_USERS\Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "OneDriveSetup" /f
 reg unload "hku\Default"
 
-# Removing startmenu entry
 Write-Host "Removing startmenu entry" -ForegroundColor Cyan
 Remove-Item -Path "$env:userprofile\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk" -Force -ErrorAction SilentlyContinue
 
-# Removing scheduled task
 Write-Host "Removing scheduled task" -ForegroundColor Cyan
 Get-ScheduledTask -TaskPath '\' -TaskName 'OneDrive*' -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
 
-# Shell folders restoring default locations
 Write-Host "Shell Fixing" -ForegroundColor Cyan
 $shellFolders = @{
     "AppData" = "$env:userprofile\AppData\Roaming";
@@ -93,11 +83,5 @@ $shellFolders.GetEnumerator() | ForEach-Object {
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name $_.Key -Value $_.Value -Type ExpandString
 }
 
-# Restarting explorer
 Write-Host "Restarting explorer" -ForegroundColor Cyan
-Start-Process "explorer.exe"
-
-# Waiting for explorer to complete loading
-Write-Host "Waiting for explorer to complete loading" -ForegroundColor Cyan
-Write-Host "Please Note - OneDrive folder may still have items in it. You must manually delete it, but all the files should already be copied to the base user folder." -ForegroundColor Cyan
-Start-Sleep -Seconds 5
+Get-Process -Name explorer -EA SilentlyContinue | Stop-Process

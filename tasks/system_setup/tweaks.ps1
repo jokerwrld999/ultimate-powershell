@@ -181,7 +181,6 @@ foreach ($tweak in $RegistryTweaks) {
 if ($Global:registryChangesCount -ne 0) {
   Write-Host ("Restarting Explorer...") -ForegroundColor Blue
   Get-Process -Name explorer -EA SilentlyContinue | Stop-Process
-  Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -ComObject Shell.Application).Windows() | ForEach-Object { $_.quit() }
 }
 
 if ((Get-WinHomeLocation).GeoId -ne 244) {
@@ -206,7 +205,7 @@ if (Test-Path -Path $edgePackage) {
 
 if (Test-Path -Path $env:OneDrive) {
   Write-Host ("Removing OneDrive...") -ForegroundColor Blue
-  Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/remove_onedrive.ps1" | Invoke-Expression
+  Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/remove_onedrive.ps1" | Invoke-Expression *> $null
 } else {
   Write-Host "OneDrive has been already uninstalled." -ForegroundColor Green
 }
