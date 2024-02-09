@@ -178,8 +178,8 @@ if ($Global:registryChangesCount -ne 0) {
   Start-Process Explorer.exe; Start-Sleep -s 2; (New-Object -ComObject Shell.Application).Windows() | ForEach-Object { $_.quit() }
 }
 
-if ((Get-WinHomeLocation).GeoId -ne 241) {
-  Set-WinHomeLocation -GeoID 241
+if ((Get-WinHomeLocation).GeoId -ne 244) {
+  Set-WinHomeLocation -GeoID 244
 }
 
 if ((Get-TimeZone).Id -ne "FLE Standard Time") {
