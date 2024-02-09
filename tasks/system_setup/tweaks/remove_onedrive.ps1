@@ -1,7 +1,7 @@
 # Kill OneDrive process
 Write-Host "Kill OneDrive process" -ForegroundColor Cyan
-taskkill.exe /F /IM "OneDrive.exe"
-taskkill.exe /F /IM "explorer.exe"
+taskkill.exe /F /IM "OneDrive.exe" -ErrorAction SilentlyContinue
+taskkill.exe /F /IM "explorer.exe" -ErrorAction SilentlyContinue
 
 # Copy all OneDrive to Root UserProfile
 Write-Host "Copy all OneDrive to Root UserProfile" -ForegroundColor Cyan
@@ -25,7 +25,7 @@ if (!(Get-ChildItem "$env:userprofile\OneDrive" -Recurse | Measure-Object).Count
 
 Write-Host "Remove Onedrive from explorer sidebar" -ForegroundColor Cyan
 
-if (!Test-Path -Path "HKCR:") {
+if (!(Test-Path -Path "HKCR:")) {
   New-PSDrive -PSProvider Registry -Root HKEY_CLASSES_ROOT -Name HKCR
 }
 
