@@ -53,35 +53,6 @@ Remove-Item -Path "$env:userprofile\AppData\Roaming\Microsoft\Windows\Start Menu
 Write-Host "Removing scheduled task" -ForegroundColor Cyan
 Get-ScheduledTask -TaskPath '\' -TaskName 'OneDrive*' -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
 
-Write-Host "Shell Fixing" -ForegroundColor Cyan
-$shellFolders = @{
-    "AppData" = "$env:userprofile\AppData\Roaming";
-    "Cache" = "$env:userprofile\AppData\Local\Microsoft\Windows\INetCache";
-    "Cookies" = "$env:userprofile\AppData\Local\Microsoft\Windows\INetCookies";
-    "Favorites" = "$env:userprofile\Favorites";
-    "History" = "$env:userprofile\AppData\Local\Microsoft\Windows\History";
-    "Local AppData" = "$env:userprofile\AppData\Local";
-    "My Music" = "$env:userprofile\Music";
-    "My Video" = "$env:userprofile\Videos";
-    "NetHood" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Network Shortcuts";
-    "PrintHood" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Printer Shortcuts";
-    "Programs" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Start Menu\Programs";
-    "Recent" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Recent";
-    "SendTo" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\SendTo";
-    "Start Menu" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Start Menu";
-    "Startup" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup";
-    "Templates" = "$env:userprofile\AppData\Roaming\Microsoft\Windows\Templates";
-    "{374DE290-123F-4565-9164-39C4925E467B}" = "$env:userprofile\Downloads";
-    "Desktop" = "$env:userprofile\Desktop";
-    "My Pictures" = "$env:userprofile\Pictures";
-    "Personal" = "$env:userprofile\Documents";
-    "{F42EE2D3-909F-4907-8871-4C22FC0BF756}" = "$env:userprofile\Documents";
-    "{0DDD015D-B06C-45D5-8C4C-F59713854639}" = "$env:userprofile\Pictures";
-}
-
-$shellFolders.GetEnumerator() | ForEach-Object {
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name $_.Key -Value $_.Value -Type ExpandString
-}
 
 Write-Host "Restarting explorer" -ForegroundColor Cyan
 Get-Process -Name explorer -EA SilentlyContinue | Stop-Process
