@@ -146,6 +146,12 @@ $RegistryTweaks = @(
     }
   },
   @{
+    Path = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer'
+    Properties = @{
+      NoPinningStoreToTaskbar = 1
+    }
+  },
+  @{
     Path = 'HKCU:\Control Panel\Mouse'
     Properties = @{
       MouseSpeed = 0
@@ -161,9 +167,9 @@ $RegistryTweaks = @(
     }
   },
   @{
-    Path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}'
+    Path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
     Properties = @{
-      InprocServer32 = ''
+      "(Default)" = ''
     }
   }
 )
@@ -190,8 +196,8 @@ Get-Service DiagTrack,dmwappushservice | Where-Object StartupType -ne Disabled |
 
 Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/oosu10.ps1" | Invoke-Expression
 
-$edgePackage = Get-Command -ErrorAction SilentlyContinue -CommandType Application -Name msedge
-if ($edgePackage) {
+$edgePackage = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+if (Test-Path -Path $edgePackage) {
   Write-Host "Removing Microsoft Edge..." -ForegroundColor Blue
   Invoke-RestMethod "https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/edgeremoval.ps1" | Invoke-Expression *> $null
 } else {
