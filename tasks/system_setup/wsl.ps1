@@ -123,6 +123,7 @@ function InstallArchDistro {
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
       wsl -d Arch -u root /bin/bash -c "ls -la" | Out-Null
+      Get-Service LxssManager | Restart-Service
       Start-Sleep 5
       # if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
       #   Stop-Job -Name $jobName | Out-Null
