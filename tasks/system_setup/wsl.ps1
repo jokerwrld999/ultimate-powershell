@@ -146,7 +146,7 @@ function InstallArchDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Arch... #######" -ForegroundColor Blue
-        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden $wsl_dir\Arch\Arch.exe } | Receive-Job -AutoRemoveJob -Wait | Out-Null
+        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden "$wsl_dir\Arch\Arch.exe" } | Receive-Job -AutoRemoveJob -Wait | Out-Null
       }
       Start-Sleep -s 5
     }
