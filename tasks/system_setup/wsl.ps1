@@ -146,7 +146,9 @@ function InstallArchDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Arch... #######" -ForegroundColor Blue
-        Start-Job -Name $jobName -ScriptBlock { Start-Process -WindowStyle hidden "$wsl_dir\Arch\Arch.exe" } | Receive-Job -AutoRemoveJob -Wait | Out-Null
+        Start-Job -Name $jobName -ScriptBlock {
+          Start-Process -WindowStyle hidden "$env:userprofile\AppData\Local\Packages\Arch\Arch.exe"
+        } | Receive-Job -AutoRemoveJob -Wait | Out-Null
       }
       Start-Sleep -s 5
     }
@@ -313,7 +315,12 @@ if (!$Boot) {
   $jobName = "Update WSL Kernel"
   if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
     Write-Host "####### Updating WSL Kernel... #######" -ForegroundColor Blue
-    Start-Job -Name $jobName -ScriptBlock { wsl --status; wsl --update; wsl --set-default-version 2; wsl --shutdown } | Receive-Job -AutoRemoveJob -Wait | Out-Null
+    Start-Job -Name $jobName -ScriptBlock {
+      wsl --status
+      wsl --update
+      wsl --set-default-version 2
+      wsl --shutdown
+    } | Receive-Job -AutoRemoveJob -Wait | Out-Null
   }
 
   SetupWSLDistro -Distro $Distro -CustomUser $CustomUser -UserPass $UserPass -VaultPass $VaultPass
