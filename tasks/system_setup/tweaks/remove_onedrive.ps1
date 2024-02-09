@@ -23,10 +23,30 @@ if (!(Get-ChildItem "$env:userprofile\OneDrive" -Recurse | Measure-Object).Count
     Remove-Item -Path "$env:userprofile\OneDrive" -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# Remove OneDrive from explorer sidebar
 Write-Host "Remove Onedrive from explorer sidebar" -ForegroundColor Cyan
-Set-ItemProperty -Path "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Name "System.IsPinnedToNameSpaceTree" -Value 0
-Set-ItemProperty -Path "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Name "System.IsPinnedToNameSpaceTree" -Value 0
+
+if (!Test-Path -Path "HKCR:") {
+  New-PSDrive -PSProvider Registry -Root HKEY_CLASSES_ROOT -Name HKCR
+}
+
+$registryPaths = @(
+    "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}",
+    "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
+)
+
+foreach ($path in $registryPaths) {
+    if (Test-Path -Path $path) {
+        $property = Get-ItemProperty -Path $path -Name "System.IsPinnedToNameSpaceTree" -ErrorAction SilentlyContinue
+        if ($property -and $property.'System.IsPinnedToNameSpaceTree' -ne 0) {
+            Set-ItemProperty -Path $path -Name "System.IsPinnedToNameSpaceTree" -Value 0
+            Write-Host "OneDrive removed from $path." -ForegroundColor Green
+        } else {
+            Write-Host "OneDrive already removed from $path." -ForegroundColor DarkGray
+        }
+    } else {
+        Write-Host "Path $path not found in registry." -ForegroundColor Yellow
+    }
+}
 
 # Removing run hook for new users
 Write-Host "Removing run hook for new users" -ForegroundColor Cyan

@@ -206,7 +206,7 @@ if (Test-Path -Path $edgePackage) {
 
 if (Test-Path -Path $env:OneDrive) {
   Write-Host ("Removing OneDrive...") -ForegroundColor Blue
-  Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/remove_onedrive.ps1" | Invoke-Expression *> $null
+  Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/tweaks/remove_onedrive.ps1" | Invoke-Expression
 } else {
   Write-Host "OneDrive has been already uninstalled." -ForegroundColor Green
 }
