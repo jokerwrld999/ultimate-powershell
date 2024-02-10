@@ -121,8 +121,9 @@ function InstallArchDistro {
   while ($true) {
     wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
-      Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
       Get-Service LxssManager | Restart-Service
+      Start-Sleep 5
+      Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
       if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
         Stop-Job -Name $jobName | Out-Null
         Remove-Job -Name $jobName | Out-Null
@@ -151,7 +152,7 @@ function InstallArchDistro {
           Start-Process -WindowStyle hidden "$env:userprofile\AppData\Local\Packages\Arch\Arch.exe"
         } | Out-Null
       }
-      Start-Sleep -s 10
+      Start-Sleep -s 20
     }
   }
 }
