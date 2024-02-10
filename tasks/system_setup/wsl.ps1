@@ -162,10 +162,6 @@ function InstallUbuntuDistro {
     wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Ubuntu installed successfully. #######" -ForegroundColor Green
-      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-        Stop-Job -Name $jobName | Out-Null
-        Remove-Job -Name $jobName | Out-Null
-      }
 
       wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
@@ -182,7 +178,17 @@ function InstallUbuntuDistro {
         Write-Host "####### Initializing Ubuntu... #######" -ForegroundColor Blue
         Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Out-Null
       }
-      Start-Sleep -s 10
+
+      while ((Get-Job $jobName).State -ne 'Completed') {
+        Write-Host "Ubuntu initialization in progress..." -ForegroundColor Blue
+        Start-Sleep -Seconds 5  # Check every 5 seconds
+      }
+
+      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+        Stop-Job -Name $jobName | Out-Null
+        Remove-Job -Name $jobName | Out-Null
+      }
+
     }
   }
 }
