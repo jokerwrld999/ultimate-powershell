@@ -121,15 +121,13 @@ function InstallArchDistro {
   while ($true) {
     wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
-      Get-Service LxssManager | Restart-Service
-      Start-Sleep 5
       Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
       if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
         Stop-Job -Name $jobName | Out-Null
         Remove-Job -Name $jobName | Out-Null
       }
 
-      $maxRetries = 3  # Set the maximum number of retries
+      $maxRetries = 3
       $retryCount = 0
 
       do {
