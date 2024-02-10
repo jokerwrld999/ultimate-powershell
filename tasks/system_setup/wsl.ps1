@@ -122,13 +122,11 @@ function InstallArchDistro {
     wsl -d Arch -u root /bin/bash -c "pacman -V >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Arch Installed Successfully. #######" -ForegroundColor Green
-      wsl -d Arch -u root /bin/bash -c "ls -la" | Out-Null
-      Get-Service LxssManager | Restart-Service
-      Start-Sleep 5
-      # if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-      #   Stop-Job -Name $jobName | Out-Null
-      #   Remove-Job -Name $jobName | Out-Null
-      # }
+      # Get-Service LxssManager | Restart-Service
+      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+        Stop-Job -Name $jobName | Out-Null
+        Remove-Job -Name $jobName | Out-Null
+      }
 
       wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
@@ -151,7 +149,7 @@ function InstallArchDistro {
         Write-Host "####### Initializing Arch... #######" -ForegroundColor Blue
         Start-Job -Name $jobName -ScriptBlock {
           Start-Process -WindowStyle hidden "$env:userprofile\AppData\Local\Packages\Arch\Arch.exe"
-        } | Receive-Job -AutoRemoveJob -Wait | Out-Null
+        } | Out-Null
       }
       Start-Sleep -s 10
     }
@@ -164,10 +162,10 @@ function InstallUbuntuDistro {
     wsl -d Ubuntu -u root /bin/bash -c "apt -v >/dev/null 2>&1" | Out-Null
     if ($LASTEXITCODE -eq 0) {
       Write-Host "####### Ubuntu installed successfully. #######" -ForegroundColor Green
-      # if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
-      #   Stop-Job -Name $jobName | Out-Null
-      #   Remove-Job -Name $jobName | Out-Null
-      # }
+      if (Get-Job -Name $jobName -ErrorAction SilentlyContinue) {
+        Stop-Job -Name $jobName | Out-Null
+        Remove-Job -Name $jobName | Out-Null
+      }
 
       wsl -d Ubuntu -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
       if ($LASTEXITCODE -ne 0) {
@@ -182,7 +180,7 @@ function InstallUbuntuDistro {
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Ubuntu... #######" -ForegroundColor Blue
-        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Receive-Job -AutoRemoveJob -Wait | Out-Null
+        Start-Job -Name $jobName -ScriptBlock { wsl --install -d Ubuntu } | Out-Null
       }
       Start-Sleep -s 10
     }
