@@ -129,22 +129,56 @@ function InstallArchDistro {
         Remove-Job -Name $jobName | Out-Null
       }
 
-      wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
-      if ($LASTEXITCODE -ne 0) {
-        Write-Host "####### Running Arch First Setup... #######" -ForegroundColor Blue
-        wsl -d Arch -u root /bin/bash -c @"
-                    rm -rf /var/lib/pacman/db.lck
-                    pacman -Syyu --noconfirm >/dev/null 2>&1
-                    pacman -S archlinux-keyring --needed --noconfirm >/dev/null 2>&1
-                    localectl set-locale LANG=en_US.UTF-8
-                    pacman -Suy --noconfirm >/dev/null 2>&1
-                    pacman -S ansible git --noconfirm >/dev/null 2>&1
+      $maxRetries = 3  # Set the maximum number of retries
+      $retryCount = 0
+
+      do {
+        wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
+
+        if ($LASTEXITCODE -ne 0) {
+          $retryCount++
+
+          if ($retryCount -le $maxRetries) {
+            Write-Host "Ansible not found. Retrying setup (attempt $retryCount of $maxRetries)..."
+            wsl -d Arch -u root /bin/bash -c @"
+              rm -rf /var/lib/pacman/db.lck
+              pacman -Syyu --noconfirm >/dev/null 2>&1
+              pacman -S archlinux-keyring --needed --noconfirm >/dev/null 2>&1
+              localectl set-locale LANG=en_US.UTF-8
+              pacman -Suy --noconfirm >/dev/null 2>&1
+              pacman -S ansible git --noconfirm >/dev/null 2>&1
 "@
+            Start-Sleep -Seconds 5  # Brief pause between retries
+          } else {
+            Write-Host "Ansible setup failed after $maxRetries attempts." -ForegroundColor Red
+            # Consider adding error handling or logging here
+            break
+          }
+        } else {
+          Write-Host "Ansible is already installed." -ForegroundColor Green
+          break
+        }
+      } while ($true)
+
+      if ($retryCount -le $maxRetries) {
         Write-Host "####### Arch First Setup is finished successfully. #######" -ForegroundColor Green
-      } else {
-        Write-Host "####### Arch First Setup has been already completed. #######" -ForegroundColor Green
       }
-      break
+#       wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
+#       if ($LASTEXITCODE -ne 0) {
+#         Write-Host "####### Running Arch First Setup... #######" -ForegroundColor Blue
+#         wsl -d Arch -u root /bin/bash -c @"
+#                     rm -rf /var/lib/pacman/db.lck
+#                     pacman -Syyu --noconfirm >/dev/null 2>&1
+#                     pacman -S archlinux-keyring --needed --noconfirm >/dev/null 2>&1
+#                     localectl set-locale LANG=en_US.UTF-8
+#                     pacman -Suy --noconfirm >/dev/null 2>&1
+#                     pacman -S ansible git --noconfirm >/dev/null 2>&1
+# "@
+#         Write-Host "####### Arch First Setup is finished successfully. #######" -ForegroundColor Green
+#       } else {
+#         Write-Host "####### Arch First Setup has been already completed. #######" -ForegroundColor Green
+#       }
+#       break
     } else {
       if (!(Get-Job -Name $jobName -EA SilentlyContinue)) {
         Write-Host "####### Initializing Arch... #######" -ForegroundColor Blue
