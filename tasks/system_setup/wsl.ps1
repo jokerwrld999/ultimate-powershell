@@ -139,7 +139,7 @@ function InstallArchDistro {
           $retryCount++
 
           if ($retryCount -le $maxRetries) {
-            Write-Host "Ansible not found. Retrying setup (attempt $retryCount of $maxRetries)..."
+            Write-Host "####### Running Arch First Setup... #######" -ForegroundColor Blue
             wsl -d Arch -u root /bin/bash -c @"
               rm -rf /var/lib/pacman/db.lck
               pacman -Syyu --noconfirm >/dev/null 2>&1
@@ -148,10 +148,9 @@ function InstallArchDistro {
               pacman -Suy --noconfirm >/dev/null 2>&1
               pacman -S ansible git --noconfirm >/dev/null 2>&1
 "@
-            Start-Sleep -Seconds 5  # Brief pause between retries
+            Start-Sleep -Seconds 5
           } else {
             Write-Host "Ansible setup failed after $maxRetries attempts." -ForegroundColor Red
-            # Consider adding error handling or logging here
             break
           }
         } else {
@@ -162,6 +161,7 @@ function InstallArchDistro {
 
       if ($retryCount -le $maxRetries) {
         Write-Host "####### Arch First Setup is finished successfully. #######" -ForegroundColor Green
+        break
       }
 #       wsl -d Arch -u root /bin/bash -c "ansible --version >/dev/null 2>&1" | Out-Null
 #       if ($LASTEXITCODE -ne 0) {
