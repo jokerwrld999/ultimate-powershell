@@ -25,7 +25,7 @@ foreach ($bucket in $buckets) {
 }
 
 Write-Host "Updating Scoop Module..." -ForegroundColor Blue
-scoop update * --force *> $null
+scoop update * *> $null
 
 $applications = @(
   @{ Name = "AdobeAcrobatReader"; Id = "Scoop-Apps/AdobeAcrobatReader-Install" },

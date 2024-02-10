@@ -13,7 +13,7 @@ $Env:currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Nam
 #######################################################
 # GENERAL ALIAS'S
 #######################################################
-Set-Alias -Name pss -Value Enter-PSSession
+Set-Alias -Name pss -Value Remote
 Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 Set-Alias -Name reboot -Value Restart-Computer
@@ -218,6 +218,15 @@ function pgrep ($name) {
 function speedtest ()
 {
   & speedtest.exe --accept-license
+}
+
+function Remote($computerName){
+  # if(!$Global:credential){
+  #   $Global:credential =  Get-Credential
+  # }
+  $session = New-PSSession -ComputerName $computerName #-Credential $credential
+  Invoke-Command -FilePath "$PSHome\profile.ps1" -Session $session
+  Enter-PSSession -Session $session
 }
 
 function Restart-Remote {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/pwsh_scripts/rebootRemotely.ps1" | Invoke-Expression}
