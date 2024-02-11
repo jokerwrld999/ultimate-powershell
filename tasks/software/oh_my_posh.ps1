@@ -39,7 +39,7 @@ function Update-Profile {
       Invoke-WebRequest -Uri $RemoteScript -OutFile $ProfileSource
       (Get-FileHash $ProfileSource).Hash | Out-File "$ProfileSource.sha256"
 
-      & $ProfileSource
+      & $ProfileSource | Out-Null
 
       Write-Host "The profile @ [$ProfileSource] has been created." -ForegroundColor Green
   } else {
@@ -68,7 +68,7 @@ foreach ($script in $scripts) {
 }
 
 
-if (!(Get-PSSessionConfiguration -Name "*PowerShell*").Enabled) {
+if (!(Get-PSSessionConfiguration -Name *PowerShell*).Enabled) {
     Enable-PSRemoting -SkipNetworkProfileCheck -Force *>$null
     Write-Host "PowerShell Remoting enabled successfully." -ForegroundColor Green
 }
