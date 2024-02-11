@@ -39,7 +39,7 @@ function Update-Profile {
       Invoke-WebRequest -Uri $RemoteScript -OutFile $ProfileSource
       (Get-FileHash $ProfileSource).Hash | Out-File "$ProfileSource.sha256"
 
-      & $ProfileSource | Out-Null
+      & $ProfileSource *>$null
 
       Write-Host "The profile @ [$ProfileSource] has been created." -ForegroundColor Green
   } else {
