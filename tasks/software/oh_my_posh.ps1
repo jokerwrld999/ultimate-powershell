@@ -68,7 +68,7 @@ foreach ($script in $scripts) {
 }
 
 
-if (!(Get-PSSessionConfiguration -Name "Microsoft*").Enabled) {
+if (!(Get-PSSessionConfiguration -Name "*PowerShell*").Enabled) {
     Enable-PSRemoting -SkipNetworkProfileCheck -Force *>$null
     Write-Host "PowerShell Remoting enabled successfully." -ForegroundColor Green
 }
