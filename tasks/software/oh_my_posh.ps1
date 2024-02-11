@@ -81,12 +81,12 @@ foreach ($package in $packages) {
     $updateAvailable = $versionMatch.Matches.Count -gt 1
     if ($updateAvailable) {
             Get-AppxPackage $package -AllUsers | Remove-AppxPackage -ErrorAction SilentlyContinue | Out-Null
-            winget install --silent --id $package --source winget
+            winget install --silent --id $package --source winget | Out-Null
         } else {
             continue
         }
     } else {
-        winget install --silent --id $package --source winget
+        winget install --silent --id $package --source winget | Out-Null
     }
 }
 
