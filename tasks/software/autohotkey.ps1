@@ -46,8 +46,11 @@ if ($getSFTAAPP -ne "SFTA.AutoHotkey64.ahk") {
   PowerShell -Command  "& { . `"$PSHome\Scripts\SFTA.ps1`"; Register-FTA $ahkExe .ahk }"
 }
 
-if (!(Get-ItemPropertyValue -Path $runAsAdminReg -Name $ahkExe -ErrorAction SilentlyContinue)) {
+if (!(Test-Path $runAsAdminReg)) {
   New-Item -Path $runAsAdminReg -Force | Out-Null
+}
+
+if ((Get-ItemProperty -Path $runAsAdminReg -EA SilentlyContinue).PSObject.Properties[$ahkExe].value -ne $runAsAdminValue) {
   New-ItemProperty -Path $runAsAdminReg -Name $ahkExe -Value $runAsAdminValue -Force | Out-Null
 }
 
