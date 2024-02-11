@@ -1,11 +1,8 @@
 Write-Host "Kill OneDrive process" -ForegroundColor Cyan
 taskkill.exe /IM "OneDrive.exe" /F /FI "STATUS eq RUNNING"
 
-Write-Host "Copy all OneDrive to Root UserProfile" -ForegroundColor Cyan
-Start-Process -FilePath robocopy -ArgumentList "$env:USERPROFILE\OneDrive $env:USERPROFILE /e /xj" -NoNewWindow -Wait | Out-Null
-
 Write-Host "Remove OneDrive" -ForegroundColor Cyan
-Start-Process -FilePath winget -ArgumentList "uninstall -e --purge --force --silent Microsoft.OneDrive " -NoNewWindow -Wait
+Start-Process -FilePath winget -ArgumentList "uninstall -e --purge --force --silent Microsoft.OneDrive --accept-source-agreements" -NoNewWindow -Wait | Out-Null
 
 Write-Host "Removing OneDrive leftovers" -ForegroundColor Cyan
 $OneDriveFolders = @("$env:localappdata\Microsoft\OneDrive", "$env:programdata\Microsoft OneDrive", "$env:systemdrive\OneDriveTemp")

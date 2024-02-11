@@ -2,7 +2,7 @@
 
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -ForegroundColor Blue
-  Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin"
+  Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin" *> $null
 }
 
 $scoopAppsBucket = 'Scoop-Apps'
