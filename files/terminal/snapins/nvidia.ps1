@@ -8,7 +8,7 @@ $nvDestUnzipPath = "$nvTempDir\$nvLatestVersion-Driver"
 $nvSrcUnzipPath = "$nvDestUnzipPath\setup.exe"
 
 
-if ($nvCurrentVersion -eq $nvLatestVersion){
+if ($nvCurrentVersion -lt $nvLatestVersion){
   if (!(Test-Path -Path $nvSrc)) {
     Write-Host "####### Downloading Nvidia Driver... #######" -ForegroundColor Blue
     New-Item -Type Directory -Path $nvTempDir
