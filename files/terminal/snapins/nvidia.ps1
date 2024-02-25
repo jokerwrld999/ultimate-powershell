@@ -7,24 +7,30 @@ $nvCurrentVersion = ($nvGetVersion | Select-String -Pattern '.{7}$').Matches.Val
 $nvDestUnzipPath = "$nvTempDir\$nvLatestVersion-Driver"
 $nvSrcUnzipPath = "$nvDestUnzipPath\setup.exe"
 
+if ([bool]((Get-CimInstance win32_VideoController).Name | Select-String Nvidia)) {
+  if ($nvCurrentVersion -lt $nvLatestVersion){
+    if (!(Test-Path -Path $nvSrc)) {
+      Write-Host "####### Downloading Nvidia Driver... #######" -ForegroundColor Blue
+      New-Item -Type Directory -Path $nvTempDir
+      (New-Object System.Net.WebClient).DownloadFile($nvRemote,$nvSrc)
+    }
 
-if ($nvCurrentVersion -lt $nvLatestVersion){
-  if (!(Test-Path -Path $nvSrc)) {
-    Write-Host "####### Downloading Nvidia Driver... #######" -ForegroundColor Blue
-    New-Item -Type Directory -Path $nvTempDir
-    (New-Object System.Net.WebClient).DownloadFile($nvRemote,$nvSrc)
+    if (!(Test-Path -Path $nvSrcUnzipPath)) {
+      Write-Host "####### Extracting Nvidia Driver... #######" -ForegroundColor Blue
+      Start-Process 7z.exe -ArgumentList "x $nvSrc `"-o$($nvDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
+    }
+
+    Write-Host "####### Installing Nvidia Driver... #######" -ForegroundColor Blue
+    $nvInstallArgs = "-passive -noreboot -noeula -clean -s"
+    Start-Process -FilePath $nvSrcUnzipPath -ArgumentList $nvInstallArgs -Wait
+
+    if (Test-Path -Path $nvTempDir) {
+      Remove-Item -Path $nvTempDir -Recurse -ErrorAction SilentlyContinue -Force
+    }
+    Write-Host "####### Nvidia Driver installed successfully. #######" -ForegroundColor Green
   }
-
-  if (!(Test-Path -Path $nvSrcUnzipPath)) {
-    Write-Host "####### Extracting Nvidia Driver... #######" -ForegroundColor Blue
-    Start-Process 7z.exe -ArgumentList "x $nvSrc `"-o$($nvDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
-  }
-
-  Write-Host "####### Installing Nvidia Driver... #######" -ForegroundColor Blue
-  $nvInstallArgs = "-passive -noreboot -noeula -clean -s"
-  Start-Process -FilePath $nvSrcUnzipPath -ArgumentList $nvInstallArgs -Wait
-
-  if (Test-Path -Path $nvTempDir) {
-    Remove-Item -Path $nvTempDir -Recurse -ErrorAction SilentlyContinue -Force
-  }
+  Write-Host "####### Nvidia Driver is already up to date. #######" -ForegroundColor Green
+} else {
+    Write-Host "####### There was no any Nvidia Card found. #######" -ForegroundColor DarkMagenta
+    exit
 }
