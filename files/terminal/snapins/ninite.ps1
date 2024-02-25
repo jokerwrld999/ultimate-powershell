@@ -28,5 +28,5 @@ while ($true) {
 
 if ((Test-Path -Path $niniteTempPath)) {
   Write-Host "####### Cleaning $niniteTempPath... #######" -ForegroundColor Blue
-  Remove-Item -Path $niniteTempPath -Recurse -ErrorAction SilentlyContinue -Force
+  Remove-Item -Path $niniteTempPath -Recurse -Force
 }
