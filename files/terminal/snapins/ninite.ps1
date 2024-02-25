@@ -1,5 +1,5 @@
 $jobName = "InstallNinite"
-$niniteTempPath= "C:\Ninite_Temp"
+$niniteTempPath= "C:\NiniteTemp"
 $niniteAppsSource = "$niniteTempPath\niniteN.exe"
 $niniteAppsRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/snapins/ninite/niniteN.exe"
 $niniteAppsInstalled = "C:\Program Files (x86)\Notepad++\notepad++.exe"
@@ -12,7 +12,7 @@ if (!(Test-Path -Path $niniteTempPath)) {
 
 Write-Host "####### Installing Ninite Apps... #######" -ForegroundColor Blue
 Start-Job -Name $jobName -ScriptBlock {
-  Start-Process -WindowStyle hidden -FilePath "C:\Ninite_Temp\niniteN.exe" -Wait
+  Start-Process -WindowStyle hidden -FilePath "C:\NiniteTemp\niniteN.exe" -Wait
 } | Out-Null
 
 while ($true) {
