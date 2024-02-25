@@ -32,5 +32,4 @@ if ([bool]((Get-CimInstance win32_VideoController).Name | Select-String Nvidia))
   Write-Host "####### Nvidia Driver is already up to date. #######" -ForegroundColor Green
 } else {
     Write-Host "####### There was no any Nvidia Card found. #######" -ForegroundColor DarkMagenta
-    break
 }
