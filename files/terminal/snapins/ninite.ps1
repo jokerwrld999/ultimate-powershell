@@ -17,10 +17,11 @@ Start-Job -Name $jobName -ScriptBlock {
 
 while ($true) {
   if ((Test-Path -Path $niniteAppsInstalled)) {
-    Get-Process Ninite | Stop-Process
+    Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
     Stop-Job -Name $jobName
     Remove-Job -Name $jobName
     Remove-Item -Path $niniteTempPath -Recurse -ErrorAction SilentlyContinue -Force
+    Write-Host "####### Ninite Apps installed successfully. #######" -ForegroundColor Green
     break
   }
   Start-Sleep 3
