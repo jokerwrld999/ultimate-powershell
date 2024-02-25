@@ -220,14 +220,13 @@ function speedtest ()
   & speedtest.exe --accept-license
 }
 
-function Restart-Remote {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/pwsh_scripts/rebootRemotely.ps1" | Invoke-Expression}
+function Restart-Remote {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/scripts/rebootRemotely.ps1" | Invoke-Expression}
 
-function Copy-SshPublicKey {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/pwsh_scripts/sshCopyID.ps1" | Invoke-Expression}
+function Copy-SshPublicKey {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/scripts/sshCopyID.ps1" | Invoke-Expression}
 
 #######################################################
 # IMPORT MODULES
 #######################################################
-Import-Module -UseWindowsPowerShell -Name AppX *>$null
 Import-Module -Name Terminal-Icons
 Import-Module -Name PSReadLine
 Set-PSReadLineOption -EditMode Emacs

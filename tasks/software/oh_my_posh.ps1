@@ -12,10 +12,10 @@ $profile7ScriptsPath = "$profile7Path\Scripts"
 $profileName = "profile.ps1"
 $profile5Source = "$profile5Path\$profileName"
 $profile7Source = "$profile7Path\$profileName"
-$profile5RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell5_profile.ps1"
-$profile7RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/PowerShell7_profile.ps1"
-$sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/SFTA.ps1"
-$wakeOnLanRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/pwsh_scripts/wakeOnLan.ps1"
+$profile5RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/profiles/PowerShell5_profile.ps1"
+$profile7RemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/profiles/PowerShell7_profile.ps1"
+$sftaRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/scripts/SFTA.ps1"
+$wakeOnLanRemoteScript = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/scripts/wakeOnLan.ps1"
 
 function Get-UriHash {
   param(
