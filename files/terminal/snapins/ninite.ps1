@@ -20,9 +20,13 @@ while ($true) {
     Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
     Stop-Job -Name $jobName
     Remove-Job -Name $jobName
-    Remove-Item -Path $niniteTempPath -Recurse -ErrorAction SilentlyContinue -Force
     Write-Host "####### Ninite Apps installed successfully. #######" -ForegroundColor Green
     break
   }
   Start-Sleep 3
+}
+
+if ((Test-Path -Path $niniteTempPath)) {
+  Write-Host "####### Cleaning... #######" -ForegroundColor Blue
+  Remove-Item -Path $niniteTempPath -Recurse -ErrorAction SilentlyContinue -Force
 }
