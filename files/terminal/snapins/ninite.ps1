@@ -1,5 +1,5 @@
 $jobName = "InstallNinite"
-$niniteTempPath= "C:\NiniteTemp"
+$niniteTempPath= "C:\Ninite_Temp"
 $niniteAppsSource = "$niniteTempPath\niniteN.exe"
 $niniteAppsRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/snapins/ninite/niniteN.exe"
 $niniteAppsInstalled = "C:\Program Files (x86)\Notepad++\notepad++.exe"
@@ -27,6 +27,6 @@ while ($true) {
 }
 
 if ((Test-Path -Path $niniteTempPath)) {
-  Write-Host "####### Cleaning... #######" -ForegroundColor Blue
+  Write-Host "####### Cleaning $niniteTempPath... #######" -ForegroundColor Blue
   Remove-Item -Path $niniteTempPath -Recurse -ErrorAction SilentlyContinue -Force
 }
