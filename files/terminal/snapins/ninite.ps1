@@ -11,7 +11,7 @@ if (!(Test-Path -Path $niniteTempPath)) {
 
 Write-Host "####### Installing Ninite Apps... #######" -ForegroundColor Blue
 Start-Job -Name $jobName -ScriptBlock {
-  Start-Process -WindowStyle hidden -FilePath "C:\NiniteTemp\niniteN.exe"
+  Start-Process -WindowStyle hidden -FilePath "C:\NiniteTemp\niniteN.exe" -Wait
 } | Out-Null
 
 while ($true) {
@@ -23,4 +23,3 @@ while ($true) {
   }
   Start-Sleep 3
 }
-

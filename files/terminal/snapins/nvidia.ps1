@@ -6,6 +6,7 @@ $nvDestUnzipPath = "$nvTempDir\$nvLatestVersion-Driver"
 $nvSrcUnzipPath = "$nvDestUnzipPath\setup.exe"
 $7zipRemote = "https://www.7-zip.org/a/7z2301-x64.exe"
 $7zipSrc = "$nvTempDir\7zip.exe"
+$7zipExe = "Get-Command 7z | Select-Object -ExpandProperty Definition"
 
 if ([bool]((Get-CimInstance win32_VideoController).Name | Select-String Nvidia)) {
   $nvGetVersion = (Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.devicename -like "*nvidia*" -and $_.devicename -notlike "*audio*"}).DriverVersion | Select-Object -Last 1 | Out-String
@@ -26,7 +27,7 @@ if ([bool]((Get-CimInstance win32_VideoController).Name | Select-String Nvidia))
       }
 
       Write-Host "####### Extracting Nvidia Driver... #######" -ForegroundColor Blue
-      Start-Process 7z.exe -ArgumentList "x $nvSrc `"-o$($nvDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
+      Start-Process $7zipExe -ArgumentList "x $nvSrc `"-o$($nvDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
     }
 
     Write-Host "####### Installing Nvidia Driver... #######" -ForegroundColor Blue
@@ -42,4 +43,3 @@ if ([bool]((Get-CimInstance win32_VideoController).Name | Select-String Nvidia))
 } else {
     Write-Host "####### There was no any Nvidia Card found. #######" -ForegroundColor DarkMagenta
 }
-
