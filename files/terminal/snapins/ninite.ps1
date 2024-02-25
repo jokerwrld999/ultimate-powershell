@@ -2,7 +2,7 @@ $jobName = "InstallNinite"
 $niniteTempPath= "C:\NiniteTemp"
 $niniteAppsSource = "$niniteTempPath\niniteN.exe"
 $niniteAppsRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/snapins/ninite/niniteN.exe"
-$niniteAppsInstalled = "$env:programfiles\Notepad++\notepad++.exe"
+$niniteAppsInstalled = "C:\Program Files (x86)\Notepad++\notepad++.exe"
 
 if (!(Test-Path -Path $niniteTempPath)) {
   Write-Host "####### Downloading Ninite Apps... #######" -ForegroundColor Blue
