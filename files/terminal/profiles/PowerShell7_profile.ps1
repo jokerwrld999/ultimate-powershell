@@ -109,11 +109,11 @@ function Edit-Profile {
 Remove-Variable identity
 Remove-Variable principal
 
-function checkcommand {
+function which {
   param($command)
   $oldPreference = $ErrorActionPreference
   $ErrorActionPreference = 'SilentlyContinue'
-  try { if (Get-Command $command) { return $true } }
+  try { if (Get-Command $command) { return Get-Command $command | Select-Object -ExpandProperty Definition } }
   catch { Write-Host "$command does not exist"; return $false }
   finally { $ErrorActionPreference = $oldPreference }
 }
@@ -197,10 +197,6 @@ function df {
 
 function sed ($file,$find,$replace) {
   (Get-Content $file).Replace("$find",$replace) | Set-Content $file
-}
-
-function which ($name) {
-  Get-Command $name | Select-Object -ExpandProperty Definition
 }
 
 function export ($name,$value) {
