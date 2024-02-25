@@ -18,6 +18,7 @@ while ($true) {
   if (((Get-Job -Name $jobName).State -eq "Completed")) {
     Get-Process Ninite | Stop-Process
     Remove-Job -Name $jobName
+    Remove-Item -Path $niniteTempPath -Recurse -ErrorAction SilentlyContinue -Force
     break
   }
   Start-Sleep 3
