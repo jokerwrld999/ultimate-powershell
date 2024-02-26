@@ -8,7 +8,7 @@ $7zipRemote = "https://www.7-zip.org/a/7z2301-x64.exe"
 $7zipSrc = "$nvTempDir\7zip.exe"
 $7zipExe = "$env:programfiles\7-Zip\7z.exe"
 
-if ([bool]((Get-CimInstance win32_VideoController).Name | Select-String Nvidia)) {
+if ([bool]((Get-WmiObject win32_VideoController).PNPDeviceID | Select-String "VEN_10DE")) {
   $nvGetVersion = (Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.devicename -like "*nvidia*" -and $_.devicename -notlike "*audio*"}).DriverVersion | Select-Object -Last 1 | Out-String
   $nvCurrentVersion = ($nvGetVersion | Select-String -Pattern '.{7}$').Matches.Value.Replace(".","").Insert(3,'.').Trim()
 
