@@ -18,7 +18,8 @@ Start-Job -Name $jobName -ScriptBlock {
 while ($true) {
   if ((Test-Path -Path $niniteAppsInstalled)) {
     Start-Sleep 60
-    Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
+    taskkill.exe /IM "Ninite.exe" /F /FI "STATUS eq RUNNING"
+    # Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
     Stop-Job -Name $jobName
     Remove-Job -Name $jobName
     Write-Host "####### Ninite Apps installed successfully. #######" -ForegroundColor Green
