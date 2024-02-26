@@ -1,6 +1,19 @@
+# Checking latest driver version. Thanks to "https://github.com/lord-carlos/nvidia-update"
+$uri = 'https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php' +
+'?func=DriverManualLookup' +
+'&psid=120' + # Geforce RTX 30 Series
+'&pfid=929' +  # RTX 3080
+'&osID=57' + # Windows 10 64bit
+'&languageCode=1033' + # en-US; seems to be "Windows Locale ID"[1] in decimal
+'&isWHQL=1' + # WHQL certified
+'&dch=1' + # DCH drivers (the new standard)
+'&sort1=0' + # sort: most recent first(?)
+'&numberOfResults=1' # single, most recent result is enough
+$response = Invoke-WebRequest -Uri $uri -Method GET -UseBasicParsing
+$payload = $response.Content | ConvertFrom-Json
+$nvLatestVersion =  $payload.IDS[0].downloadInfo.Version
 $nvTempDir = "C:\NvidiaTemp"
 $nvSrc = "$nvTempDir\driver.exe"
-$nvLatestVersion = "551.61"
 $nvRemote = "https://uk.download.nvidia.com/Windows/$nvLatestVersion/$nvLatestVersion-desktop-win10-win11-64bit-international-dch-whql.exe"
 $nvDestUnzipPath = "$nvTempDir\$nvLatestVersion-Driver"
 $nvSrcUnzipPath = "$nvDestUnzipPath\setup.exe"
