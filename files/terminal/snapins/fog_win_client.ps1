@@ -1,15 +1,22 @@
-$fogTempDir = "C:\fogtemp"
+$fogTempDir = "C:\FogTemp"
 $fogMsiPath = "$fogTempDir\fog.msi"
 $fogInstalledPath = "C:\Program Files (x86)\FOG\FOGService.exe"
-$fogserver = "10.2.252.200"
+$fogServerIP = "10.2.252.200"
+$fogServiceName = "*Fog*"
 
-if (!(Test-Path $fogMsiPath)) {
-  New-Item -Type Directory -Path $fogTempDir
-  if (!(Test-Path $fogInstalledPath)) {
-    (New-Object System.Net.WebClient).DownloadFile("http://$fogserver/fog/client/download.php?newclient",$fogMsiPath)
-    Start-Process msiexec.exe "/i $fogMsiPath /quiet /norestart /qn USETRAY=`"0`" WEBADDRESS=`"$fogserver`"" -Wait
+
+if (!(Test-Path $fogInstalledPath)) {
+  if (!(Test-Path $fogMsiPath)) {
+    New-Item -Type Directory -Path $fogTempDir
   }
-  Get-Service "*Fog*" |  Set-Service -Status Running -StartupType Automatic
-  Get-Service "*Fog*" | Start-Service
+  (New-Object System.Net.WebClient).DownloadFile("http://$fogServerIP/fog/client/download.php?newclient",$fogMsiPath)
+  Start-Process msiexec.exe "/i $fogMsiPath /quiet /norestart /qn USETRAY=`"0`" WEBADDRESS=`"$fogServerIP`"" -Wait
+}
+
+if ((get-Service "*Fog*").Status -ne "Running") {
+  Get-Service $fogServiceName | Set-Service -Status Running -StartupType Automatic
+}
+
+if (Test-Path $fogTempDir) {
   Remove-Item -Path $fogTempDir -Recurse -ErrorAction SilentlyContinue -Force
 }
