@@ -1,8 +1,8 @@
 $jobName = "InstallNinite"
 $niniteTempPath= "C:\NiniteTemp"
 $niniteAppsSource = "$niniteTempPath\NiniteApps.exe"
-$niniteAppsRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/snapins/ninite/niniteN.exe"
-$niniteAppsInstalled = "C:\Program Files (x86)\Notepad++\notepad++.exe"
+$niniteAppsRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/terminal/snapins/ninite/NiniteApps.exe"
+$niniteAppsInstalled = "C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 if (!(Test-Path -Path $niniteTempPath)) {
   Write-Host "####### Downloading Ninite Apps... #######" -ForegroundColor Blue
@@ -17,13 +17,14 @@ Start-Job -Name $jobName -ScriptBlock {
 
 while ($true) {
   if ((Test-Path -Path $niniteAppsInstalled)) {
+    Start-Sleep 60
     Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
     Stop-Job -Name $jobName
     Remove-Job -Name $jobName
     Write-Host "####### Ninite Apps installed successfully. #######" -ForegroundColor Green
     break
   }
-  Start-Sleep 3
+  Start-Sleep 120
 }
 
 if ((Test-Path -Path $niniteTempPath)) {
