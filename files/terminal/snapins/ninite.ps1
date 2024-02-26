@@ -19,6 +19,7 @@ while ($true) {
   if ((Test-Path -Path $niniteAppsInstalled)) {
     Start-Sleep 60
     taskkill.exe /IM "Ninite.exe" /F
+    taskkill.exe /IM "NiniteApps.exe" /F
     # Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
     Stop-Job -Name $jobName
     Remove-Job -Name $jobName
