@@ -7,7 +7,7 @@ $fogServiceName = "*Fog*"
 
 if (!(Test-Path $fogInstalledPath)) {
   if (!(Test-Path $fogMsiPath)) {
-    New-Item -Type Directory -Path $fogTempDir
+    New-Item -Type Directory -Path $fogTempDir | Out-Null
   }
   (New-Object System.Net.WebClient).DownloadFile("http://$fogServerIP/fog/client/download.php?newclient",$fogMsiPath)
   Start-Process msiexec.exe "/i $fogMsiPath /quiet /norestart /qn USETRAY=`"0`" WEBADDRESS=`"$fogServerIP`"" -Wait

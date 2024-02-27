@@ -28,7 +28,7 @@ if ([bool]((Get-WmiObject win32_VideoController).PNPDeviceID | Select-String "VE
   if ($nvCurrentVersion -lt $nvLatestVersion){
     if (!(Test-Path -Path $nvSrc)) {
       Write-Host "####### Downloading Nvidia Driver... #######" -ForegroundColor Blue
-      New-Item -Type Directory -Path $nvTempDir
+      New-Item -Type Directory -Path $nvTempDir | Out-Null
       (New-Object System.Net.WebClient).DownloadFile($nvRemote,$nvSrc)
     }
 
