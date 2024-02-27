@@ -3,12 +3,14 @@ $hpDriverTempDir = "C:\HpTemp"
 $hpDriverSrc = "$hpDriverTempDir\chipset.exe"
 $hpDestUnzipPath = "$hpDriverTempDir\Chipset"
 
-if (!(Test-Path -Path $hpDriverTempDir)) {
-  New-Item -Type Directory -Path $hpDriverTempDir
+if (!(Test-Path -Path $hpDriverSrc)) {
+  if (!(Test-Path -Path $hpDriverTempDir)) {
+    New-Item -Type Directory -Path $hpDriverTempDir
+  }
+  Write-Host "####### Downloading HP Chipset Driver... #######" -ForegroundColor Blue
+  (New-Object System.Net.WebClient).DownloadFile($hpDriverRemote,$hpDriverSrc)
 }
 
-Write-Host "####### Downloading HP Chipset Driver... #######" -ForegroundColor Blue
-(New-Object System.Net.WebClient).DownloadFile($hpDriverRemote,$hpDriverSrc)
 
 Start-Process -FilePath $hpDriverSrc -ArgumentList "/f $hpDestUnzipPath" -Wait
 
