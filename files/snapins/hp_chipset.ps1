@@ -26,8 +26,14 @@ if (!(Test-Path -Path $hpDriverSrc)) {
   Start-Process $7zipExe -ArgumentList "x $hpSrcUnzipPath `"-o$($hpDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
 }
 
-Write-Host "####### Installing HP Chipset Driver... #######" -ForegroundColor Blue
-Start-Process -FilePath $hpDriverSrc -ArgumentList "/S" -Wait
+$hpChipsetDriverID = "$(pnputil /enum-devices /problem | Select-String 'VEN_8086')"
+if ([bool]$hpChipsetDriverID) {
+  Write-Host "####### Installing HP Chipset Driver... #######" -ForegroundColor Blue
+  Start-Process -FilePath $hpDriverSrc -ArgumentList "/S" -Wait
+} else {
+    Write-Host "####### HP Chipset Driver has been already installed. #######" -ForegroundColor Green
+}
+
 
 if (Test-Path -Path $hpDriverSrc) {
   Remove-Item -Path $hpDriverTempDir -Recurse -Force
