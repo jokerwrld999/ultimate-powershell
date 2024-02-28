@@ -29,7 +29,7 @@ if (!(Test-Path -Path $hpDriverSrc)) {
 $hpChipsetDriverID = "$(pnputil /enum-devices /problem | Select-string 'VEN_8086&DEV_8D3D&SUBSYS_212A103C')"
 if ([bool]$hpChipsetDriverID) {
   Write-Host "####### Installing HP IntelME Driver... #######" -ForegroundColor Blue
-  Start-Process -FilePath $hpDriverSrc -ArgumentList "/S" -Wait
+  Start-Process -FilePath $hpDriverSrc -ArgumentList "-overwrite -s" -Wait
 } else {
     Write-Host "####### HP IntelME Driver has been already installed. #######" -ForegroundColor Green
 }
