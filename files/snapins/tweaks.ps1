@@ -33,7 +33,7 @@ $packagesToRemove = @(
   'Microsoft.ScreenSketch'
   'Microsoft.SkypeApp'
   'Microsoft.Todos'
-  'Microsoft.Windows.Photos'
+  # 'Microsoft.Windows.Photos'
   'Microsoft.WindowsAlarms'
   'Microsoft.Wallet'
   'Microsoft.Whiteboard'
