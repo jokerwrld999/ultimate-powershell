@@ -33,7 +33,7 @@ if ([bool]((Get-WmiObject win32_VideoController).PNPDeviceID | Select-String "VE
     }
 
     if (!(Test-Path -Path $nvSrcUnzipPath)) {
-      if (![bool](Get-Command 7z -ErrorAction SilentlyContinue)) {
+      if (!(Test-Path -Path $7zipExe) -and ![bool](Get-Command 7z -ErrorAction SilentlyContinue)) {
           Write-Host "####### Installing 7zip... #######" -ForegroundColor Blue
           (New-Object System.Net.WebClient).DownloadFile($7zipRemote,$7zipSrc)
           Start-Process -FilePath $7zipSrc -ArgumentList "/S" -Wait

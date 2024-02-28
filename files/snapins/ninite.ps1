@@ -20,7 +20,6 @@ while ($true) {
     Start-Sleep 60
     taskkill.exe /IM "Ninite.exe" /F
     taskkill.exe /IM "NiniteApps.exe" /F
-    # Get-Process Ninite -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
     Stop-Job -Name $jobName
     Remove-Job -Name $jobName
     Write-Host "####### Ninite Apps installed successfully. #######" -ForegroundColor Green

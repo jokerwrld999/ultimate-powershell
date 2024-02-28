@@ -18,7 +18,7 @@ if (!(Test-Path -Path $hpDriverSrc)) {
 }
 
 if (!(Test-Path -Path $hpDriverSrc)) {
-  if (![bool](Get-Command 7z -ErrorAction SilentlyContinue)) {
+  if (!(Test-Path -Path $7zipExe) -and ![bool](Get-Command 7z -ErrorAction SilentlyContinue)) {
       Write-Host "####### Installing 7zip... #######" -ForegroundColor Blue
       (New-Object System.Net.WebClient).DownloadFile($7zipRemote,$7zipSrc)
       Start-Process -FilePath $7zipSrc -ArgumentList "/S" -Wait
