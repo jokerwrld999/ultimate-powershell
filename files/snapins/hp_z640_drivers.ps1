@@ -5,19 +5,19 @@ $7zipSrc = "$hpDriverTempDir\7zip.exe"
 $7zipExe = "$env:programfiles\7-Zip\7z.exe"
 $drivers = @(
   @{ Name = "Intel Rapid Storage Technology";
-    installSwitches = "/S"
+    hpDriverID = "";
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelRST(sp96420).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\rst.exe";
     hpDestUnzipPath = "$hpDriverTempDir\RST";
-    hpDriverSrc = "$hpDestUnzipPath\Setup.exe";
-    hpChipsetDriverID = "";
+    hpDriverSrc = "$($driver.hpDestUnzipPath)\Setup.exe";
+    installSwitches = "/S"
   },
   @{ Name = "Intel Management Engine";
     hpDriverID = "$(pnputil /enum-devices /problem | Select-string 'VEN_8086&DEV_8D3D&SUBSYS_212A103C')";
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelME(sp74499).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\intelME.exe";
     hpDestUnzipPath = "$hpDriverTempDir\IntelME";
-    hpDriverSrc = "$hpDestUnzipPath\SetupME.exe";
+    hpDriverSrc = "$($driver.hpDestUnzipPath)\SetupME.exe";
     installSwitches = "-overwrite -s"
   },
   @{ Name = "Intel Chipset";
@@ -25,7 +25,7 @@ $drivers = @(
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/Chipset(sp101759).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\chipset.exe";
     hpDestUnzipPath = "$hpDriverTempDir\Chipset";
-    hpDriverSrc = "$hpDestUnzipPath\SetupChipset.exe";
+    hpDriverSrc = "$($hpDestUnzipPath)\SetupChipset.exe";
     installSwitches = "/S"
   }
 )
