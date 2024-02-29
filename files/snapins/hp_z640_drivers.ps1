@@ -18,7 +18,7 @@ $drivers = @(
     hpSrcUnzipPath = "$hpDriverTempDir\intelME.exe";
     hpDestUnzipPath = "$hpDriverTempDir\IntelME";
     hpDriverExe = "SetupME.exe";
-    installSwitches = "-overwrite -s"
+    installSwitches = "-overwrite -noIMSS -s"
   },
   @{ Name = "Intel Chipset";
     hpDriverID = "$(pnputil /enum-devices /problem | Select-String 'VEN_8086')";
