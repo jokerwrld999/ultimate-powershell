@@ -5,7 +5,6 @@ $7zipSrc = "$hpDriverTempDir\7zip.exe"
 $7zipExe = "$env:programfiles\7-Zip\7z.exe"
 $drivers = @(
   @{ Name = "Intel Rapid Storage Technology";
-    # hpDriverID = "";
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelRST(sp96420).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\rst.exe";
     hpDestUnzipPath = "$hpDriverTempDir\RST";
@@ -51,7 +50,6 @@ foreach ($driver in $drivers) {
       Write-Host "####### Extracting HP $($driver.Name) Driver... #######" -ForegroundColor Blue
       Start-Process $7zipExe -ArgumentList "x $($driver.hpSrcUnzipPath) `"-o$($driver.hpDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
     }
-    Write-Host "DRIversrc: $($driver.hpDestUnzipPath)\$($driver.hpDriverExe)" -ForegroundColor DarkYellow
     Write-Host "####### Installing HP $($driver.Name) Driver... #######" -ForegroundColor Blue
     Start-Process -FilePath "$($driver.hpDestUnzipPath)\$($driver.hpDriverExe)" -ArgumentList $driver.installSwitches -Wait
   } else {
@@ -59,6 +57,6 @@ foreach ($driver in $drivers) {
   }
 }
 
-# if (Test-Path -Path $hpDriverExe) {
-#   Remove-Item -Path $hpDriverTempDir -Recurse -Force
-# }
+if (Test-Path -Path $hpDriverExe) {
+  Remove-Item -Path $hpDriverTempDir -Recurse -Force
+}

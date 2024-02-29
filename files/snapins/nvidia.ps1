@@ -23,7 +23,7 @@ $7zipExe = "$env:programfiles\7-Zip\7z.exe"
 
 if ([bool]((Get-WmiObject win32_VideoController).PNPDeviceID | Select-String "VEN_10DE")) {
   $nvGetVersion = (Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.devicename -like "*nvidia*" -and $_.devicename -notlike "*audio*"}).DriverVersion | Select-Object -Last 1 | Out-String
-  $nvCurrentVersion = ($nvGetVersion | Select-String -Pattern '.{7}$').Matches.Value.Replace(".","").Insert(3,'.').Trim()
+  $nvCurrentVersion = ($($nvGetVersion) | Select-String -Pattern '.{7}$').Matches.Value.Replace(".","").Insert(3,'.').Trim()
 
   if ($nvCurrentVersion -lt $nvLatestVersion){
     if (!(Test-Path -Path $nvSrc)) {
