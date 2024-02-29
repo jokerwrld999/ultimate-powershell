@@ -1,5 +1,5 @@
-$hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelME(sp74499).exe"
 $hpDriverTempDir = "C:\HpTemp"
+$hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelME(sp74499).exe"
 $hpSrcUnzipPath = "$hpDriverTempDir\intelME.exe"
 $hpDestUnzipPath = "$hpDriverTempDir\IntelME"
 $hpDriverSrc = "$hpDestUnzipPath\SetupME.exe"

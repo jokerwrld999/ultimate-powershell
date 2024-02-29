@@ -1,5 +1,5 @@
-$hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/Chipset(sp101759).exe"
 $hpDriverTempDir = "C:\HpTemp"
+$hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/Chipset(sp101759).exe"
 $hpSrcUnzipPath = "$hpDriverTempDir\chipset.exe"
 $hpDestUnzipPath = "$hpDriverTempDir\Chipset"
 $hpDriverSrc = "$hpDestUnzipPath\SetupChipset.exe"
