@@ -51,7 +51,7 @@ foreach ($driver in $drivers) {
       Write-Host "####### Extracting HP $($driver.Name) Driver... #######" -ForegroundColor Blue
       Start-Process $7zipExe -ArgumentList "x $($driver.hpSrcUnzipPath) `"-o$($driver.hpDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
     }
-    Write-Debug "DRIversrc: $($driver.hpDriverSRC)"
+    Write-Host "DRIversrc: $($driver.hpDriverSrc)" -ForegroundColor DarkYellow
     Write-Host "####### Installing HP $($driver.Name) Driver... #######" -ForegroundColor Blue
     Start-Process -FilePath $driver.hpDriverSrc -ArgumentList $driver.installSwitches -Wait
   } else {
