@@ -1,4 +1,5 @@
 $hpDriverTempDir = "C:\HpTemp"
+$intelRSTExe = "C:\Program Files (x86)\Intel\Intel(R) Rapid Storage Technology enterprise\IAStorUI.exe"
 $7zipRemote = "https://www.7-zip.org/a/7z2301-x64.exe"
 $7zipSrc = "$hpDriverTempDir\7zip.exe"
 $7zipExe = "$env:programfiles\7-Zip\7z.exe"
@@ -40,7 +41,7 @@ if (!(Test-Path -Path $7zipExe) -and ![bool](Get-Command 7z -ErrorAction Silentl
 }
 
 foreach ($driver in $drivers) {
-  if ([bool]$driver.hpDriverID -or $driver.Name -eq "Intel Rapid Storage Technology") {
+  if ([bool]$driver.hpDriverID -or !(Test-Path -Path $intelRSTExe)) {
     if (!(Test-Path -Path $driver.hpDriverSrc)) {
       Write-Host "####### Downloading HP $($driver.Name) Driver... #######" -ForegroundColor Blue
       (New-Object System.Net.WebClient).DownloadFile($driver.hpDriverRemote,$driver.hpSrcUnzipPath)
@@ -52,7 +53,7 @@ foreach ($driver in $drivers) {
     }
 
     Write-Host "####### Installing HP $($driver.Name) Driver... #######" -ForegroundColor Blue
-    Start-Process -FilePath $hpDriverSrc -ArgumentList $driver.installSwitches -Wait
+    Start-Process -FilePath $driver.hpDriverSrc -ArgumentList $driver.installSwitches -Wait
   } else {
       Write-Host "####### HP $($driver.Name) Driver has been already installed. #######" -ForegroundColor Green
   }
