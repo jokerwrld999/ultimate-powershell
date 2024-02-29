@@ -10,7 +10,7 @@ $drivers = @(
     hpSrcUnzipPath = "$hpDriverTempDir\rst.exe";
     hpDestUnzipPath = "$hpDriverTempDir\RST";
     hpDriverSrc = "$($driver.hpDestUnzipPath)\Setup.exe";
-    installSwitches = "/S"
+    installSwitches = "-notray -s"
   },
   @{ Name = "Intel Management Engine";
     hpDriverID = "$(pnputil /enum-devices /problem | Select-string 'VEN_8086&DEV_8D3D&SUBSYS_212A103C')";
@@ -25,8 +25,8 @@ $drivers = @(
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/Chipset(sp101759).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\chipset.exe";
     hpDestUnzipPath = "$hpDriverTempDir\Chipset";
-    hpDriverSrc = "$($hpDestUnzipPath)\SetupChipset.exe";
-    installSwitches = "/S"
+    hpDriverSrc = "$($driver.hpDestUnzipPath)\SetupChipset.exe";
+    installSwitches = "-s -norestart"
   }
 )
 
@@ -51,7 +51,7 @@ foreach ($driver in $drivers) {
       Write-Host "####### Extracting HP $($driver.Name) Driver... #######" -ForegroundColor Blue
       Start-Process $7zipExe -ArgumentList "x $($driver.hpSrcUnzipPath) `"-o$($driver.hpDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
     }
-
+    Write-Debug "DRIversrc: $($driver.hpDriverSRC)"
     Write-Host "####### Installing HP $($driver.Name) Driver... #######" -ForegroundColor Blue
     Start-Process -FilePath $driver.hpDriverSrc -ArgumentList $driver.installSwitches -Wait
   } else {
