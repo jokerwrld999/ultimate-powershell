@@ -9,7 +9,7 @@ $drivers = @(
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelRST(sp96420).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\rst.exe";
     hpDestUnzipPath = "$hpDriverTempDir\RST";
-    hpDriverSrc = "$($driver.hpDestUnzipPath)\Setup.exe";
+    hpDriverExe = "Setup.exe";
     installSwitches = "-notray -s"
   },
   @{ Name = "Intel Management Engine";
@@ -17,7 +17,7 @@ $drivers = @(
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelME(sp74499).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\intelME.exe";
     hpDestUnzipPath = "$hpDriverTempDir\IntelME";
-    hpDriverSrc = "$($driver.hpDestUnzipPath)\SetupME.exe";
+    hpDriverExe = "SetupME.exe";
     installSwitches = "-overwrite -s"
   },
   @{ Name = "Intel Chipset";
@@ -25,7 +25,7 @@ $drivers = @(
     hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/Chipset(sp101759).exe";
     hpSrcUnzipPath = "$hpDriverTempDir\chipset.exe";
     hpDestUnzipPath = "$hpDriverTempDir\Chipset";
-    hpDriverSrc = "$($driver.hpDestUnzipPath)\SetupChipset.exe";
+    hpDriverExe = "SetupChipset.exe";
     installSwitches = "-s -norestart"
   }
 )
@@ -42,23 +42,23 @@ if (!(Test-Path -Path $7zipExe) -and ![bool](Get-Command 7z -ErrorAction Silentl
 
 foreach ($driver in $drivers) {
   if ([bool]$driver.hpDriverID -or !(Test-Path -Path $intelRSTExe)) {
-    if (!(Test-Path -Path $driver.hpDriverSrc)) {
+    if (!(Test-Path -Path "$($driver.hpDestUnzipPath)\$($driver.hpDriverExe)")) {
       Write-Host "####### Downloading HP $($driver.Name) Driver... #######" -ForegroundColor Blue
       (New-Object System.Net.WebClient).DownloadFile($driver.hpDriverRemote,$driver.hpSrcUnzipPath)
     }
 
-    if (!(Test-Path -Path $driver.hpDriverSrc)) {
+    if (!(Test-Path -Path "$($driver.hpDestUnzipPath)\$($driver.hpDriverExe)")) {
       Write-Host "####### Extracting HP $($driver.Name) Driver... #######" -ForegroundColor Blue
       Start-Process $7zipExe -ArgumentList "x $($driver.hpSrcUnzipPath) `"-o$($driver.hpDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
     }
-    Write-Host "DRIversrc: $($driver.hpDriverSrc)" -ForegroundColor DarkYellow
+    Write-Host "DRIversrc: $($driver.hpDestUnzipPath)\$($driver.hpDriverExe)" -ForegroundColor DarkYellow
     Write-Host "####### Installing HP $($driver.Name) Driver... #######" -ForegroundColor Blue
-    Start-Process -FilePath $driver.hpDriverSrc -ArgumentList $driver.installSwitches -Wait
+    Start-Process -FilePath "$($driver.hpDestUnzipPath)\$($driver.hpDriverExe)" -ArgumentList $driver.installSwitches -Wait
   } else {
       Write-Host "####### HP $($driver.Name) Driver has been already installed. #######" -ForegroundColor Green
   }
 }
 
-# if (Test-Path -Path $hpDriverSrc) {
+# if (Test-Path -Path $hpDriverExe) {
 #   Remove-Item -Path $hpDriverTempDir -Recurse -Force
 # }
