@@ -6,10 +6,10 @@ $7zipExe = "$env:programfiles\7-Zip\7z.exe"
 $drivers = @(
   @{ Name = "Intel Rapid Storage Technology";
     installSwitches = "/S"
-    hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/Chipset(sp101759).exe";
-    hpSrcUnzipPath = "$hpDriverTempDir\chipset.exe";
-    hpDestUnzipPath = "$hpDriverTempDir\Chipset";
-    hpDriverSrc = "$hpDestUnzipPath\SetupChipset.exe";
+    hpDriverRemote = "https://github.com/jokerwrld999/ultimate-powershell/raw/main/files/snapins/hp/IntelRST(sp96420).exe";
+    hpSrcUnzipPath = "$hpDriverTempDir\rst.exe";
+    hpDestUnzipPath = "$hpDriverTempDir\RST";
+    hpDriverSrc = "$hpDestUnzipPath\Setup.exe";
     hpChipsetDriverID = "";
   },
   @{ Name = "Intel Management Engine";
