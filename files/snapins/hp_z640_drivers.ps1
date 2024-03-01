@@ -61,6 +61,6 @@ foreach ($driver in $drivers) {
   }
 }
 
-if (Test-Path -Path $hpDriverExe) {
-  Remove-Item -Path $hpDriverTempDir -Recurse -Force
+if (Test-Path -Path $driver.hpDriverExe) {
+  Remove-Item -Path $driver.hpDriverTempDir -Recurse -Force
 }
