@@ -28,7 +28,10 @@ scoop update * *> $null
 
 $applications = @(
   @{ Name = "Firefox"; Id = "extras/firefox" },
-  @{ Name = "Google Chrome"; Id = "googlechrome" }
+  @{ Name = "Foxit Reader"; Id = "extras/foxit-reader" },
+  @{ Name = "Google Chrome"; Id = "extras/googlechrome" },
+  @{ Name = "Slack"; Id = "extras/slack" },
+  @{ Name = "Notepad++"; Id = "extras/notepadplusplus" }
 )
 
 foreach ($app in $applications) {
