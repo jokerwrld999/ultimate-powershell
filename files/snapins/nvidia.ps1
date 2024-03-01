@@ -40,9 +40,8 @@ if ([bool]((Get-WmiObject win32_VideoController).PNPDeviceID | Select-String "VE
       }
 
       Write-Host "####### Extracting Nvidia Driver... #######" -ForegroundColor Blue
-      if (!(Test-Path -Path $7zipExe)){
+      if (Test-Path -Path $7zipExe){
         Start-Process $7zipExe -ArgumentList "x $nvSrc `"-o$($nvDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
-
       } else {
           Start-Process 7z -ArgumentList "x $nvSrc `"-o$($nvDestUnzipPath)`" -y -bso0 -bd" -NoNewWindow -Wait
       }
