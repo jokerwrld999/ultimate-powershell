@@ -1,5 +1,10 @@
 #Requires -RunAsAdministrator
 
+$ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
+if ($ExecutionPolicy -ne "RemoteSigned") {
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+}
+
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -ForegroundColor Blue
   Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin"
