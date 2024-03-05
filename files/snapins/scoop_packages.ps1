@@ -13,7 +13,7 @@ $CurrentValue=[Environment]::GetEnvironmentVariable('PSModulePath','Machine')
 
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Scoop Module..." -ForegroundColor Blue
-  iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+  iex "(new-object net.webclient).downloadstring('https://get.scoop.sh') -RunAsAdmin"
   # Invoke-Expression "& {$(Invoke-RestMethod get.scoop.sh)} -RunAsAdmin"
 }
 
