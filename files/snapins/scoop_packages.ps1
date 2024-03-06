@@ -10,18 +10,18 @@ if ($ExecutionPolicy -ne "RemoteSigned") {
 
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -ForegroundColor Blue
-  Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin"
+  Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin -ScoopDir 'C:\Scoop'"
+  scoop install gsudo git scoop-search *> $null
 }
 
-$scoopAppsBucket = 'Scoop-Apps'
-if (!(scoop bucket list | Select-String $scoopAppsBucket)) {
-  Write-Host "Setting Scoop Apps Custom Bucket" -ForegroundColor Blue
-  scoop install gsudo git scoop-search *> $null
-  scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core' *> $null
-  scoop bucket add 'Base' *> $null
-  [Environment]::SetEnvironmentVariable('SCOOP',"$env:UserProfile\scoop",'User')
-  scoop update *> $null
-}
+# $scoopAppsBucket = 'Scoop-Apps'
+# if (!(scoop bucket list | Select-String $scoopAppsBucket)) {
+#   Write-Host "Setting Scoop Apps Custom Bucket" -ForegroundColor Blue
+#   scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core' *> $null
+#   scoop bucket add 'Base' *> $null
+#   [Environment]::SetEnvironmentVariable('SCOOP',"$env:UserProfile\scoop",'User')
+#   scoop update *> $null
+# }
 
 $buckets = @('main','extras')
 foreach ($bucket in $buckets) {
