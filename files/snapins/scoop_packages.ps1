@@ -11,6 +11,7 @@ if ($ExecutionPolicy -ne "RemoteSigned") {
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -ForegroundColor Blue
   Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin -ScoopDir 'C:\Scoop' -ScoopGlobalDir `"$env:ProgramData\scoop`""
+  [Environment]::SetEnvironmentVariable('SCOOP',"C:\Scoop\scoop",'Machine')
   scoop install gsudo git scoop-search -g *> $null
 }
 
@@ -19,7 +20,6 @@ if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
 #   Write-Host "Setting Scoop Apps Custom Bucket" -ForegroundColor Blue
 #   scoop config SCOOP_REPO 'https://github.com/Ash258/Scoop-Core' *> $null
 #   scoop bucket add 'Base' *> $null
-#   [Environment]::SetEnvironmentVariable('SCOOP',"$env:UserProfile\scoop",'User')
 #   scoop update *> $null
 # }
 
