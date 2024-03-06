@@ -9,8 +9,8 @@ if ($ExecutionPolicy -ne "RemoteSigned") {
 }
 
 
-# # $env:SCOOP_GLOBAL='c:\GlobalScoopApps'
-# # [Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
+$env:SCOOP_GLOBAL="$env:ProgramData\GlobalScoopApps"
+[Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
 $env:SCOOP="$env:ProgramData\Scoop"
 [Environment]::SetEnvironmentVariable('SCOOP', $env:SCOOP, 'MACHINE')
 $Reg='Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environment'
@@ -24,7 +24,7 @@ $CurrentValue=[Environment]::GetEnvironmentVariable('PSModulePath','Machine')
 
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -ForegroundColor Blue
-  Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin -ScoopDir 'C:\Scoop' -ScoopGlobalDir `"$env:ProgramData\scoop`""
+  Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin"
   scoop install gsudo git scoop-search -g *> $null
 }
 
