@@ -10,8 +10,8 @@ if ($ExecutionPolicy -ne "RemoteSigned") {
 
 if (![bool](Get-Command -Name 'scoop' -ErrorAction SilentlyContinue)) {
   Write-Host "Installing Scoop Module..." -ForegroundColor Blue
-  Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin -ScoopDir 'C:\Scoop'"
-  scoop install gsudo git scoop-search *> $null
+  Invoke-Expression "& {$(Invoke-RestMethod 'https://get.scoop.sh')} -RunAsAdmin -ScoopDir 'C:\Scoop' -ScoopGlobalDir `"$env:ProgramData\scoop`""
+  scoop install gsudo git scoop-search -g *> $null
 }
 
 # $scoopAppsBucket = 'Scoop-Apps'
