@@ -1,5 +1,8 @@
 #Requires -RunAsAdministrator
 
+Write-Host "Current User: $(whoami)"
+Write-Host "Current Work Dir: $(pwd)"
+
 $ExecutionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($ExecutionPolicy -ne "RemoteSigned") {
   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
