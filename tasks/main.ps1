@@ -1,3 +1,6 @@
+# >>> Installing Nvidia Drivers
+Write-Host "####### Installing Nvidia Drivers....... #######" -ForegroundColor Cyan
+Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/tasks/system_setup/nvidia.ps1" | Invoke-Expression
 
 # >>> Running Tweaks
 Write-Host "####### Running Tweaks....... #######" -ForegroundColor Cyan
