@@ -216,7 +216,7 @@ function speedtest ()
   & speedtest.exe --accept-license
 }
 
-function Restart-Remote {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/scripts/rebootRemotely.ps1" | Invoke-Expression}
+function Restart-Remote {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/scripts/remote_power_mgmt.ps1" | Invoke-Expression}
 
 function Copy-SshPublicKey {Invoke-RestMethod "https://raw.githubusercontent.com/jokerwrld999/ultimate-powershell/main/files/terminal/scripts/sshCopyID.ps1" | Invoke-Expression}
 
